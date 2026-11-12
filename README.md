@@ -81,3 +81,33 @@ Captain/
 ### 5. `swagger/` (API Documentation)
 * **Spesifikasi**: OpenAPI 3.0 Standard (`openapi.json`).
 * **Akses Langsung**: `http://localhost:8080/swagger`
+
+---
+
+## 🌐 Live Vercel Production Deployments
+
+Seluruh modul frontend telah terdeploy secara resmi di Vercel:
+
+| Aplikasi | Lingkup / Role | URL Produksi Vercel | Status |
+| :--- | :--- | :--- | :--- |
+| **Merchant Dashboard** | Portal Merchant (Live & Sandbox) | [bpg-dashboard-coral.vercel.app](https://bpg-dashboard-coral.vercel.app) | 🟢 Live (200 OK) |
+| **Super Admin Portal** | Dev Ops, Gas Watcher & Circuit Breaker | [bpg-admin.vercel.app](https://bpg-admin.vercel.app) | 🟢 Live (200 OK) |
+| **Customer Checkout & Sandbox** | Checkout Widget & Simulator | [bpg-sandbox.vercel.app](https://bpg-sandbox.vercel.app) | 🟢 Live (200 OK) |
+
+---
+
+## 🐳 Panduan Deployment VPS (Backend Go & PostgreSQL)
+
+Untuk menjalankan Backend Go daemon & indexer blockchain di server VPS:
+
+```bash
+# 1. Clone repository di VPS
+git clone https://github.com/gonzhilaz/bpg.git
+cd bpg
+
+# 2. Jalankan Backend & PostgreSQL dengan Docker Compose
+docker compose up -d
+
+# 3. Verifikasi log container
+docker compose logs -f backend
+```
