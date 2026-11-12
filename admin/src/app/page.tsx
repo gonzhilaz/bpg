@@ -12,6 +12,8 @@ import { HotWalletGasCard } from "../components/admin/HotWalletGasCard";
 import { WatcherHealthCard } from "../components/admin/WatcherHealthCard";
 import { MerchantControlTable } from "../components/admin/MerchantControlTable";
 import { NetworkGasMatrixCard } from "../components/admin/NetworkGasMatrixCard";
+import { PlatformFinancialReportCard } from "../components/admin/PlatformFinancialReportCard";
+import { DatabaseHealthCard } from "../components/admin/DatabaseHealthCard";
 
 export default function AdminPage() {
   return (
@@ -77,16 +79,22 @@ export default function AdminPage() {
         {/* 1. Platform Metrics & Emergency Switch */}
         <PlatformMetricsCard metrics={mockPlatformMetrics} />
 
-        {/* 2. On-Chain Gas & Live Coin Price Matrix */}
+        {/* 2. Platform Revenue & Financial Ledger */}
+        <PlatformFinancialReportCard />
+
+        {/* 3. On-Chain Gas & Live Coin Price Matrix */}
         <NetworkGasMatrixCard rates={mockNetworkGasList} />
 
-        {/* 3. Hot Wallet Gas Reserves */}
+        {/* 4. Hot Wallet Gas Reserves */}
         <HotWalletGasCard wallets={mockHotWallets} />
 
-        {/* 4. Multi-Chain Watcher Indexers */}
+        {/* 5. Database Health & Pruning Maintenance */}
+        <DatabaseHealthCard />
+
+        {/* 6. Multi-Chain Watcher Indexers */}
         <WatcherHealthCard watchers={mockWatchers} />
 
-        {/* 5. Merchant Control Table */}
+        {/* 7. Merchant Control Table */}
         <MerchantControlTable initialMerchants={mockMerchantsList} />
       </main>
     </div>

@@ -28,3 +28,4 @@ func (h *RateHandler) GetGasRates(c *gin.Context) {
 	}
 	response.Success(c, http.StatusOK, "Network gas rates retrieved successfully", rates)
 }
+

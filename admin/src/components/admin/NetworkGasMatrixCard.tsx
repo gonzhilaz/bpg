@@ -96,3 +96,4 @@ export function NetworkGasMatrixCard({ rates = mockNetworkGasList }: Props) {
     </div>
   );
 }
+

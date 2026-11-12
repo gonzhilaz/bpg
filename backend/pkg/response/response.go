@@ -62,3 +62,13 @@ func Unauthorized(c *gin.Context, message string) {
 	Error(c, http.StatusUnauthorized, message, nil)
 }
 
+// Forbidden helper
+func Forbidden(c *gin.Context, message string) {
+	Error(c, http.StatusForbidden, message, nil)
+}
+
+// ValidationError helper
+func ValidationError(c *gin.Context, err any) {
+	Error(c, http.StatusBadRequest, "Validation failed", err)
+}
+

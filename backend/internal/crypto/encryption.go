@@ -82,3 +82,35 @@ func DecryptAESGCM(cipherHex string, secretKey string) (string, error) {
 	return string(plaintext), nil
 }
 
+// HashSHA256 computes a hex-encoded SHA-256 digest of any string
+func HashSHA256(input string) string {
+	digest := sha256.Sum256([]byte(input))
+	return hex.EncodeToString(digest[:])
+}
+
+// GenerateSecureAPIKey generates a CSPRNG-grade API key, its SHA-256 hash, and a safe prefix
+func GenerateSecureAPIKey(env string) (rawKey string, hash string, prefixDisplay string, err error) {
+	bytes := make([]byte, 24)
+	if _, err := rand.Read(bytes); err != nil {
+		return "", "", "", fmt.Errorf("failed to generate random bytes: %w", err)
+	}
+	prefix := "cap_live"
+	if env == "test" || env == "sandbox" {
+		prefix = "cap_test"
+	}
+	rawKey = fmt.Sprintf("%s_%s", prefix, hex.EncodeToString(bytes))
+	hash = HashSHA256(rawKey)
+	prefixDisplay = rawKey[:12] + "..."
+	return rawKey, hash, prefixDisplay, nil
+}
+
+// GenerateSecureSecretKey generates a 32-byte hex HMAC secret
+func GenerateSecureSecretKey() (string, error) {
+	bytes := make([]byte, 32)
+	if _, err := rand.Read(bytes); err != nil {
+		return "", fmt.Errorf("failed to generate random secret: %w", err)
+	}
+	return "sec_" + hex.EncodeToString(bytes), nil
+}
+
+

@@ -13,6 +13,7 @@ import (
 	"gorm.io/gorm"
 
 	"captain-gateway/configs"
+	"captain-gateway/internal/crypto"
 	"captain-gateway/internal/domain"
 	"captain-gateway/internal/handler"
 	"captain-gateway/internal/middleware"
@@ -67,9 +68,11 @@ func main() {
 
 	// Initialize Handlers
 	healthHandler := handler.NewHealthHandler()
-	merchantHandler := handler.NewMerchantHandler(merchantRepo)
 	invoiceHandler := handler.NewInvoiceHandler(invoiceSvc)
 	rateHandler := handler.NewRateHandler(rateSvc)
+	authSvc := service.NewAuthService(merchantRepo, cfg.JWTSecret)
+	authHandler := handler.NewAuthHandler(authSvc)
+	adminHandler := handler.NewAdminHandler(db, merchantRepo, invoiceRepo, payoutSvc)
 
 	// Setup Router
 	r := gin.New()
@@ -90,8 +93,18 @@ func main() {
 	// API Routes
 	v1 := r.Group("/api/v1")
 	{
-		// Merchant Registration
-		v1.POST("/merchants/register", merchantHandler.Register)
+		// Authentication (Self-service merchant onboarding & login)
+		authRoutes := v1.Group("/auth")
+		{
+			authRoutes.POST("/register", authHandler.Register)
+			authRoutes.POST("/login", authHandler.Login)
+			authProtected := authRoutes.Group("/")
+			authProtected.Use(middleware.JWTAuth(cfg.JWTSecret, merchantRepo))
+			{
+				authProtected.GET("/me", authHandler.Me)
+				authProtected.POST("/regenerate-key", authHandler.RegenerateKey)
+			}
+		}
 
 		// Public Checkout Endpoints (for Customer Payment Screens)
 		v1.GET("/invoices/:id", invoiceHandler.GetByID)
@@ -100,7 +113,20 @@ func main() {
 		// Sandbox Simulation Endpoint (for dev/testing)
 		v1.POST("/invoices/simulate-payment", invoiceHandler.SimulatePayment)
 
-		// Protected Merchant Endpoints
+		// Financial Reports (Public or session-scoped summary)
+		v1.GET("/reports/financial", adminHandler.GetFinancialReports)
+
+		// Platform Dev & DevOps Admin Routes
+		adminRoutes := v1.Group("/admin")
+		{
+			adminRoutes.GET("/database/health", adminHandler.GetDatabaseHealth)
+			adminRoutes.POST("/database/prune", adminHandler.PruneExpiredInvoices)
+			adminRoutes.POST("/sweeps/manual", adminHandler.TriggerManualSweep)
+			adminRoutes.GET("/merchants", adminHandler.ListMerchants)
+			adminRoutes.PUT("/merchants/:id/status", adminHandler.UpdateMerchantStatus)
+		}
+
+		// Protected Merchant Invoicing (API Key Auth)
 		authorized := v1.Group("/")
 		authorized.Use(middleware.APIKeyAuth(merchantRepo))
 		{
@@ -150,14 +176,20 @@ func seedDefaultMerchant(db *gorm.DB) {
 	db.Model(&domain.Merchant{}).Count(&count)
 	if count == 0 {
 		defaultMerchant := domain.Merchant{
+			Email:                "demo@captain.local",
 			Name:                 "Captain Demo Store",
+			Role:                 "admin",
+			Status:               "ACTIVE",
 			APIKey:               "cap_demo_api_key_12345678",
+			APIKeyHash:           crypto.HashSHA256("cap_demo_api_key_12345678"),
+			APIKeyPrefix:         "cap_demo_...",
 			SecretKey:            "cap_demo_secret_key_87654321",
 			PayoutAddressBSC:     "0x71C8A3951F6b4d3E118bFE7c251d18fF2113f019",
 			PayoutAddressPolygon: "0x71C8A3951F6b4d3E118bFE7c251d18fF2113f019",
 			PayoutAddressTron:    "TYUKBQ1AHuC6U1Qj88J7sE5FzW7xJg9vEa",
 			PayoutAddressSolana:  "7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU",
 			AutoPayoutEnabled:   true,
+			FeePayer:             "customer",
 			WebhookURL:          "http://localhost:3000/api/webhooks/crypto",
 		}
 		db.Create(&defaultMerchant)

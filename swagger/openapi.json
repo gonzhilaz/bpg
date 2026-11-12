@@ -2,8 +2,8 @@
   "openapi": "3.0.3",
   "info": {
     "title": "Captain Crypto Payment Gateway API",
-    "description": "High-performance non-custodial crypto payment gateway inspired by OxaPay. Supports dynamic ephemeral deposit addresses, auto-payout to cold wallets, multi-chain indexers (BSC, Polygon, TRON, Solana), and cryptographic HMAC webhooks.",
-    "version": "1.0.0"
+    "description": "High-performance non-custodial crypto payment gateway sekelas OxaPay. Supports dynamic ephemeral deposit addresses, auto-forwarding & manual sweeps to cold wallets, multi-chain indexers (BSC, Polygon, TRON, Solana), fee payer configurations (customer surcharge vs merchant absorbed), SHA-256 hashed API keys, and cryptographic HMAC webhooks.",
+    "version": "1.2.0"
   },
   "servers": [
     {
@@ -17,49 +17,93 @@
         "summary": "Health Check",
         "description": "Returns operational status and uptime of the gateway",
         "responses": {
-          "200": {
-            "description": "System operational",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResponse"
-                }
-              }
-            }
-          }
+          "200": { "description": "System operational" }
         }
       }
     },
-    "/api/v1/merchants/register": {
+    "/api/v1/auth/register": {
       "post": {
-        "summary": "Register Merchant",
-        "description": "Create a new merchant profile and generate API credentials & payout addresses",
+        "summary": "Merchant Registration (Reveal Once API Key)",
+        "description": "Registers a new merchant with password hashing (Bcrypt) and generates a unique CSPRNG-grade API key (shown only once).",
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/RegisterMerchantRequest"
+                "type": "object",
+                "required": ["email", "password", "name"],
+                "properties": {
+                  "email": { "type": "string", "format": "email", "example": "merchant@store.com" },
+                  "password": { "type": "string", "minLength": 6, "example": "SuperSecretPass123" },
+                  "name": { "type": "string", "example": "My Crypto Store" }
+                }
               }
             }
           }
         },
         "responses": {
-          "201": {
-            "description": "Merchant registered successfully"
+          "201": { "description": "Registered successfully with raw API key" }
+        }
+      }
+    },
+    "/api/v1/auth/login": {
+      "post": {
+        "summary": "Merchant & Admin Login",
+        "description": "Authenticates credentials and sets secure HttpOnly JWT session cookie.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email", "password"],
+                "properties": {
+                  "email": { "type": "string", "example": "merchant@store.com" },
+                  "password": { "type": "string", "example": "SuperSecretPass123" }
+                }
+              }
+            }
           }
+        },
+        "responses": {
+          "200": { "description": "JWT session token returned" }
+        }
+      }
+    },
+    "/api/v1/auth/me": {
+      "get": {
+        "summary": "Get Authenticated Profile",
+        "description": "Returns current merchant profile from JWT session",
+        "security": [{ "BearerAuth": [] }],
+        "responses": {
+          "200": { "description": "Current merchant details" }
+        }
+      }
+    },
+    "/api/v1/auth/regenerate-key": {
+      "post": {
+        "summary": "Regenerate API Key",
+        "description": "Rotates merchant API credentials and returns a new raw key (revealed once).",
+        "security": [{ "BearerAuth": [] }],
+        "responses": {
+          "200": { "description": "New API Key generated" }
+        }
+      }
+    },
+    "/api/v1/rates/gas": {
+      "get": {
+        "summary": "Live Coin Prices & Gas Surcharge Matrix",
+        "description": "Returns real-time ticker prices (BNB, POL, TRX, SOL) and estimated sweep gas fees per network.",
+        "responses": {
+          "200": { "description": "List of network gas metrics and live USD coin prices" }
         }
       }
     },
     "/api/v1/invoices": {
       "post": {
         "summary": "Create Invoice",
-        "description": "Generates a new invoice with a unique dedicated deposit address",
-        "security": [
-          {
-            "ApiKeyAuth": []
-          }
-        ],
+        "description": "Generates a new invoice with a dedicated ephemeral deposit address and calculates fee surcharge based on fee_payer.",
+        "security": [{ "ApiKeyAuth": [] }],
         "requestBody": {
           "required": true,
           "content": {
@@ -71,9 +115,7 @@
           }
         },
         "responses": {
-          "201": {
-            "description": "Invoice created successfully with deposit address"
-          }
+          "201": { "description": "Invoice created successfully with deposit address" }
         }
       }
     },
@@ -86,23 +128,18 @@
             "name": "id",
             "in": "path",
             "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
+            "schema": { "type": "string", "format": "uuid" }
           }
         ],
         "responses": {
-          "200": {
-            "description": "Invoice details and payment status"
-          }
+          "200": { "description": "Invoice details and payment status" }
         }
       }
     },
     "/api/v1/invoices/simulate-payment": {
       "post": {
-        "summary": "Simulate Payment (Sandbox)",
-        "description": "Simulates on-chain transaction to test automatic status transition, auto-payout, and webhooks",
+        "summary": "Simulate Payment (Sandbox Simulator)",
+        "description": "Simulates on-chain deposit to trigger status update, auto-payout, and HMAC webhook dispatch.",
         "requestBody": {
           "required": true,
           "content": {
@@ -114,9 +151,60 @@
           }
         },
         "responses": {
-          "200": {
-            "description": "Payment simulated successfully"
+          "200": { "description": "Payment simulated successfully" }
+        }
+      }
+    },
+    "/api/v1/admin/sweeps/manual": {
+      "post": {
+        "summary": "Trigger Manual Sweep",
+        "description": "Manually sweeps funds from deposit address to merchant cold wallet if automated sweep was delayed.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["invoice_id"],
+                "properties": {
+                  "invoice_id": { "type": "string", "format": "uuid" }
+                }
+              }
+            }
           }
+        },
+        "responses": {
+          "200": { "description": "Manual sweep transfer recorded" }
+        }
+      }
+    },
+    "/api/v1/admin/database/health": {
+      "get": {
+        "summary": "Database Pool & Storage Health",
+        "description": "Returns active connection pool metrics, table counts, and driver mode.",
+        "responses": {
+          "200": { "description": "Database metrics" }
+        }
+      }
+    },
+    "/api/v1/admin/database/prune": {
+      "post": {
+        "summary": "Prune Expired Invoices",
+        "description": "Deletes expired invoice records older than N days (default 7).",
+        "parameters": [
+          { "name": "days", "in": "query", "schema": { "type": "integer", "default": 7 } }
+        ],
+        "responses": {
+          "200": { "description": "Pruned count returned" }
+        }
+      }
+    },
+    "/api/v1/reports/financial": {
+      "get": {
+        "summary": "Financial Revenue & Ledger Reports",
+        "description": "Returns audited gross volume, platform fee revenue (0.4%), gas expended, and net profit.",
+        "responses": {
+          "200": { "description": "Financial accounting summary" }
         }
       }
     }
@@ -127,30 +215,14 @@
         "type": "apiKey",
         "in": "header",
         "name": "X-API-KEY"
+      },
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
       }
     },
     "schemas": {
-      "ApiResponse": {
-        "type": "object",
-        "properties": {
-          "success": { "type": "boolean" },
-          "message": { "type": "string" },
-          "data": { "type": "object" },
-          "error": { "type": "string", "nullable": true }
-        }
-      },
-      "RegisterMerchantRequest": {
-        "type": "object",
-        "required": ["name"],
-        "properties": {
-          "name": { "type": "string", "example": "My E-Commerce Store" },
-          "payout_address_bsc": { "type": "string", "example": "0x71C8A3951F6b4d3E118bFE7c251d18fF2113f019" },
-          "payout_address_polygon": { "type": "string", "example": "0x71C8A3951F6b4d3E118bFE7c251d18fF2113f019" },
-          "payout_address_tron": { "type": "string", "example": "TYUKBQ1AHuC6U1Qj88J7sE5FzW7xJg9vEa" },
-          "payout_address_solana": { "type": "string", "example": "7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU" },
-          "webhook_url": { "type": "string", "example": "https://myshop.com/api/crypto-callback" }
-        }
-      },
       "CreateInvoiceRequest": {
         "type": "object",
         "required": ["order_id", "amount", "currency", "pay_currency", "pay_network"],
@@ -160,6 +232,7 @@
           "currency": { "type": "string", "example": "USD" },
           "pay_currency": { "type": "string", "example": "USDT" },
           "pay_network": { "type": "string", "enum": ["BSC", "POLYGON", "TRON", "SOLANA"], "example": "TRON" },
+          "fee_payer": { "type": "string", "enum": ["customer", "merchant"], "default": "customer", "example": "customer" },
           "callback_url": { "type": "string", "example": "https://myshop.com/webhooks/crypto" },
           "custom_expiry_min": { "type": "integer", "example": 30 }
         }
@@ -178,4 +251,3 @@
     }
   }
 }
-

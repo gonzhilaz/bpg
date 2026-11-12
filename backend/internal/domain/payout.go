@@ -14,6 +14,7 @@ type PayoutType string
 const (
 	PayoutTypeInstant PayoutType = "INSTANT_PAYOUT"
 	PayoutTypeBatch   PayoutType = "BATCH_SWEEP"
+	PayoutTypeManual  PayoutType = "MANUAL_SWEEP"
 )
 
 // PayoutStatus represents payout state

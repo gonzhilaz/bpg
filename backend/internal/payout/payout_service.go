@@ -15,6 +15,7 @@ import (
 // PayoutService orchestrates instant auto-payout from Master Hot Wallet to merchant cold wallet
 type PayoutService interface {
 	ProcessAutoPayout(ctx context.Context, invoice *domain.Invoice) (*domain.PayoutTransfer, error)
+	ProcessManualSweep(ctx context.Context, invoice *domain.Invoice) (*domain.PayoutTransfer, error)
 }
 
 type payoutService struct {
@@ -28,6 +29,15 @@ func NewPayoutService(payoutRepo repository.PayoutRepository) PayoutService {
 
 // ProcessAutoPayout forwards confirmed payment immediately to merchant's external wallet
 func (s *payoutService) ProcessAutoPayout(ctx context.Context, invoice *domain.Invoice) (*domain.PayoutTransfer, error) {
+	return s.executeSweep(ctx, invoice, domain.PayoutTypeInstant)
+}
+
+// ProcessManualSweep forces a manual sweep on an invoice
+func (s *payoutService) ProcessManualSweep(ctx context.Context, invoice *domain.Invoice) (*domain.PayoutTransfer, error) {
+	return s.executeSweep(ctx, invoice, domain.PayoutTypeManual)
+}
+
+func (s *payoutService) executeSweep(ctx context.Context, invoice *domain.Invoice, pType domain.PayoutType) (*domain.PayoutTransfer, error) {
 	if invoice == nil {
 		return nil, fmt.Errorf("invoice is nil")
 	}
@@ -37,27 +47,28 @@ func (s *payoutService) ProcessAutoPayout(ctx context.Context, invoice *domain.I
 		return nil, nil
 	}
 
-	// Calculate net payout amount (e.g. 0.4% platform fee like OxaPay, or 100% net)
-	// For self-hosted platform, default is 100% forward to merchant
 	payoutAmount := invoice.ReceivedAmount
+	if payoutAmount.IsZero() {
+		payoutAmount = invoice.PayAmount
+	}
 
 	payoutRecord := &domain.PayoutTransfer{
 		InvoiceID:        invoice.ID,
 		Network:          invoice.PayNetwork,
-		PayoutTxHash:     fmt.Sprintf("0xpayout_%s_%s", invoice.PayNetwork, uuid.New().String()[:8]),
+		PayoutTxHash:     fmt.Sprintf("0xsweep_%s_%s", invoice.PayNetwork, uuid.New().String()[:8]),
 		RecipientAddress: invoice.PayoutAddress,
 		AmountSent:       payoutAmount,
-		NetworkFeePaid:   decimal.NewFromFloat(0.02), // Estimated gas fee
-		PayoutType:       domain.PayoutTypeInstant,
+		NetworkFeePaid:   decimal.NewFromFloat(0.02),
+		PayoutType:       pType,
 		Status:           domain.PayoutStatusCompleted,
 	}
 
 	if err := s.payoutRepo.Create(ctx, payoutRecord); err != nil {
-		return nil, fmt.Errorf("failed to record auto-payout: %w", err)
+		return nil, fmt.Errorf("failed to record sweep payout: %w", err)
 	}
 
-	log.Printf("[PAYOUT SUCCESS] Forwarded %s %s to %s for invoice %s (Tx: %s)",
-		payoutAmount.String(), invoice.PayCurrency, invoice.PayoutAddress, invoice.ID, payoutRecord.PayoutTxHash)
+	log.Printf("[SWEEP SUCCESS] Swept %s %s to %s for invoice %s (Tx: %s, Type: %s)",
+		payoutAmount.String(), invoice.PayCurrency, invoice.PayoutAddress, invoice.ID, payoutRecord.PayoutTxHash, pType)
 
 	return payoutRecord, nil
 }
