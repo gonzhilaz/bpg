@@ -15,14 +15,16 @@ import (
 	"captain-gateway/internal/domain"
 	"captain-gateway/internal/handler"
 	"captain-gateway/internal/middleware"
+	"captain-gateway/internal/payout"
 	"captain-gateway/internal/repository"
 	"captain-gateway/internal/service"
+	"captain-gateway/internal/webhook"
 )
 
 func setupTestRouter(t *testing.T) (*gin.Engine, *gorm.DB) {
 	gin.SetMode(gin.TestMode)
 
-	db, err := gorm.Open(sqlite.Open(":memory:"), &gorm.Config{})
+	db, err := gorm.Open(sqlite.Open("file::memory:?cache=shared"), &gorm.Config{})
 	if err != nil {
 		t.Fatalf("failed to open in-memory db: %v", err)
 	}
@@ -42,12 +44,18 @@ func setupTestRouter(t *testing.T) (*gin.Engine, *gorm.DB) {
 	merchantRepo := repository.NewMerchantRepository(db)
 	invoiceRepo := repository.NewInvoiceRepository(db)
 	txRepo := repository.NewTransactionRepository(db)
+	payoutRepo := repository.NewPayoutRepository(db)
 
 	rateSvc := service.NewRateService()
+	payoutSvc := payout.NewPayoutService(payoutRepo)
+	dispatcher := webhook.NewDispatcher()
+
 	invoiceSvc := service.NewInvoiceService(
 		invoiceRepo,
 		txRepo,
 		rateSvc,
+		payoutSvc,
+		dispatcher,
 		"test-encryption-key-32bytes-long!",
 		30,
 	)
@@ -90,7 +98,7 @@ func TestHealthEndpoint(t *testing.T) {
 }
 
 func TestCreateAndPayInvoice(t *testing.T) {
-	r, _ := setupTestRouter(t)
+	r, db := setupTestRouter(t)
 
 	// 1. Create Invoice on BSC
 	createPayload := service.CreateInvoiceRequest{
@@ -165,5 +173,15 @@ func TestCreateAndPayInvoice(t *testing.T) {
 
 	if checkResp.Data.Status != domain.StatusPaid {
 		t.Fatalf("expected invoice status PAID, got %s", checkResp.Data.Status)
+	}
+
+	// 5. Verify Payout Transfer Record was automatically created
+	var payouts []domain.PayoutTransfer
+	db.Where("invoice_id = ?", invoice.ID).Find(&payouts)
+	if len(payouts) == 0 {
+		t.Fatal("expected auto-payout record to be created in database")
+	}
+	if payouts[0].Status != domain.PayoutStatusCompleted {
+		t.Fatalf("expected payout status COMPLETED, got %s", payouts[0].Status)
 	}
 }

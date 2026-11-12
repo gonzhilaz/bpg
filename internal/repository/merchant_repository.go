@@ -58,3 +58,4 @@ func (r *merchantRepository) GetByAPIKey(ctx context.Context, apiKey string) (*d
 func (r *merchantRepository) Update(ctx context.Context, merchant *domain.Merchant) error {
 	return r.db.WithContext(ctx).Save(merchant).Error
 }
+

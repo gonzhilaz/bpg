@@ -11,7 +11,9 @@ import (
 
 	"captain-gateway/internal/crypto"
 	"captain-gateway/internal/domain"
+	"captain-gateway/internal/payout"
 	"captain-gateway/internal/repository"
+	"captain-gateway/internal/webhook"
 )
 
 // CreateInvoiceRequest defines payload for creating a new invoice
@@ -51,27 +53,33 @@ type InvoiceService interface {
 }
 
 type invoiceService struct {
-	invRepo   repository.InvoiceRepository
-	txRepo    repository.TransactionRepository
-	rateSvc   RateService
-	secretKey string
-	expiryMin int
+	invRepo    repository.InvoiceRepository
+	txRepo     repository.TransactionRepository
+	rateSvc    RateService
+	payoutSvc  payout.PayoutService
+	dispatcher webhook.Dispatcher
+	secretKey  string
+	expiryMin  int
 }
 
-// NewInvoiceService creates a new invoice service
+// NewInvoiceService creates a new invoice service with payout and webhook integration
 func NewInvoiceService(
 	invRepo repository.InvoiceRepository,
 	txRepo repository.TransactionRepository,
 	rateSvc RateService,
+	payoutSvc payout.PayoutService,
+	dispatcher webhook.Dispatcher,
 	secretKey string,
 	expiryMin int,
 ) InvoiceService {
 	return &invoiceService{
-		invRepo:   invRepo,
-		txRepo:    txRepo,
-		rateSvc:   rateSvc,
-		secretKey: secretKey,
-		expiryMin: expiryMin,
+		invRepo:    invRepo,
+		txRepo:     txRepo,
+		rateSvc:    rateSvc,
+		payoutSvc:  payoutSvc,
+		dispatcher: dispatcher,
+		secretKey:  secretKey,
+		expiryMin:  expiryMin,
 	}
 }
 
@@ -80,13 +88,11 @@ func (s *invoiceService) CreateInvoice(ctx context.Context, merchant *domain.Mer
 		return nil, errors.New("merchant is required")
 	}
 
-	// 1. Convert requested fiat amount to exact crypto amount
 	payAmount, err := s.rateSvc.ConvertToCrypto(ctx, req.Amount, req.Currency, req.PayCurrency)
 	if err != nil {
 		return nil, fmt.Errorf("failed to calculate crypto rate: %w", err)
 	}
 
-	// 2. Resolve merchant destination payout address based on network
 	var payoutAddress string
 	switch req.PayNetwork {
 	case domain.NetworkBSC:
@@ -101,7 +107,6 @@ func (s *invoiceService) CreateInvoice(ctx context.Context, merchant *domain.Mer
 		return nil, fmt.Errorf("unsupported network: %s", req.PayNetwork)
 	}
 
-	// 3. Generate unique deposit address and encrypt private key with AES-256-GCM
 	wallet, err := crypto.GenerateDepositWallet(req.PayNetwork, s.secretKey)
 	if err != nil {
 		return nil, fmt.Errorf("failed to generate deposit wallet: %w", err)
@@ -151,7 +156,6 @@ func (s *invoiceService) GetInvoice(ctx context.Context, id uuid.UUID) (*Invoice
 		return nil, errors.New("invoice not found")
 	}
 
-	// Check if expired
 	if invoice.Status == domain.StatusPending && time.Now().After(invoice.ExpiresAt) {
 		invoice.Status = domain.StatusExpired
 		_ = s.invRepo.Update(ctx, invoice)
@@ -169,7 +173,6 @@ func (s *invoiceService) RecordPayment(ctx context.Context, depositAddress strin
 		return nil, fmt.Errorf("no invoice found for address: %s", depositAddress)
 	}
 
-	// Record raw transaction
 	txRecord := &domain.BlockchainTransaction{
 		InvoiceID:     invoice.ID,
 		Network:       network,
@@ -184,20 +187,33 @@ func (s *invoiceService) RecordPayment(ctx context.Context, depositAddress strin
 	}
 	_ = s.txRepo.Create(ctx, txRecord)
 
-	// Update received amount
 	invoice.ReceivedAmount = invoice.ReceivedAmount.Add(amount)
 
 	now := time.Now()
-	// Determine status: PAID, UNDERPAID, or OVERPAID
+	var eventName string
 	if invoice.ReceivedAmount.GreaterThanOrEqual(invoice.PayAmount) {
 		invoice.Status = domain.StatusPaid
 		invoice.PaidAt = &now
+		eventName = "invoice.paid"
 	} else {
 		invoice.Status = domain.StatusUnderpaid
+		eventName = "invoice.underpaid"
 	}
 
 	if err := s.invRepo.Update(ctx, invoice); err != nil {
 		return nil, err
+	}
+
+	// 1. Trigger Auto-Payout if PAID and Merchant has auto-payout enabled
+	if invoice.Status == domain.StatusPaid && s.payoutSvc != nil {
+		go func(inv *domain.Invoice) {
+			_, _ = s.payoutSvc.ProcessAutoPayout(context.Background(), inv)
+		}(invoice)
+	}
+
+	// 2. Dispatch HMAC-Signed Webhook to Merchant callback URL
+	if s.dispatcher != nil && invoice.Merchant != nil {
+		s.dispatcher.DispatchInvoiceEvent(ctx, invoice, invoice.Merchant.SecretKey, eventName)
 	}
 
 	return invoice, nil

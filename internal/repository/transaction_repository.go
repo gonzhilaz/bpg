@@ -52,3 +52,4 @@ func (r *transactionRepository) GetByInvoiceID(ctx context.Context, invoiceID uu
 func (r *transactionRepository) Update(ctx context.Context, tx *domain.BlockchainTransaction) error {
 	return r.db.WithContext(ctx).Save(tx).Error
 }
+

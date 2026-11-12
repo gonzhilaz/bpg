@@ -77,3 +77,4 @@ func (r *invoiceRepository) ExpireOverdueInvoices(ctx context.Context, now time.
 		Update("status", domain.StatusExpired)
 	return res.RowsAffected, res.Error
 }
+

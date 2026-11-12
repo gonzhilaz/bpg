@@ -114,3 +114,4 @@ func (s *rateService) fetchBinancePrice(ctx context.Context, symbol string) (dec
 
 	return rate, nil
 }
+

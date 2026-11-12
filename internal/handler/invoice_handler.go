@@ -104,3 +104,4 @@ func (h *InvoiceHandler) SimulatePayment(c *gin.Context) {
 		"pay_amount":      inv.PayAmount,
 	})
 }
+

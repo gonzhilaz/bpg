@@ -63,3 +63,4 @@ func InitDatabase(cfg *Config) (*gorm.DB, error) {
 	log.Println("[INFO] AutoMigration completed successfully")
 	return db, nil
 }
+

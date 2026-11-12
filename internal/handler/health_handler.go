@@ -29,3 +29,4 @@ func (h *HealthHandler) Check(c *gin.Context) {
 	}
 	response.Success(c, http.StatusOK, "Gateway is running healthy", data)
 }
+

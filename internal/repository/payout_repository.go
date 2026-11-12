@@ -52,3 +52,4 @@ func (r *payoutRepository) GetByInvoiceID(ctx context.Context, invoiceID uuid.UU
 func (r *payoutRepository) Update(ctx context.Context, payout *domain.PayoutTransfer) error {
 	return r.db.WithContext(ctx).Save(payout).Error
 }
+

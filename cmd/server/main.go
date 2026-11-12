@@ -16,8 +16,11 @@ import (
 	"captain-gateway/internal/domain"
 	"captain-gateway/internal/handler"
 	"captain-gateway/internal/middleware"
+	"captain-gateway/internal/payout"
 	"captain-gateway/internal/repository"
 	"captain-gateway/internal/service"
+	"captain-gateway/internal/watcher"
+	"captain-gateway/internal/webhook"
 )
 
 func main() {
@@ -40,16 +43,27 @@ func main() {
 	merchantRepo := repository.NewMerchantRepository(db)
 	invoiceRepo := repository.NewInvoiceRepository(db)
 	txRepo := repository.NewTransactionRepository(db)
+	payoutRepo := repository.NewPayoutRepository(db)
 
 	// Initialize Services
 	rateSvc := service.NewRateService()
+	payoutSvc := payout.NewPayoutService(payoutRepo)
+	webhookDispatcher := webhook.NewDispatcher()
+
 	invoiceSvc := service.NewInvoiceService(
 		invoiceRepo,
 		txRepo,
 		rateSvc,
+		payoutSvc,
+		webhookDispatcher,
 		cfg.MasterSecretKey,
 		cfg.InvoiceExpiryMin,
 	)
+
+	// Initialize Multi-Chain Background Watchers (BSC, Polygon, TRON, Solana)
+	watcherCtx, cancelWatchers := context.WithCancel(context.Background())
+	watcherManager := watcher.NewWatcherManager(cfg, invoiceRepo, invoiceSvc)
+	watcherManager.Start(watcherCtx)
 
 	// Initialize Handlers
 	healthHandler := handler.NewHealthHandler()
@@ -90,7 +104,7 @@ func main() {
 		WriteTimeout: 15 * time.Second,
 	}
 
-	// Graceful Shutdown
+	// Start HTTP Server
 	go func() {
 		log.Printf("[INFO] Server listening on http://localhost:%s\n", cfg.ServerPort)
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
@@ -98,11 +112,18 @@ func main() {
 		}
 	}()
 
+	// Graceful Shutdown
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
 
 	log.Println("[INFO] Shutting down server gracefully...")
+
+	// 1. Stop background watchers
+	cancelWatchers()
+	watcherManager.Stop()
+
+	// 2. Shutdown HTTP server
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 

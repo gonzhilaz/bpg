@@ -64,3 +64,4 @@ func (h *MerchantHandler) Register(c *gin.Context) {
 
 	response.Success(c, http.StatusCreated, "Merchant registered successfully", merchant)
 }
+

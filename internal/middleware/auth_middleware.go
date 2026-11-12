@@ -54,3 +54,4 @@ func GetCurrentMerchant(c *gin.Context) *domain.Merchant {
 	}
 	return nil
 }
+
