@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -23,6 +24,7 @@ type CreateInvoiceRequest struct {
 	Currency          string          `json:"currency" binding:"required"`      // "USD", "IDR"
 	PayCurrency       string          `json:"pay_currency" binding:"required"`  // "USDT", "USDC", "BNB", "SOL"
 	PayNetwork        domain.Network  `json:"pay_network" binding:"required"`   // "BSC", "POLYGON", "TRON", "SOLANA"
+	FeePayer          string          `json:"fee_payer"`                        // "customer" or "merchant"
 	CallbackURL       string          `json:"callback_url"`
 	CustomExpiryMin   int             `json:"custom_expiry_min"`
 }
@@ -36,6 +38,9 @@ type InvoiceResponse struct {
 	PayCurrency      string               `json:"pay_currency"`
 	PayNetwork       domain.Network       `json:"pay_network"`
 	PayAmount        decimal.Decimal      `json:"pay_amount"`
+	FeePayer         string               `json:"fee_payer"`
+	BaseAmount       decimal.Decimal      `json:"base_amount"`
+	NetworkFee       decimal.Decimal      `json:"network_fee"`
 	DepositAddress   string               `json:"deposit_address"`
 	Status           domain.InvoiceStatus `json:"status"`
 	ReceivedAmount   decimal.Decimal      `json:"received_amount"`
@@ -93,6 +98,30 @@ func (s *invoiceService) CreateInvoice(ctx context.Context, merchant *domain.Mer
 		return nil, fmt.Errorf("failed to calculate crypto rate: %w", err)
 	}
 
+	feePayer := strings.ToLower(strings.TrimSpace(req.FeePayer))
+	if feePayer != "merchant" {
+		feePayer = "customer"
+	}
+
+	var networkFee decimal.Decimal
+	switch req.PayNetwork {
+	case domain.NetworkBSC:
+		networkFee = decimal.NewFromFloat(0.05)
+	case domain.NetworkPolygon:
+		networkFee = decimal.NewFromFloat(0.02)
+	case domain.NetworkTron:
+		networkFee = decimal.NewFromFloat(1.20)
+	case domain.NetworkSolana:
+		networkFee = decimal.NewFromFloat(0.01)
+	default:
+		networkFee = decimal.Zero
+	}
+
+	baseAmount := payAmount
+	if feePayer == "customer" {
+		payAmount = baseAmount.Add(networkFee)
+	}
+
 	var payoutAddress string
 	switch req.PayNetwork {
 	case domain.NetworkBSC:
@@ -131,6 +160,9 @@ func (s *invoiceService) CreateInvoice(ctx context.Context, merchant *domain.Mer
 		PayCurrency:       req.PayCurrency,
 		PayNetwork:        req.PayNetwork,
 		PayAmount:         payAmount,
+		FeePayer:          feePayer,
+		BaseAmount:        baseAmount,
+		NetworkFee:        networkFee,
 		DepositAddress:    wallet.Address,
 		EncryptedPrivKey:  wallet.EncryptedPrivKey,
 		Status:            domain.StatusPending,
@@ -238,6 +270,9 @@ func (s *invoiceService) toInvoiceResponse(inv *domain.Invoice) *InvoiceResponse
 		PayCurrency:      inv.PayCurrency,
 		PayNetwork:       inv.PayNetwork,
 		PayAmount:        inv.PayAmount,
+		FeePayer:         inv.FeePayer,
+		BaseAmount:       inv.BaseAmount,
+		NetworkFee:       inv.NetworkFee,
 		DepositAddress:   inv.DepositAddress,
 		Status:           inv.Status,
 		ReceivedAmount:   inv.ReceivedAmount,

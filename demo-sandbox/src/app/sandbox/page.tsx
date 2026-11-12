@@ -13,6 +13,7 @@ export default function SandboxPage() {
   const [currency] = useState("USD");
   const [payCurrency, setPayCurrency] = useState("USDT");
   const [network, setNetwork] = useState<Network>("TRON");
+  const [feePayer, setFeePayer] = useState<"customer" | "merchant">("customer");
   const [loading, setLoading] = useState(false);
   const [createdInvoice, setCreatedInvoice] = useState<{ id: string; deposit_address: string; pay_amount: string } | null>(null);
   const [simulating, setSimulating] = useState(false);
@@ -36,6 +37,7 @@ export default function SandboxPage() {
           currency,
           pay_currency: payCurrency,
           pay_network: network,
+          fee_payer: feePayer,
         }),
       });
 
@@ -163,6 +165,34 @@ export default function SandboxPage() {
                   readOnly
                   className="w-full bg-zinc-800/40 border border-zinc-700/40 rounded-xl px-3 py-2 text-zinc-400 cursor-not-allowed font-mono"
                 />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-zinc-400 mb-1 font-medium">Fee Payer</label>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => setFeePayer("customer")}
+                  className={`py-2 px-3 rounded-xl border text-xs font-medium transition-all ${
+                    feePayer === "customer"
+                      ? "bg-cyan-500/10 border-cyan-500/50 text-cyan-400"
+                      : "bg-zinc-800/40 border-zinc-700/40 text-zinc-400 hover:text-zinc-300"
+                  }`}
+                >
+                  Customer (Surcharge)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setFeePayer("merchant")}
+                  className={`py-2 px-3 rounded-xl border text-xs font-medium transition-all ${
+                    feePayer === "merchant"
+                      ? "bg-cyan-500/10 border-cyan-500/50 text-cyan-400"
+                      : "bg-zinc-800/40 border-zinc-700/40 text-zinc-400 hover:text-zinc-300"
+                  }`}
+                >
+                  Merchant (Absorbed)
+                </button>
               </div>
             </div>
 

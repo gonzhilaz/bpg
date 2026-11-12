@@ -1,6 +1,7 @@
 import React from "react";
-import { CheckCircle2, Clock, Loader2, AlertCircle } from "lucide-react";
+import { CheckCircle2, Clock, Loader2, AlertCircle, UserCheck, Building2 } from "lucide-react";
 import { DashboardInvoice } from "../../types/merchant";
+import { Tooltip } from "../ui/Tooltip";
 
 interface Props {
   invoices: DashboardInvoice[];
@@ -55,6 +56,7 @@ export function InvoicesTable({ invoices }: Props) {
               <th className="pb-3 pr-4">Order</th>
               <th className="pb-3 px-4">Amount</th>
               <th className="pb-3 px-4">Network</th>
+              <th className="pb-3 px-4">Fee Payer</th>
               <th className="pb-3 px-4">Deposit Address</th>
               <th className="pb-3 px-4">Status</th>
               <th className="pb-3 pl-4">Created</th>
@@ -68,6 +70,19 @@ export function InvoicesTable({ invoices }: Props) {
                   {inv.pay_amount} <span className="text-cyan-400">{inv.pay_currency}</span>
                 </td>
                 <td className="py-3 px-4 text-zinc-400">{inv.pay_network}</td>
+                <td className="py-3 px-4 font-sans">
+                  {inv.fee_payer === "merchant" ? (
+                    <span className="inline-flex items-center gap-1 text-[10px] text-zinc-400 bg-zinc-800 px-2 py-0.5 rounded-md">
+                      <Building2 className="w-3 h-3 text-cyan-400" />
+                      <span>Merchant</span>
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1 text-[10px] text-zinc-300 bg-zinc-800 px-2 py-0.5 rounded-md">
+                      <UserCheck className="w-3 h-3 text-emerald-400" />
+                      <span>Customer</span>
+                    </span>
+                  )}
+                </td>
                 <td className="py-3 px-4 text-zinc-400 truncate max-w-[140px]" title={inv.deposit_address}>
                   {inv.deposit_address}
                 </td>

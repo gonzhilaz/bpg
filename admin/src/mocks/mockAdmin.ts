@@ -1,4 +1,43 @@
-import { HotWalletBalance, WatcherStatus, AdminMerchant, PlatformMetrics } from "../types/admin";
+import { HotWalletBalance, WatcherStatus, AdminMerchant, PlatformMetrics, NetworkGasItem } from "../types/admin";
+
+export const mockNetworkGasList: NetworkGasItem[] = [
+  {
+    network: "BSC",
+    native_coin: "BNB",
+    coin_price_usd: "642.50",
+    gas_price_metric: "3.0 Gwei",
+    est_sweep_fee_usd: "0.05",
+    status: "OPTIMAL",
+    updated_at: "Real-time",
+  },
+  {
+    network: "POLYGON",
+    native_coin: "POL",
+    coin_price_usd: "0.3840",
+    gas_price_metric: "32.5 Gwei",
+    est_sweep_fee_usd: "0.02",
+    status: "OPTIMAL",
+    updated_at: "Real-time",
+  },
+  {
+    network: "TRON",
+    native_coin: "TRX",
+    coin_price_usd: "0.2015",
+    gas_price_metric: "31,895 Energy",
+    est_sweep_fee_usd: "1.20",
+    status: "OPTIMAL",
+    updated_at: "Real-time",
+  },
+  {
+    network: "SOLANA",
+    native_coin: "SOL",
+    coin_price_usd: "182.40",
+    gas_price_metric: "5,000 Lamports",
+    est_sweep_fee_usd: "0.01",
+    status: "OPTIMAL",
+    updated_at: "Real-time",
+  },
+];
 
 export const mockPlatformMetrics: PlatformMetrics = {
   total_volume_usd: "248,500.00",

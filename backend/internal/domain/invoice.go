@@ -42,6 +42,9 @@ type Invoice struct {
 	PayCurrency      string          `gorm:"type:varchar(10);not null" json:"pay_currency"`
 	PayNetwork       Network         `gorm:"type:varchar(20);not null" json:"pay_network"`
 	PayAmount        decimal.Decimal `gorm:"type:numeric(28,8);not null" json:"pay_amount"`
+	FeePayer         string          `gorm:"type:varchar(20);default:'customer'" json:"fee_payer"`
+	BaseAmount       decimal.Decimal `gorm:"type:numeric(28,8);default:0" json:"base_amount"`
+	NetworkFee       decimal.Decimal `gorm:"type:numeric(28,8);default:0" json:"network_fee"`
 	DepositAddress   string          `gorm:"type:varchar(128);index;not null" json:"deposit_address"`
 	EncryptedPrivKey string          `gorm:"type:text;not null" json:"-"`
 	Status           InvoiceStatus   `gorm:"type:varchar(20);index;default:'PENDING'" json:"status"`

@@ -146,13 +146,30 @@ function CheckoutContent({ params }: { params: Promise<{ id: string }> }) {
         <div className="px-6 pt-5 pb-3 text-center space-y-1">
           <div className="text-[11px] font-medium text-zinc-400 uppercase tracking-wider flex items-center justify-center">
             Total Payable
-            <Tooltip content="Live crypto calculation based on your order total." />
+            <Tooltip content="Live crypto calculation based on your order total and network gas fee." />
           </div>
           <div className="text-2xl font-bold font-mono tracking-tight text-white flex items-center justify-center gap-1.5">
             <span>{invoice.pay_amount}</span>
             <span className="text-cyan-400 text-lg">{invoice.pay_currency}</span>
           </div>
-          <div className="text-xs text-zinc-500 font-medium">
+
+          {invoice.network_fee && invoice.base_amount && (
+            <div className="mx-auto max-w-xs mt-2 p-2 bg-zinc-800/40 border border-zinc-700/40 rounded-lg text-[11px] text-zinc-400 font-mono space-y-1">
+              <div className="flex justify-between">
+                <span className="font-sans text-zinc-500">Order Subtotal</span>
+                <span>{invoice.base_amount} {invoice.pay_currency}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="font-sans text-zinc-500 flex items-center gap-1">
+                  <span>Network Gas Fee</span>
+                  <Tooltip content="On-chain blockchain gas fee for payment verification and settlement." />
+                </span>
+                <span className="text-emerald-400">+{invoice.network_fee} {invoice.pay_currency}</span>
+              </div>
+            </div>
+          )}
+
+          <div className="text-xs text-zinc-500 font-medium pt-1">
             Order #{invoice.order_id} • Network: <span className="text-zinc-300 font-semibold">{invoice.pay_network}</span>
           </div>
         </div>

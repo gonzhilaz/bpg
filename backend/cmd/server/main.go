@@ -69,6 +69,7 @@ func main() {
 	healthHandler := handler.NewHealthHandler()
 	merchantHandler := handler.NewMerchantHandler(merchantRepo)
 	invoiceHandler := handler.NewInvoiceHandler(invoiceSvc)
+	rateHandler := handler.NewRateHandler(rateSvc)
 
 	// Setup Router
 	r := gin.New()
@@ -94,6 +95,7 @@ func main() {
 
 		// Public Checkout Endpoints (for Customer Payment Screens)
 		v1.GET("/invoices/:id", invoiceHandler.GetByID)
+		v1.GET("/rates/gas", rateHandler.GetGasRates)
 
 		// Sandbox Simulation Endpoint (for dev/testing)
 		v1.POST("/invoices/simulate-payment", invoiceHandler.SimulatePayment)

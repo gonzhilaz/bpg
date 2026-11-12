@@ -36,3 +36,13 @@ export interface PlatformMetrics {
   circuit_breaker_active: boolean;
 }
 
+export interface NetworkGasItem {
+  network: Network;
+  native_coin: string;
+  coin_price_usd: string;
+  gas_price_metric: string;
+  est_sweep_fee_usd: string;
+  status: "OPTIMAL" | "CONGESTED";
+  updated_at: string;
+}
+

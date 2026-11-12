@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/glebarez/sqlite"
@@ -177,7 +178,13 @@ func TestCreateAndPayInvoice(t *testing.T) {
 
 	// 5. Verify Payout Transfer Record was automatically created
 	var payouts []domain.PayoutTransfer
-	db.Where("invoice_id = ?", invoice.ID).Find(&payouts)
+	for i := 0; i < 25; i++ {
+		db.Where("invoice_id = ?", invoice.ID).Find(&payouts)
+		if len(payouts) > 0 {
+			break
+		}
+		time.Sleep(20 * time.Millisecond)
+	}
 	if len(payouts) == 0 {
 		t.Fatal("expected auto-payout record to be created in database")
 	}

@@ -18,6 +18,9 @@ export interface Invoice {
   pay_currency: string;
   pay_network: Network;
   pay_amount: string;
+  fee_payer?: "customer" | "merchant";
+  base_amount?: string;
+  network_fee?: string;
   deposit_address: string;
   status: InvoiceStatus;
   received_amount: string;
