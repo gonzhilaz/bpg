@@ -106,3 +106,4 @@ export const mockMerchantsList: AdminMerchant[] = [
     created_at: "2026-11-01",
   },
 ];
+

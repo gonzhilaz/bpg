@@ -88,3 +88,4 @@ export function MerchantControlTable({ initialMerchants }: Props) {
     </div>
   );
 }
+

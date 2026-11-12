@@ -65,3 +65,4 @@ export function HotWalletGasCard({ wallets }: Props) {
     </div>
   );
 }
+
