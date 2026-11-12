@@ -1,0 +1,165 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Captain Crypto Payment Gateway API",
+    "description": "High-performance non-custodial crypto payment gateway inspired by OxaPay. Supports dynamic ephemeral deposit addresses, auto-payout to cold wallets, multi-chain indexers (BSC, Polygon, TRON, Solana), and cryptographic HMAC webhooks.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080",
+      "description": "Local Development Server"
+    }
+  ],
+  "paths": {
+    "/health": {
+      "get": {
+        "summary": "Health Check",
+        "description": "Returns operational status and uptime of the gateway",
+        "responses": {
+          "200": {
+            "description": "System operational"
+          }
+        }
+      }
+    },
+    "/api/v1/merchants/register": {
+      "post": {
+        "summary": "Register Merchant",
+        "description": "Create a new merchant profile and generate API credentials & payout addresses",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterMerchantRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Merchant registered successfully"
+          }
+        }
+      }
+    },
+    "/api/v1/invoices": {
+      "post": {
+        "summary": "Create Invoice",
+        "description": "Generates a new invoice with a unique dedicated deposit address",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateInvoiceRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Invoice created successfully with deposit address"
+          }
+        }
+      }
+    },
+    "/api/v1/invoices/{id}": {
+      "get": {
+        "summary": "Get Invoice Status",
+        "description": "Public endpoint used by checkout screen to track payment progress",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Invoice details and payment status"
+          }
+        }
+      }
+    },
+    "/api/v1/invoices/simulate-payment": {
+      "post": {
+        "summary": "Simulate Payment (Sandbox)",
+        "description": "Simulates on-chain transaction to test automatic status transition, auto-payout, and webhooks",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SimulatePaymentRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Payment simulated successfully"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-API-KEY"
+      }
+    },
+    "schemas": {
+      "RegisterMerchantRequest": {
+        "type": "object",
+        "required": ["name"],
+        "properties": {
+          "name": { "type": "string", "example": "My E-Commerce Store" },
+          "payout_address_bsc": { "type": "string", "example": "0x71C8A3951F6b4d3E118bFE7c251d18fF2113f019" },
+          "payout_address_polygon": { "type": "string", "example": "0x71C8A3951F6b4d3E118bFE7c251d18fF2113f019" },
+          "payout_address_tron": { "type": "string", "example": "TYUKBQ1AHuC6U1Qj88J7sE5FzW7xJg9vEa" },
+          "payout_address_solana": { "type": "string", "example": "7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU" },
+          "webhook_url": { "type": "string", "example": "https://myshop.com/api/crypto-callback" }
+        }
+      },
+      "CreateInvoiceRequest": {
+        "type": "object",
+        "required": ["order_id", "amount", "currency", "pay_currency", "pay_network"],
+        "properties": {
+          "order_id": { "type": "string", "example": "ORD-12345" },
+          "amount": { "type": "string", "example": "25.00" },
+          "currency": { "type": "string", "example": "USD" },
+          "pay_currency": { "type": "string", "example": "USDT" },
+          "pay_network": { "type": "string", "enum": ["BSC", "POLYGON", "TRON", "SOLANA"], "example": "TRON" },
+          "callback_url": { "type": "string", "example": "https://myshop.com/webhooks/crypto" },
+          "custom_expiry_min": { "type": "integer", "example": 30 }
+        }
+      },
+      "SimulatePaymentRequest": {
+        "type": "object",
+        "required": ["deposit_address", "amount"],
+        "properties": {
+          "deposit_address": { "type": "string", "example": "TYUKBQ1AHuC6U1Qj88J7sE5FzW7xJg9vEa" },
+          "amount": { "type": "string", "example": "25.0000" },
+          "network": { "type": "string", "example": "TRON" },
+          "tx_hash": { "type": "string", "example": "0xsimulated_tx_hash_123" },
+          "block_number": { "type": "integer", "example": 15423120 }
+        }
+      }
+    }
+  }
+}
+
