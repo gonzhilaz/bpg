@@ -96,3 +96,4 @@ export function PayoutSettingsCard({ profile }: Props) {
     </div>
   );
 }
+

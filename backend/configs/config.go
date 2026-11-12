@@ -41,7 +41,7 @@ func LoadConfig() *Config {
 		AppEnv:           getEnv("APP_ENV", "development"),
 		MasterSecretKey:  getEnv("MASTER_SECRET_KEY", "captain-default-master-secret-key-32bytes!"),
 		DatabaseDriver:   getEnv("DB_DRIVER", "sqlite"),
-		DatabaseURL:      getEnv("DATABASE_URL", "captain.db"),
+		DatabaseURL:      getEnv("DATABASE_URL", "data/captain.db"),
 		InvoiceExpiryMin: expiryMin,
 
 		BSCRPCURL:      getEnv("BSC_RPC_URL", "https://bsc-dataseed.binance.org/"),

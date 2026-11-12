@@ -1,4 +1,5 @@
 export type Network = "BSC" | "POLYGON" | "TRON" | "SOLANA";
+export type EnvironmentMode = "LIVE" | "SANDBOX";
 
 export interface MerchantProfile {
   id: string;
@@ -25,6 +26,7 @@ export interface DashboardInvoice {
   deposit_address: string;
   status: "PENDING" | "DETECTED" | "PAID" | "UNDERPAID" | "EXPIRED";
   created_at: string;
+  is_sandbox?: boolean;
 }
 
 export interface PayoutRecord {
@@ -37,4 +39,15 @@ export interface PayoutRecord {
   network_fee_paid: string;
   status: "COMPLETED" | "SUBMITTED" | "FAILED";
   created_at: string;
+  is_sandbox?: boolean;
+}
+
+export interface WebhookLog {
+  id: string;
+  event: string;
+  order_id: string;
+  url: string;
+  status_code: number;
+  signature: string;
+  timestamp: string;
 }

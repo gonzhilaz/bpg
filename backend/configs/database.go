@@ -3,6 +3,8 @@ package configs
 import (
 	"fmt"
 	"log"
+	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/glebarez/sqlite"
@@ -21,6 +23,9 @@ func InitDatabase(cfg *Config) (*gorm.DB, error) {
 	case "postgres":
 		dialector = postgres.Open(cfg.DatabaseURL)
 	case "sqlite":
+		if dir := filepath.Dir(cfg.DatabaseURL); dir != "" && dir != "." {
+			_ = os.MkdirAll(dir, 0755)
+		}
 		dialector = sqlite.Open(cfg.DatabaseURL)
 	default:
 		return nil, fmt.Errorf("unsupported database driver: %s", cfg.DatabaseDriver)

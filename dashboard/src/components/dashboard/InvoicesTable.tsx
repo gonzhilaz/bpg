@@ -81,3 +81,4 @@ export function InvoicesTable({ invoices }: Props) {
     </div>
   );
 }
+

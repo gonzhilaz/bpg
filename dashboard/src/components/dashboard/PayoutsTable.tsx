@@ -53,3 +53,4 @@ export function PayoutsTable({ payouts }: Props) {
     </div>
   );
 }
+
