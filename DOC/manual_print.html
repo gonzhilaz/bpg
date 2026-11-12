@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Captain Crypto Payment Gateway Manual</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 18mm 15mm 20mm 15mm;
+      @bottom-right {
+        content: counter(page);
+      }
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      color: #1e293b;
+      line-height: 1.6;
+      font-size: 11pt;
+      background: #ffffff;
+      margin: 0;
+      padding: 0;
+    }
+    .doc-title {
+      font-size: 24pt;
+      font-weight: 800;
+      color: #0f172a;
+      border-bottom: 3px solid #06b6d4;
+      padding-bottom: 8px;
+      margin-top: 10px;
+      margin-bottom: 15px;
+    }
+    .section-title {
+      font-size: 16pt;
+      font-weight: 700;
+      color: #0f172a;
+      border-bottom: 1.5px solid #e2e8f0;
+      padding-bottom: 6px;
+      margin-top: 28px;
+      page-break-after: avoid;
+    }
+    .sub-title {
+      font-size: 12.5pt;
+      font-weight: 600;
+      color: #0369a1;
+      margin-top: 18px;
+      margin-bottom: 6px;
+      page-break-after: avoid;
+    }
+    .sub2-title {
+      font-size: 11pt;
+      font-weight: 600;
+      color: #334155;
+      margin-top: 12px;
+      margin-bottom: 4px;
+    }
+    p {
+      margin: 8px 0;
+      text-align: justify;
+    }
+    strong {
+      color: #0f172a;
+    }
+    ul {
+      margin: 6px 0 12px 20px;
+      padding: 0;
+    }
+    li {
+      margin-bottom: 4px;
+    }
+    .divider {
+      border: 0;
+      height: 1px;
+      background: #e2e8f0;
+      margin: 20px 0;
+    }
+    .code-block {
+      background: #0f172a;
+      color: #38bdf8;
+      padding: 12px 14px;
+      border-radius: 8px;
+      font-family: "Consolas", "Courier New", monospace;
+      font-size: 9.5pt;
+      overflow-x: auto;
+      margin: 12px 0;
+      page-break-inside: avoid;
+    }
+    .img-box {
+      margin: 16px 0;
+      text-align: center;
+      page-break-inside: avoid;
+    }
+    .img-box img {
+      max-width: 95%;
+      height: auto;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+    .caption {
+      font-size: 9pt;
+      color: #64748b;
+      font-style: italic;
+      margin-top: 4px;
+      text-align: center;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 14px 0;
+      font-size: 9.5pt;
+      page-break-inside: avoid;
+    }
+    th, td {
+      border: 1px solid #cbd5e1;
+      padding: 8px 10px;
+      text-align: left;
+    }
+    th {
+      background: #f1f5f9;
+      font-weight: 600;
+      color: #0f172a;
+    }
+    tr:nth-child(even) {
+      background: #f8fafc;
+    }
+    blockquote {
+      border-left: 4px solid #06b6d4;
+      background: #f0fdf4;
+      padding: 8px 14px;
+      margin: 12px 0;
+      border-radius: 0 8px 8px 0;
+      font-size: 10pt;
+    }
+  </style>
+</head>
+<body>
+  <h1 class="doc-title">Panduan Operasional & Dokumentasi Resmi Captain Crypto Payment Gateway</h1>
+<p>
+<strong>Versi</strong>: 1.2.0  </p>
+<p><strong>Tanggal</strong>: November 2026  </p>
+<p><strong>Klasifikasi</strong>: User Manual, Technical Specification & Integration Guide  </p>
+<p><strong>Repositori</strong>: [https://github.com/gonzhilaz/bpg.git](https://github.com/gonzhilaz/bpg.git)</p>
+
+<hr class="divider" />
+
+<h2 class="section-title">DAFTAR ISI</h2>
+<p>
+1. <strong>Bab 1: Gambaran Umum & Spesifikasi Arsitektur</strong></p>
+<p>   * 1.1 Prinsip Non-Custodial & Kedaulatan Dana</p>
+<p>   * 1.2 Multi-Chain Network Matrix (BSC, Polygon, TRON, Solana)</p>
+<p>   * 1.3 Siklus Tagihan 1 Invoice = 1 Dedicated Ephemeral Address</p>
+<p>   * 1.4 Protokol Keamanan & API Key Hashing At-Rest</p>
+<p>
+2. <strong>Bab 2: Panduan Pengguna Merchant Portal</strong></p>
+<p>   <em> 2.1 Pendaftaran Akun & Protokol </em>Reveal Once* API Key</p>
+<p>   * 2.2 Autentikasi & Navigasi Dashboard</p>
+<p>   * 2.3 Konfigurasi Cold Wallet Payout & Auto-Forwarding</p>
+<p>   <em> 2.4 Pengaturan </em>Fee Payer* (Customer Surcharge vs. Merchant Absorbed)</p>
+<p>   * 2.5 Pemantauan Laporan Keuangan (Financial Ledger) & Ekspor CSV</p>
+<p>   * 2.6 Monitoring Riwayat Tagihan & Webhook Callback Logs</p>
+<p>
+3. <strong>Bab 3: Tutorial Integrasi Toko Online (Merchant Integration)</strong></p>
+<p>   * 3.1 Pembuatan Tagihan via REST API (cURL, Node.js, PHP, Python)</p>
+<p>   * 3.2 Menampilkan Checkout Widget ke Pelanggan</p>
+<p>   * 3.3 Penanganan & Validasi Tanda Tangan Kriptografis Webhook (HMAC-SHA256)</p>
+<p>
+4. <strong>Bab 4: Panduan Pengujian Sandbox & Jaringan Testnet</strong></p>
+<p>   * 4.1 Menggunakan Sandbox Simulator Bawaan</p>
+<p>   * 4.2 Pengujian Transaksi On-Chain Menggunakan Faucet Testnet Resmi</p>
+<p>
+5. <strong>Bab 5: Panduan DevOps & Super Admin Portal</strong></p>
+<p>   * 5.1 Dashboard Monitoring Operasional Platform</p>
+<p>   * 5.2 Manajemen Cadangan Gas Hot Wallet & Alert Otomatis</p>
+<p>   <em> 5.3 Prosedur Penyapuan Dana Manual (</em>Manual Sweeper*)</p>
+<p>   * 5.4 Pemeliharaan Database (Pool Connection & Pruning Expired Records)</p>
+<p>   * 5.5 Emergency Circuit Breaker (Prosedur Darurat Pembekuan Payout)</p>
+<p>   * 5.6 Deployment Mandiri di Server VPS Menggunakan Docker Compose</p>
+
+<hr class="divider" />
+
+<h2 class="section-title">BAB 1: GAMBARAN UMUM & SPESIFIKASI ARSITEKTUR</h2>
+
+<h3 class="sub-title">1.1 Prinsip Non-Custodial & Kedaulatan Dana</h3>
+<p>Captain Crypto Payment Gateway dirancang untuk memecahkan kelemahan terbesar payment gateway sentralistik (seperti BitPay atau NOWPayments), yaitu risiko pembekuan dana sepihak (<em>fund freezing</em>) dan biaya perantara ganda.</p>
+<p>
+Dengan arsitektur <strong>Non-Custodial Instant Forwarding</strong>, sistem Captain tidak pernah mengendapkan saldo merchant di akun perantara. Setiap pembayaran yang diverifikasi on-chain langsung disapu (<em>swept</em>) ke <strong>Cold Wallet Pribadi Merchant</strong> yang aman.</p>
+
+<pre class="code-block"><code>
+<p>[Pembeli] ──────&gt; [Alamat Tagihan Ephemeral] ──────&gt; [Cold Wallet Merchant]</p>
+<p>                         │</p>
+<p>                         ▼</p>
+<p>             [Indexer Node Memindai Event]</p>
+<p>             [Webhook HMAC Dikirim ke Toko]</p>
+</code></pre>
+
+<h3 class="sub-title">1.2 Multi-Chain Network Matrix</h3>
+<p>Sistem secara <em>native</em> mendukung 4 ekosistem blockchain utama dunia dengan biaya transaksi rendah dan finalitas blok instan:</p>
+<p>
+| Blockchain | Standar Token | Satuan Biaya Gas | Kecepatan Konfirmasi | Estimasi Biaya Sweep |</p>
+<p>| :--- | :--- | :--- | :--- | :--- |</p>
+<p>| <strong>BSC (BNB Smart Chain)</strong> | BEP-20 (USDT / USDC) | Gwei (Native BNB) | ~3 Detik | ~$0.05 |</p>
+<p>| <strong>Polygon PoS</strong> | ERC-20 (USDT / USDC) | Gwei (Native POL) | ~2 Detik | ~$0.02 |</p>
+<p>| <strong>TRON Network</strong> | TRC-20 (USDT) | Energy & Bandwidth (TRX) | ~1 Detik | ~$1.20 |</p>
+<p>| <strong>Solana</strong> | SPL Token (USDC / USDT) | Lamports (Native SOL) | ~400 Milidetik | ~$0.01 |</p>
+
+<h3 class="sub-title">1.3 Siklus Tagihan 1 Invoice = 1 Dedicated Ephemeral Address</h3>
+<p>1. <strong>Generasi Kunci Kriptografi</strong>: Saat toko memanggil endpoint pembuatan invoice, backend Go membangkitkan pasangan kunci (<em>keypair</em>) baru secara dinamis menggunakan algoritma kriptografi standar industri (ECDSA secp256k1 untuk EVM/TRON dan Ed25519 untuk Solana).</p>
+<p>2. <strong>Enkripsi Kunci Privat</strong>: Kunci privat dari alamat deposit langsung dienkripsi menggunakan sandi militer <strong>AES-256-GCM</strong> sebelum disimpan ke database.</p>
+<p>3. <strong>Masa Berlaku Tagihan</strong>: Tagihan memiliki masa aktif 15–30 menit dengan hitung mundur presisi. Alamat yang kedaluwarsa tanpa pelunasan otomatis dinonaktifkan.</p>
+
+<hr class="divider" />
+
+<h2 class="section-title">BAB 2: PANDUAN PENGGUNA MERCHANT PORTAL</h2>
+
+<h3 class="sub-title">2.1 Pendaftaran Akun & Protokol Reveal Once API Key</h3>
+<p>Untuk menjadi merchant, kunjungi halaman registrasi di `/register`:</p>
+
+<div class="img-box"><img src="images/03_merchant_register.png" alt="Registrasi Merchant" /><p class="caption">Registrasi Merchant</p></div>
+<p>
+1. Masukkan <strong>Nama Toko / Perusahaan</strong>, <strong>Business Email</strong>, dan <strong>Password</strong> (minimal 6 karakter).</p>
+<p>2. Klik tombol <strong>Generate API Key & Register</strong>.</p>
+<p>3. <strong>PENTING (Protokol Reveal Once)</strong>: Sistem akan menampilkan kartu peringatan khusus yang memuat <strong>Production API Key</strong> dan <strong>Webhook Secret</strong>.</p>
+<p>   <em> </em>Kunci ini hanya ditampilkan satu kali demi alasan keamanan tingkat tinggi.*</p>
+<p>   <em> Segera klik tombol salin (</em>copy*) dan simpan di password manager atau file konfigurasi `.env` server toko Anda.</p>
+<p>   * Di dalam database Captain, API Key disimpan dalam bentuk hash <strong>SHA-256</strong>, sehingga kunci asli tidak dapat dibaca oleh siapa pun jika database diretas.</p>
+
+<h3 class="sub-title">2.2 Autentikasi & Navigasi Dashboard</h3>
+<p>Kunjungi halaman login di `/login`:</p>
+
+<div class="img-box"><img src="images/02_merchant_login.png" alt="Login Merchant" /><p class="caption">Login Merchant</p></div>
+<p>
+1. Masukkan email bisnis dan password yang telah didaftarkan.</p>
+<p>2. Setelah berhasil masuk, Anda akan diarahkan ke halaman utama <strong>Merchant Portal</strong>.</p>
+
+<div class="img-box"><img src="images/01_merchant_dashboard.png" alt="Dashboard Merchant" /><p class="caption">Dashboard Merchant</p></div>
+
+<h3 class="sub-title">2.3 Konfigurasi Cold Wallet Payout & Auto-Forwarding</h3>
+<p>Pada kartu <strong>Payout Wallets</strong>:</p>
+<p>1. Masukkan alamat cold wallet penerima untuk masing-masing jaringan:</p>
+<p>   * <strong>TRON Address</strong>: Alamat Base58 berawalan huruf `T` (misal dompet TronLink, Ledger, atau Binance).</p>
+<p>   * <strong>BSC Address</strong>: Alamat 0x EVM (Trust Wallet, MetaMask, Safe).</p>
+<p>   * <strong>Polygon Address</strong>: Alamat 0x EVM.</p>
+<p>   * <strong>Solana Address</strong>: Alamat Base58 Solana (Phantom, Solflare).</p>
+<p>2. Pastikan centang toggle <strong>Auto-Payout</strong> aktif agar dana otomatis diteruskan begitu transaksi terdeteksi.</p>
+<p>3. Klik tombol <strong>Save Payout Settings</strong>.</p>
+
+<h3 class="sub-title">2.4 Pengaturan Fee Payer (Customer Surcharge vs. Merchant Absorbed)</h3>
+<p>Di bagian atas kartu Payout Wallets, terdapat pemilih opsi <strong>Fee Payer</strong>:</p>
+<ul><li><strong>Opsi Customer (Direkomendasikan)</strong>: Biaya gas jaringan ditambahkan ke total invoice tagihan pembeli. Pembeli membayar produk + gas surcharge, merchant menerima nominal bersih 100%.</li></ul>
+<ul><li><strong>Opsi Merchant</strong>: Pembeli membayar nominal pas harga produk, biaya gas penyapuan dipotong dari saldo yang masuk ke cold wallet merchant.</li></ul>
+
+<h3 class="sub-title">2.5 Pemantauan Laporan Keuangan (Financial Ledger) & Ekspor CSV</h3>
+<p>Kartu <strong>Financial Ledger</strong> menyediakan data audit pembukuan yang transparan:</p>
+<ul><li><strong>Gross Sales</strong>: Total akumulasi volume penjualan kotor.</li></ul>
+<ul><li><strong>Net Settled</strong>: Total dana bersih yang telah sukses mendarat di Cold Wallet Anda.</li></ul>
+<ul><li><strong>Fee (0.4%)</strong>: Akumulasi potongan biaya pemrosesan gateway.</li></ul>
+<ul><li><strong>Sweep Gas</strong>: Estimasi biaya gas jaringan yang dikeluarkan untuk sweeping on-chain.</li></ul>
+<ul><li><strong>Filter Rentang Waktu</strong>: Pilih `7D` (7 hari terakhir), `30D` (30 hari terakhir), atau `ALL` (sepanjang waktu).</li></ul>
+<ul><li><strong>Ekspor CSV</strong>: Klik tombol <strong>Export CSV</strong> untuk mengunduh laporan pembukuan langsung ke komputer Anda dalam format spreadsheet.</li></ul>
+
+<h3 class="sub-title">2.6 Monitoring Riwayat Tagihan & Webhook Callback Logs</h3>
+<ul><li><strong>Tabel Recent Invoices</strong>: Menampilkan nomor pesanan, nominal kripto, jaringan, deposit address, indikator Fee Payer, dan status terkini (`PENDING`, `DETECTED`, `PAID`, `UNDERPAID`, `EXPIRED`).</li></ul>
+<ul><li><strong>Tabel Settlement Transfers</strong>: Menampilkan bukti tx hash on-chain dari penyapuan dana ke cold wallet Anda.</li></ul>
+<ul><li><strong>Kartu Webhook Delivery Logs</strong>: Menampilkan riwayat pengiriman notifikasi HTTP POST ke server toko Anda lengkap dengan kode HTTP respons (200 OK) dan tanda tangan HMAC.</li></ul>
+
+<hr class="divider" />
+
+<h2 class="section-title">BAB 3: TUTORIAL INTEGRASI TOKO ONLINE (MERCHANT INTEGRATION)</h2>
+
+<h3 class="sub-title">3.1 Pembuatan Tagihan via REST API</h3>
+<p>Server e-commerce toko Anda cukup memanggil endpoint berikut:</p>
+
+<pre class="code-block"><code>bash
+<p>curl -X POST https://api.yourgateway.com/api/v1/invoices \</p>
+<p>  -H "Content-Type: application/json" \</p>
+<p>  -H "X-API-KEY: cap_live_9a41b2c8e104f..." \</p>
+<p>  -d '{</p>
+<p>    "order_id": "INV-2026-001",</p>
+<p>    "amount": 50.00,</p>
+<p>    "currency": "USD",</p>
+<p>    "pay_currency": "USDT",</p>
+<p>    "pay_network": "TRON",</p>
+<p>    "fee_payer": "customer",</p>
+<p>    "callback_url": "https://tokosaya.com/api/crypto-webhook"</p>
+<p>  }'</p>
+</code></pre>
+
+<h4 class="sub2-title">Contoh Implementasi Node.js:</h4>
+<pre class="code-block"><code>javascript
+<p>const axios = require('axios');</p>
+<p>
+async function createCryptoInvoice() {</p>
+<p>  const response = await axios.post('https://api.yourgateway.com/api/v1/invoices', {</p>
+<p>    order_id: 'ORD-88219',</p>
+<p>    amount: 100.00,</p>
+<p>    currency: 'USD',</p>
+<p>    pay_currency: 'USDT',</p>
+<p>    pay_network: 'BSC',</p>
+<p>    fee_payer: 'customer',</p>
+<p>    callback_url: 'https://tokosaya.com/api/crypto-webhook'</p>
+<p>  }, {</p>
+<p>    headers: { 'X-API-KEY': process.env.CAPTAIN_API_KEY }</p>
+<p>  });</p>
+<p>
+  const { id, deposit_address, pay_amount, pay_currency } = response.data.data;</p>
+<p>  console.log(`Tagihan dibuat: Kirim ${pay_amount} ${pay_currency} ke ${deposit_address}`);</p>
+<p>  return id;</p>
+<p>}</p>
+</code></pre>
+
+<h4 class="sub2-title">Contoh Implementasi PHP:</h4>
+<pre class="code-block"><code>php
+<p>&lt;?php</p>
+<p>$apiKey = 'cap_live_9a41b2c8e104f...';</p>
+<p>$payload = [</p>
+<p>    'order_id'     =&gt; 'ORD-99120',</p>
+<p>    'amount'       =&gt; 25.50,</p>
+<p>    'currency'     =&gt; 'USD',</p>
+<p>    'pay_currency' =&gt; 'USDT',</p>
+<p>    'pay_network'  =&gt; 'POLYGON',</p>
+<p>    'fee_payer'    =&gt; 'customer',</p>
+<p>    'callback_url' =&gt; 'https://tokosaya.com/api/webhook'</p>
+<p>];</p>
+<p>
+$ch = curl_init('https://api.yourgateway.com/api/v1/invoices');</p>
+<p>curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);</p>
+<p>curl_setopt($ch, CURLOPT_POST, true);</p>
+<p>curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));</p>
+<p>curl_setopt($ch, CURLOPT_HTTPHEADER, [</p>
+<p>    'Content-Type: application/json',</p>
+<p>    'X-API-KEY: ' . $apiKey</p>
+<p>]);</p>
+<p>
+$result = json_decode(curl_exec($ch), true);</p>
+<p>curl_close($ch);</p>
+<p>?&gt;</p>
+</code></pre>
+
+<h3 class="sub-title">3.2 Menampilkan Checkout Widget ke Pelanggan</h3>
+<p>Setelah invoice dibuat, arahkan pembeli ke halaman checkout atau pasang iframe checkout:</p>
+
+<div class="img-box"><img src="images/06_checkout_widget.png" alt="Customer Checkout Widget" /><p class="caption">Customer Checkout Widget</p></div>
+<p>
+Fitur Checkout Widget:</p>
+<ul><li><strong>Dynamic QR Code</strong>: Mendukung pemindaian dari kamera smartphone atau aplikasi Trust Wallet / Binance.</li></ul>
+<ul><li><strong>1-Click Copy</strong>: Menyalin alamat deposit dan nominal presisi dalam 1 kali klik.</li></ul>
+<ul><li><strong>Rincian Transparan</strong>: Menampilkan harga barang asli + surcharge gas jaringan (jika fee_payer adalah customer).</li></ul>
+<ul><li><strong>Hitung Mundur Kedaluwarsa</strong>: Mencegah fluktuasi kurs yang merugikan merchant.</li></ul>
+<ul><li><strong>1-Click Web3 Pay</strong>: Pembeli pengguna MetaMask atau Phantom dapat membayar langsung tanpa mengetik alamat manual.</li></ul>
+
+<h3 class="sub-title">3.3 Penanganan & Validasi Tanda Tangan Webhook (HMAC-SHA256)</h3>
+<p>Ketika pembayaran pembeli terkonfirmasi di blockchain, Captain mengirimkan callback HTTP POST ke `callback_url` toko Anda dengan header `X-Signature`.</p>
+
+<h4 class="sub2-title">Contoh Payload Webhook:</h4>
+<pre class="code-block"><code>json
+<p>{</p>
+<p>  "event": "invoice.paid",</p>
+<p>  "invoice_id": "4d374131-bcca-4749-8a5e-12c802131d1f",</p>
+<p>  "order_id": "ORD-88219",</p>
+<p>  "amount_paid": "100.0500",</p>
+<p>  "pay_currency": "USDT",</p>
+<p>  "pay_network": "BSC",</p>
+<p>  "received_at": "2026-11-12T16:25:00Z"</p>
+<p>}</p>
+</code></pre>
+
+<h4 class="sub2-title">Verifikasi Tanda Tangan di Node.js:</h4>
+<pre class="code-block"><code>javascript
+<p>const crypto = require('crypto');</p>
+<p>
+function verifyWebhook(req, secretKey) {</p>
+<p>  const signature = req.headers['x-signature'];</p>
+<p>  const rawBody = JSON.stringify(req.body);</p>
+<p>  const expectedSignature = 'sha256=' + crypto</p>
+<p>    .createHmac('sha256', secretKey)</p>
+<p>    .update(rawBody)</p>
+<p>    .digest('hex');</p>
+<p>
+  return signature === expectedSignature;</p>
+<p>}</p>
+</code></pre>
+
+<hr class="divider" />
+
+<h2 class="section-title">BAB 4: PANDUAN PENGUJIAN SANDBOX & JARINGAN TESTNET</h2>
+
+<h3 class="sub-title">4.1 Menggunakan Sandbox Simulator Bawaan</h3>
+<p>Kunjungi `/sandbox` untuk menguji alur integrasi tanpa modal uang riil:</p>
+
+<div class="img-box"><img src="images/05_sandbox_simulator.png" alt="Sandbox Simulator" /><p class="caption">Sandbox Simulator</p></div>
+<p>
+1. Isi form simulasi: Order ID, Nominal USD, Pilihan Network (TRON, BSC, Polygon, Solana), dan Fee Payer.</p>
+<p>2. Klik tombol <strong>Generate Deposit Address</strong>.</p>
+<p>3. Sistem akan memunculkan detail alamat uji coba dan tombol hijau <strong>Simulate Payment</strong>.</p>
+<p>4. Begitu tombol simulasi diklik, backend Go akan memproses invoice seolah-olah terjadi transfer on-chain asli: status berubah menjadi `PAID`, rekonsiliasi auto-payout dibuat, dan webhook HMAC langsung ditembakkan ke URL callback toko Anda.</p>
+
+<h3 class="sub-title">4.2 Pengujian Transaksi On-Chain Menggunakan Faucet Testnet Resmi</h3>
+<p>Jika Anda ingin menguji transaksi nyata dari dompet Web3 tanpa biaya:</p>
+<p>1. Aktifkan jaringan Testnet pada wallet MetaMask atau Phantom Anda.</p>
+<p>2. Klaim koin gratis melalui tautan Faucet resmi yang disediakan di banner atas Merchant Dashboard:</p>
+<p>   * <strong>TRON Nile Testnet</strong>: [https://nileex.io/join/getJoinPage](https://nileex.io/join/getJoinPage)</p>
+<p>   * <strong>BSC Testnet Faucet</strong>: [https://www.bnbchain.org/en/testnet-faucet](https://www.bnbchain.org/en/testnet-faucet)</p>
+<p>   * <strong>Solana Devnet Faucet</strong>: [https://faucet.solana.com](https://faucet.solana.com)</p>
+<p>3. Lakukan transfer koin testnet ke alamat deposit invoice. Watcher daemon Captain di background akan menangkap transaksi on-chain tersebut secara otomatis.</p>
+
+<hr class="divider" />
+
+<h2 class="section-title">BAB 5: PANDUAN DEVOPS & SUPER ADMIN PORTAL</h2>
+
+<h3 class="sub-title">5.1 Dashboard Monitoring Operasional Platform</h3>
+<p>Kunjungi Super Admin Portal di [https://bpg-admin.vercel.app](https://bpg-admin.vercel.app):</p>
+
+<div class="img-box"><img src="images/04_admin_portal.png" alt="Super Admin Portal" /><p class="caption">Super Admin Portal</p></div>
+<p>
+Portal ini diperuntukkan khusus bagi DevOps dan Pemilik Platform (<em>Platform Owner</em>) untuk mengawasi seluruh infrastruktur gateway secara real-time.</p>
+
+<h3 class="sub-title">5.2 Manajemen Cadangan Gas Hot Wallet & Alert Otomatis</h3>
+<p>Pada kartu <strong>Hot Wallet Gas Reserves</strong>:</p>
+<ul><li>Pantau saldo koin native operasional: <strong>TRX & Energy Pool (TRON)</strong>, <strong>BNB (BSC)</strong>, <strong>POL (Polygon)</strong>, dan <strong>SOL (Solana)</strong>.</li></ul>
+<p><em> <strong>Low Gas Alert</strong>: Jika saldo native menipis hingga batas kritis, sistem akan memunculkan lencana kuning `LOW` sebagai peringatan untuk segera mengisi ulang (</em>top up*) gas agar penyapuan otomatis tidak terhambat.</p>
+
+<h3 class="sub-title">5.3 Prosedur Penyapuan Dana Manual (Manual Sweeper)</h3>
+<p>Jika terjadi kondisi di mana saldo gas hot wallet sempat habis dan ada deposit pembayaran yang belum tersapu:</p>
+<p>1. Isi ulang saldo gas native pada Master Hot Wallet yang bersangkutan.</p>
+<p>2. Buka <strong>Super Admin Portal</strong> atau panggil endpoint `POST /api/v1/admin/sweeps/manual` dengan membawa `invoice_id`.</p>
+<p>3. Mesin penyapu akan langsung mengeksekusi transfer on-chain memindahkan dana dari alamat deposit tagihan ke cold wallet merchant penerima.</p>
+
+<h3 class="sub-title">5.4 Pemeliharaan Database (Database Engine & Pruning)</h3>
+<p>Pada kartu <strong>Database Engine</strong>:</p>
+<ul><li>Pantau jumlah koneksi pool aktif (`open_connections`, `in_use`, `idle`).</li></ul>
+<ul><li>Pantau volume pertumbuhan baris tabel (`invoices`, `payouts`, `transactions`, `merchants`).</li></ul>
+<ul><li><strong>Pruning Rutin</strong>: Klik tombol <strong>Prune Expired</strong> untuk membersihkan rekaman tagihan yang kedaluwarsa lebih dari 7 hari tanpa menghapus riwayat invoice yang sukses.</li></ul>
+
+<h3 class="sub-title">5.5 Emergency Circuit Breaker</h3>
+<p>Pada kartu <strong>Platform Overview</strong>:</p>
+<ul><li>Terdapat sakelar darurat <strong>Circuit Breaker Active</strong>.</li></ul>
+<ul><li>Jika terjadi anomali pada blockchain (misal hard fork, reorg ekstrim, atau eksploitasi RPC node eksternal), admin dapat mengaktifkan Circuit Breaker dalam 1 klik.</li></ul>
+<ul><li>Saat aktif, seluruh eksekusi payout sweeping otomatis akan dibekukan sementara di memori hingga situasi jaringan dinyatakan aman.</li></ul>
+
+<h3 class="sub-title">5.6 Deployment Mandiri di Server VPS Menggunakan Docker Compose</h3>
+<p>Untuk mengoperasikan backend Go dan database PostgreSQL di server VPS privat:</p>
+
+<pre class="code-block"><code>bash
+<h1 class="doc-title">1. Kloning repositori resmi</h1>
+<p>git clone https://github.com/gonzhilaz/bpg.git</p>
+<p>cd bpg</p>
+
+<h1 class="doc-title">2. Sesuaikan konfigurasi rahasia pada file .env</h1>
+<p>cp .env.example .env</p>
+<p>nano .env</p>
+
+<h1 class="doc-title">3. Jalankan container dengan Docker Compose</h1>
+<p>docker compose up -d --build</p>
+
+<h1 class="doc-title">4. Pantau log operasional indexer blockchain</h1>
+<p>docker compose logs -f backend</p>
+</code></pre>
+
+<hr class="divider" />
+<p><em>Dokumen manual ini dihasilkan secara otomatis dari spesifikasi arsitektur resmi Captain Crypto Payment Gateway v1.2.</em></p>
+
+</body>
+</html>
