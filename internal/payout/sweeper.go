@@ -94,3 +94,4 @@ func (s *batchSweeper) SweepInvoice(ctx context.Context, invoice *domain.Invoice
 
 	return nil
 }
+

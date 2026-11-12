@@ -61,3 +61,4 @@ func (s *payoutService) ProcessAutoPayout(ctx context.Context, invoice *domain.I
 
 	return payoutRecord, nil
 }
+

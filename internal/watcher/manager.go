@@ -107,3 +107,4 @@ func (m *WatcherManager) Stop() {
 	m.wg.Wait()
 	log.Println("[WATCHER] All multi-chain indexers stopped gracefully.")
 }
+

@@ -134,3 +134,4 @@ func (w *TronWatcher) ScanBlocks(ctx context.Context) error {
 	w.lastSeenTs = maxTs + 1
 	return nil
 }
+

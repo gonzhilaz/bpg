@@ -30,3 +30,4 @@ type NetworkWatcher interface {
 	Network() domain.Network
 	ScanBlocks(ctx context.Context) error
 }
+

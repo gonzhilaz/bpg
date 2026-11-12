@@ -207,3 +207,4 @@ func (w *SolanaWatcher) calculateTokenDelta(tx *solParsedTx, ownerAddress string
 	}
 	return decimal.Zero
 }
+

@@ -243,3 +243,4 @@ func (w *EVMWatcher) getLogs(ctx context.Context, fromBlock, toBlock uint64) ([]
 
 	return logs, nil
 }
+
