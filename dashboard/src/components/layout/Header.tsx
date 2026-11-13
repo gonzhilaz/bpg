@@ -2,12 +2,12 @@
 
 import React from "react";
 import { usePathname } from "next/navigation";
-import { Menu, ShieldCheck, ExternalLink, Sun, Moon, Globe } from "lucide-react";
+import { Menu, ShieldCheck, Sun, Moon, Globe } from "lucide-react";
 import { useEnvironment } from "../../context/EnvironmentContext";
 import { useTheme } from "../../context/ThemeContext";
 import { useLanguage } from "../../context/LanguageContext";
 import { EnvironmentToggle } from "../dashboard/EnvironmentToggle";
-import { getEnvUrl } from "../../utils/env";
+import { MerchantNotificationDropdown } from "./MerchantNotificationDropdown";
 
 export function Header() {
   const pathname = usePathname();
@@ -59,12 +59,15 @@ export function Header() {
         </div>
       </div>
 
-      {/* Right: Environment Toggle, Theme, Language & Quick Status */}
+      {/* Right: Notifications, Language, Theme, Environment Toggle */}
       <div className="flex items-center gap-2.5">
         <div className="hidden lg:flex items-center gap-2 text-xs font-medium text-emerald-400 bg-emerald-950/30 border border-emerald-800/40 px-3 py-1.5 rounded-xl">
           <ShieldCheck className="w-3.5 h-3.5" />
           <span>{t("connected")}</span>
         </div>
+
+        {/* Merchant Notifications */}
+        <MerchantNotificationDropdown />
 
         {/* Language Selector */}
         <button
@@ -90,16 +93,6 @@ export function Header() {
           )}
         </button>
 
-        <a
-          href={getEnvUrl.admin()}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-zinc-800/80 hover:bg-zinc-700/80 text-zinc-300 text-xs font-medium border border-zinc-700/80 transition-colors"
-        >
-          <span>{t("adminPortal")}</span>
-          <ExternalLink className="w-3 h-3 text-zinc-400" />
-        </a>
-
         <div className="h-5 w-px bg-zinc-800 hidden sm:block" />
 
         <EnvironmentToggle mode={mode} onToggle={setMode} />
@@ -107,4 +100,3 @@ export function Header() {
     </header>
   );
 }
-

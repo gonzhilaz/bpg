@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { Key, Copy, Check, Eye, EyeOff } from "lucide-react";
 import { Tooltip } from "../ui/Tooltip";
+import { IconButton } from "../ui/IconButton";
 
 interface Props {
   apiKey: string;
@@ -20,56 +21,59 @@ export function ApiKeyCard({ apiKey, secretKey }: Props) {
   };
 
   return (
-    <div className="bg-zinc-900/80 border border-zinc-800 rounded-2xl p-5 shadow-xl space-y-4">
-      <div className="flex items-center justify-between">
+    <div className="bg-zinc-900/80 border border-zinc-800 rounded-2xl p-4 shadow-sm space-y-3">
+      <div className="flex items-center justify-between border-b border-zinc-800/60 pb-2">
         <div className="flex items-center gap-2">
           <Key className="w-4 h-4 text-cyan-400" />
-          <h2 className="text-sm font-semibold text-zinc-100">API Credentials</h2>
-          <Tooltip content="Use X-API-KEY in HTTP request headers to authenticate." />
+          <h2 className="text-xs font-bold text-white uppercase tracking-wider">Active Credentials</h2>
+          <Tooltip content="Use X-API-KEY in HTTP request headers to authenticate with 13C Gateway." />
         </div>
       </div>
 
-      <div className="space-y-3 text-xs">
+      <div className="space-y-2.5 text-xs">
         {/* API Key */}
         <div className="space-y-1">
-          <span className="text-zinc-400 font-medium">Public API Key</span>
-          <div className="flex items-center justify-between bg-zinc-800/60 border border-zinc-700/60 rounded-xl px-3 py-2">
-            <span className="font-mono text-zinc-200 select-all truncate">{apiKey}</span>
-            <button
-              type="button"
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] text-zinc-400 font-medium">API Key</span>
+            <Tooltip content="Live production authentication credential for your store." />
+          </div>
+          <div className="flex items-center justify-between bg-zinc-950/80 border border-zinc-800 rounded-xl px-3 py-1.5">
+            <span className="font-mono text-xs text-zinc-200 select-all truncate">{apiKey}</span>
+            <IconButton
+              icon={copiedKey === "api" ? Check : Copy}
+              tooltip={copiedKey === "api" ? "Copied" : "Copy Key"}
               onClick={() => handleCopy(apiKey, "api")}
-              className="ml-2 inline-flex items-center gap-1 text-[11px] text-zinc-400 hover:text-zinc-200"
-            >
-              {copiedKey === "api" ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-              {copiedKey === "api" ? "Copied" : "Copy"}
-            </button>
+              size="xs"
+              variant="ghost"
+            />
           </div>
         </div>
 
         {/* Secret Key */}
         <div className="space-y-1">
-          <span className="text-zinc-400 font-medium">Webhook Secret</span>
-          <div className="flex items-center justify-between bg-zinc-800/60 border border-zinc-700/60 rounded-xl px-3 py-2">
-            <span className="font-mono text-zinc-200 truncate">
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] text-zinc-400 font-medium">Signing Secret</span>
+            <Tooltip content="HMAC-SHA256 signature key to verify webhook callbacks." />
+          </div>
+          <div className="flex items-center justify-between bg-zinc-950/80 border border-zinc-800 rounded-xl px-3 py-1.5">
+            <span className="font-mono text-xs text-zinc-200 truncate">
               {showSecret ? secretKey : "••••••••••••••••••••••••••••••••"}
             </span>
-            <div className="flex items-center gap-2 ml-2">
-              <button
-                type="button"
+            <div className="flex items-center gap-1 ml-2">
+              <IconButton
+                icon={showSecret ? EyeOff : Eye}
+                tooltip={showSecret ? "Hide Secret" : "Reveal Secret"}
                 onClick={() => setShowSecret(!showSecret)}
-                className="text-zinc-400 hover:text-zinc-200"
-                aria-label="Toggle secret visibility"
-              >
-                {showSecret ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
-              </button>
-              <button
-                type="button"
+                size="xs"
+                variant="ghost"
+              />
+              <IconButton
+                icon={copiedKey === "secret" ? Check : Copy}
+                tooltip={copiedKey === "secret" ? "Copied" : "Copy Secret"}
                 onClick={() => handleCopy(secretKey, "secret")}
-                className="inline-flex items-center gap-1 text-[11px] text-zinc-400 hover:text-zinc-200"
-              >
-                {copiedKey === "secret" ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-                {copiedKey === "secret" ? "Copied" : "Copy"}
-              </button>
+                size="xs"
+                variant="ghost"
+              />
             </div>
           </div>
         </div>
@@ -77,4 +81,3 @@ export function ApiKeyCard({ apiKey, secretKey }: Props) {
     </div>
   );
 }
-

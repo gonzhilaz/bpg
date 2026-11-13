@@ -3,6 +3,8 @@
 import React, { useState } from "react";
 import { DollarSign, Download, TrendingUp, Layers, Flame, Percent } from "lucide-react";
 import { Tooltip } from "../ui/Tooltip";
+import { StatTile } from "../ui/StatTile";
+import { IconButton } from "../ui/IconButton";
 
 export function PlatformFinancialReportCard() {
   const [filterPeriod, setFilterPeriod] = useState<"7D" | "30D" | "ALL">("30D");
@@ -53,12 +55,12 @@ export function PlatformFinancialReportCard() {
   };
 
   return (
-    <div className="bg-zinc-900/80 border border-zinc-800 rounded-2xl p-5 shadow-xl space-y-4">
+    <div className="bg-zinc-900/80 border border-zinc-800 rounded-2xl p-4 shadow-sm space-y-3">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-zinc-800/60 pb-2.5">
         <div className="flex items-center gap-2">
           <TrendingUp className="w-4 h-4 text-emerald-400" />
-          <h2 className="text-sm font-semibold text-zinc-100">Financial Revenue & Margin</h2>
+          <h2 className="text-xs font-bold text-white uppercase tracking-wider">Revenue & Margin</h2>
           <Tooltip content="Audited global platform volume, 0.4% platform fee collection, and net gateway profitability." />
         </div>
 
@@ -69,9 +71,9 @@ export function PlatformFinancialReportCard() {
                 key={period}
                 type="button"
                 onClick={() => setFilterPeriod(period)}
-                className={`px-2.5 py-1 rounded-lg transition-all ${
+                className={`px-2.5 py-1 rounded-lg transition-colors ${
                   filterPeriod === period
-                    ? "bg-zinc-800 text-white font-semibold shadow-sm"
+                    ? "bg-zinc-800 text-white font-bold"
                     : "text-zinc-400 hover:text-zinc-200"
                 }`}
               >
@@ -80,66 +82,48 @@ export function PlatformFinancialReportCard() {
             ))}
           </div>
 
-          <button
-            type="button"
+          <IconButton
+            icon={Download}
+            tooltip="Export CSV Report"
             onClick={handleExportCSV}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs font-medium border border-zinc-700 transition-colors"
-          >
-            <Download className="w-3.5 h-3.5 text-cyan-400" />
-            <span>Export CSV</span>
-          </button>
+            variant="primary"
+          />
         </div>
       </div>
 
-      {/* 4-Box Metric Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 font-mono text-xs">
-        {/* Gross Volume */}
-        <div className="bg-zinc-950/70 border border-zinc-800/80 rounded-xl p-3 space-y-1">
-          <div className="text-[10px] text-zinc-500 uppercase tracking-wider font-sans font-medium flex items-center justify-between">
-            <span>Gross Volume</span>
-            <DollarSign className="w-3 h-3 text-cyan-400" />
-          </div>
-          <div className="text-lg font-bold text-white">{current.grossVolume}</div>
-          <div className="text-[10px] text-zinc-500 font-sans">{current.totalTransactions} transactions</div>
-        </div>
-
-        {/* Platform Fee Collected */}
-        <div className="bg-zinc-950/70 border border-zinc-800/80 rounded-xl p-3 space-y-1">
-          <div className="text-[10px] text-zinc-500 uppercase tracking-wider font-sans font-medium flex items-center justify-between">
-            <span className="flex items-center gap-1">
-              Fee Cut (0.4%)
-              <Tooltip content="Platform commission collected directly from gross payments." />
-            </span>
-            <Percent className="w-3 h-3 text-indigo-400" />
-          </div>
-          <div className="text-lg font-bold text-indigo-300">{current.feeRevenue}</div>
-          <div className="text-[10px] text-zinc-500 font-sans">Accumulated gross fee</div>
-        </div>
-
-        {/* Gas Expended */}
-        <div className="bg-zinc-950/70 border border-zinc-800/80 rounded-xl p-3 space-y-1">
-          <div className="text-[10px] text-zinc-500 uppercase tracking-wider font-sans font-medium flex items-center justify-between">
-            <span className="flex items-center gap-1">
-              Gas Expended
-              <Tooltip content="Total native blockchain gas consumed by hot wallets to sweep funds." />
-            </span>
-            <Flame className="w-3 h-3 text-amber-400" />
-          </div>
-          <div className="text-lg font-bold text-amber-300">{current.hotWalletGasSpent}</div>
-          <div className="text-[10px] text-zinc-500 font-sans">BNB, POL, TRX, SOL</div>
-        </div>
-
-        {/* Net Profit */}
-        <div className="bg-zinc-950/70 border border-zinc-800/80 rounded-xl p-3 space-y-1">
-          <div className="text-[10px] text-zinc-500 uppercase tracking-wider font-sans font-medium flex items-center justify-between">
-            <span>Net Profit</span>
-            <Layers className="w-3 h-3 text-emerald-400" />
-          </div>
-          <div className="text-lg font-bold text-emerald-400">{current.netProfit}</div>
-          <div className="text-[10px] text-zinc-500 font-sans">Net platform margin</div>
-        </div>
+      {/* Primary KPI Grid */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <StatTile
+          label="Gross Volume"
+          value={current.grossVolume}
+          icon={DollarSign}
+          tooltip="Gross cumulative cryptocurrency payment volume across all chains."
+          subValue={`${current.totalTransactions} transactions`}
+        />
+        <StatTile
+          label="Fee Cut"
+          value={current.feeRevenue}
+          icon={Percent}
+          tooltip="Platform commission collected directly (0.4%) from gross transactions."
+          trend="0.4%"
+          trendUp={true}
+        />
+        <StatTile
+          label="Gas Spent"
+          value={current.hotWalletGasSpent}
+          icon={Flame}
+          tooltip="Total native blockchain gas consumed by hot wallets to sweep funds."
+          subValue="BNB, POL, TRX, SOL"
+        />
+        <StatTile
+          label="Net Margin"
+          value={current.netProfit}
+          icon={Layers}
+          tooltip="Net retained platform revenue after deducting hot wallet gas costs."
+          trend="Net Profit"
+          trendUp={true}
+        />
       </div>
     </div>
   );
 }
-

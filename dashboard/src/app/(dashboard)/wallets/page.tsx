@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Wallet, ShieldCheck, Flame, Info } from "lucide-react";
+import { Wallet, ShieldCheck, Flame } from "lucide-react";
 import { useEnvironment } from "../../../context/EnvironmentContext";
 import { PayoutSettingsCard } from "../../../components/dashboard/PayoutSettingsCard";
 import { mockNetworkGasRates } from "../../../mocks/mockMerchant";
@@ -11,26 +11,32 @@ export default function WalletsPage() {
   const { profile } = useEnvironment();
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight text-white">Wallets & Gas Policy</h1>
-        <p className="text-xs text-zinc-400 mt-1">
-          Configure cold wallet settlement addresses, select fee payer policies, and track live network gas rates.
-        </p>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-zinc-800/80">
+        <div>
+          <h1 className="text-xl font-bold tracking-tight text-white flex items-center gap-2">
+            <Wallet className="w-5 h-5 text-emerald-400" />
+            <span>Wallets & Gas</span>
+            <Tooltip content="Security Notice: Always use hardware wallets (Ledger, Trezor) or multi-sig contracts (Safe) as settlement destinations. Never use exchange addresses requiring memo tags." />
+          </h1>
+          <p className="text-xs text-zinc-400">
+            Cold wallet settlement addresses, fee payer rules, and live network gas rates.
+          </p>
+        </div>
       </div>
 
       {/* Network Gas & Coin Prices Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {mockNetworkGasRates.map((rate) => (
           <div
             key={rate.network}
-            className="p-4 rounded-2xl bg-zinc-900/60 border border-zinc-800 space-y-2"
+            className="p-3 rounded-2xl bg-zinc-900/60 border border-zinc-800 space-y-1.5"
           >
             <div className="flex items-center justify-between">
               <span className="text-xs font-bold text-white tracking-wider">{rate.network}</span>
               <span
-                className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${
+                className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${
                   rate.status === "OPTIMAL"
                     ? "text-emerald-400 bg-emerald-500/10 border border-emerald-500/20"
                     : "text-amber-400 bg-amber-500/10 border border-amber-500/20"
@@ -40,18 +46,14 @@ export default function WalletsPage() {
               </span>
             </div>
 
-            <div className="space-y-1 font-mono">
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-zinc-400 font-sans">{rate.native_coin} Price:</span>
+            <div className="space-y-0.5 font-mono text-xs">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] text-zinc-400 font-sans">{rate.native_coin}:</span>
                 <span className="text-white font-semibold">${rate.coin_price_usd}</span>
               </div>
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-zinc-400 font-sans">Est. Sweep:</span>
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] text-zinc-400 font-sans">Est. Sweep:</span>
                 <span className="text-cyan-400 font-semibold">{rate.est_sweep_fee_usd}</span>
-              </div>
-              <div className="flex items-center justify-between text-[11px] text-zinc-500 pt-1 border-t border-zinc-800">
-                <span className="font-sans">Gas Metric:</span>
-                <span>{rate.gas_price_metric}</span>
               </div>
             </div>
           </div>
@@ -59,19 +61,9 @@ export default function WalletsPage() {
       </div>
 
       {/* Main Settings Form */}
-      <div className="max-w-3xl">
+      <div className="max-w-2xl">
         <PayoutSettingsCard profile={profile} gasRates={mockNetworkGasRates} />
-      </div>
-
-      {/* Advisory Note */}
-      <div className="max-w-3xl p-4 rounded-2xl bg-zinc-900/40 border border-zinc-800 text-xs text-zinc-400 flex items-start gap-3">
-        <Info className="w-4 h-4 text-cyan-400 shrink-0 mt-0.5" />
-        <div>
-          <span className="font-semibold text-zinc-200">Security Recommendation: </span>
-          Always use hardware wallets (Ledger, Trezor, Keystone) or multi-sig contracts (Safe) as your settlement destination. Never enter exchange deposit addresses that require memo/tags unless verified.
-        </div>
       </div>
     </div>
   );
 }
-

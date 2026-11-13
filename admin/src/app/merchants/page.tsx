@@ -5,6 +5,8 @@ import { Users, Search, Plus, RotateCcw, ShieldCheck, Ban, CheckCircle2, Chevron
 import { useAdmin } from "../../context/AdminContext";
 import { useLanguage } from "../../context/LanguageContext";
 import { MerchantControlTable } from "../../components/admin/MerchantControlTable";
+import { StatTile } from "../../components/ui/StatTile";
+import { IconButton } from "../../components/ui/IconButton";
 import { AdminMerchant } from "../../types/admin";
 
 export default function MerchantsPage() {
@@ -73,36 +75,33 @@ export default function MerchantsPage() {
       </div>
 
       {/* KPI Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="bg-zinc-900/60 border border-zinc-800 p-4 rounded-2xl space-y-1">
-          <div className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider">
-            Total Registered
-          </div>
-          <div className="text-2xl font-bold font-mono text-white">{merchants.length}</div>
-          <div className="text-[11px] text-zinc-500">Live & Sandbox merchants</div>
-        </div>
-
-        <div className="bg-zinc-900/60 border border-zinc-800 p-4 rounded-2xl space-y-1">
-          <div className="text-[11px] font-semibold text-emerald-400 uppercase tracking-wider flex items-center gap-1">
-            <CheckCircle2 className="w-3.5 h-3.5" />
-            <span>Active Merchants</span>
-          </div>
-          <div className="text-2xl font-bold font-mono text-emerald-400">{activeCount}</div>
-          <div className="text-[11px] text-zinc-500">Authorized to process orders</div>
-        </div>
-
-        <div className="bg-zinc-900/60 border border-zinc-800 p-4 rounded-2xl space-y-1">
-          <div className="text-[11px] font-semibold text-rose-400 uppercase tracking-wider flex items-center gap-1">
-            <Ban className="w-3.5 h-3.5" />
-            <span>Suspended</span>
-          </div>
-          <div className="text-2xl font-bold font-mono text-rose-400">{suspendedCount}</div>
-          <div className="text-[11px] text-zinc-500">API access revoked</div>
-        </div>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <StatTile
+          label="Total Merchants"
+          value={merchants.length}
+          icon={Users}
+          tooltip="Total registered merchant profiles in gateway registry."
+        />
+        <StatTile
+          label="Active Merchants"
+          value={activeCount}
+          icon={CheckCircle2}
+          tooltip="Merchants with active status and valid API credentials."
+          trend="Live"
+          trendUp={true}
+        />
+        <StatTile
+          label="Suspended"
+          value={suspendedCount}
+          icon={Ban}
+          tooltip="Merchant profiles with temporarily revoked checkout access."
+          trend={suspendedCount > 0 ? "Alert" : undefined}
+          trendUp={false}
+        />
       </div>
 
       {/* Search and Dropdown Filter */}
-      <div className="bg-zinc-900/60 border border-zinc-800 p-4 rounded-2xl flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+      <div className="bg-zinc-900/60 border border-zinc-800 p-3.5 rounded-2xl flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
         <div className="relative flex-1 max-w-md">
           <Search className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
           <input
@@ -129,16 +128,14 @@ export default function MerchantsPage() {
           </div>
 
           {(search !== "" || statusFilter !== "ALL") && (
-            <button
+            <IconButton
+              icon={RotateCcw}
+              tooltip={t("reset")}
               onClick={() => {
                 setSearch("");
                 setStatusFilter("ALL");
               }}
-              className="p-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-white border border-zinc-700 transition-colors"
-              title={t("reset")}
-            >
-              <RotateCcw className="w-3.5 h-3.5" />
-            </button>
+            />
           )}
         </div>
       </div>

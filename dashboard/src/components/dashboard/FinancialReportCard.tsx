@@ -3,6 +3,8 @@
 import React, { useState } from "react";
 import { DollarSign, Download, TrendingUp, Layers, Flame, Percent } from "lucide-react";
 import { Tooltip } from "../ui/Tooltip";
+import { IconButton } from "../ui/IconButton";
+import { StatTile } from "../ui/StatTile";
 
 export function FinancialReportCard() {
   const [dateRange, setDateRange] = useState<"7D" | "30D" | "ALL">("30D");
@@ -86,66 +88,53 @@ export function FinancialReportCard() {
           </div>
 
           {/* Export CSV Button */}
-          <button
-            type="button"
+          <IconButton
+            icon={Download}
+            tooltip="Export CSV ledger"
             onClick={handleExportCSV}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs font-medium border border-zinc-700 transition-colors"
-          >
-            <Download className="w-3.5 h-3.5 text-cyan-400" />
-            <span>Export CSV</span>
-          </button>
+            size="sm"
+          />
         </div>
       </div>
 
-      {/* Metrics 4-Box Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 font-mono">
-        {/* Gross Sales */}
-        <div className="bg-zinc-950/70 border border-zinc-800/80 rounded-xl p-3 space-y-1">
-          <div className="text-[10px] text-zinc-500 uppercase tracking-wider font-sans font-medium flex items-center justify-between">
-            <span>Gross Sales</span>
-            <DollarSign className="w-3 h-3 text-cyan-400" />
-          </div>
-          <div className="text-lg font-bold text-white">{current.grossVolume}</div>
-          <div className="text-[10px] text-zinc-500 font-sans">{current.payoutsCount} settlements</div>
-        </div>
+      {/* Metrics 4-Box Grid using StatTile */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <StatTile
+          label="Gross Sales"
+          value={current.grossVolume}
+          icon={DollarSign}
+          tooltip="Total cryptocurrency payments received before fees."
+          trend={`${current.payoutsCount} txs`}
+          trendUp={true}
+        />
 
-        {/* Net Settled */}
-        <div className="bg-zinc-950/70 border border-zinc-800/80 rounded-xl p-3 space-y-1">
-          <div className="text-[10px] text-zinc-500 uppercase tracking-wider font-sans font-medium flex items-center justify-between">
-            <span>Net Settled</span>
-            <Layers className="w-3 h-3 text-emerald-400" />
-          </div>
-          <div className="text-lg font-bold text-emerald-400">{current.netSettled}</div>
-          <div className="text-[10px] text-zinc-500 font-sans">Cold wallet received</div>
-        </div>
+        <StatTile
+          label="Net Settled"
+          value={current.netSettled}
+          icon={Layers}
+          tooltip="Net tokens successfully forwarded to cold wallets."
+          trend="Delivered"
+          trendUp={true}
+        />
 
-        {/* Platform Fee */}
-        <div className="bg-zinc-950/70 border border-zinc-800/80 rounded-xl p-3 space-y-1">
-          <div className="text-[10px] text-zinc-500 uppercase tracking-wider font-sans font-medium flex items-center justify-between">
-            <span className="flex items-center gap-1">
-              Fee (0.4%)
-              <Tooltip content="Platform gateway processing commission." />
-            </span>
-            <Percent className="w-3 h-3 text-indigo-400" />
-          </div>
-          <div className="text-lg font-bold text-indigo-300">{current.platformFee}</div>
-          <div className="text-[10px] text-zinc-500 font-sans">Avg {current.avgOrder}/tx</div>
-        </div>
+        <StatTile
+          label="Fee (0.4%)"
+          value={current.platformFee}
+          icon={Percent}
+          tooltip="Flat 0.4% platform gateway service commission."
+          trend="0.40%"
+          trendUp={true}
+        />
 
-        {/* Gas Incurred */}
-        <div className="bg-zinc-950/70 border border-zinc-800/80 rounded-xl p-3 space-y-1">
-          <div className="text-[10px] text-zinc-500 uppercase tracking-wider font-sans font-medium flex items-center justify-between">
-            <span className="flex items-center gap-1">
-              Sweep Gas
-              <Tooltip content="Estimated blockchain network fees incurred during auto-forwarding." />
-            </span>
-            <Flame className="w-3 h-3 text-amber-400" />
-          </div>
-          <div className="text-lg font-bold text-amber-300">{current.gasFeesPaid}</div>
-          <div className="text-[10px] text-zinc-500 font-sans">Multi-chain total</div>
-        </div>
+        <StatTile
+          label="Sweep Gas"
+          value={current.gasFeesPaid}
+          icon={Flame}
+          tooltip="Blockchain gas costs consumed during automated sweeping."
+          trend="Network"
+          trendUp={false}
+        />
       </div>
     </div>
   );
 }
-

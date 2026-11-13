@@ -1,8 +1,9 @@
 "use client";
 
 import React, { useState } from "react";
-import { Activity, RefreshCw, Zap, Gauge, DollarSign } from "lucide-react";
+import { Activity, RefreshCw, Gauge, DollarSign } from "lucide-react";
 import { Tooltip } from "../ui/Tooltip";
+import { IconButton } from "../ui/IconButton";
 import { NetworkGasItem } from "../../types/admin";
 import { mockNetworkGasList } from "../../mocks/mockAdmin";
 
@@ -18,7 +19,7 @@ export function NetworkGasMatrixCard({ rates = mockNetworkGasList }: Props) {
     setIsRefreshing(true);
     setTimeout(() => {
       setIsRefreshing(false);
-    }, 800);
+    }, 600);
   };
 
   return (
@@ -31,14 +32,13 @@ export function NetworkGasMatrixCard({ rates = mockNetworkGasList }: Props) {
           <Tooltip content="Live on-chain gas metrics and native coin prices used for sweeping cost estimations." />
         </div>
 
-        <button
-          type="button"
+        <IconButton
+          icon={RefreshCw}
+          tooltip="Refresh gas rates"
           onClick={handleRefresh}
-          className="p-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white border border-zinc-700/80 transition-colors"
-          title="Refresh rates"
-        >
-          <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? "animate-spin text-cyan-400" : ""}`} />
-        </button>
+          className={isRefreshing ? "animate-spin text-cyan-400" : ""}
+          size="sm"
+        />
       </div>
 
       {/* 4-Column Responsive Grid */}
@@ -96,4 +96,3 @@ export function NetworkGasMatrixCard({ rates = mockNetworkGasList }: Props) {
     </div>
   );
 }
-

@@ -5,6 +5,8 @@ import { Flame, Gauge, Play, ShieldAlert, CheckCircle2, RotateCw } from "lucide-
 import { useAdmin } from "../../context/AdminContext";
 import { HotWalletGasCard } from "../../components/admin/HotWalletGasCard";
 import { NetworkGasMatrixCard } from "../../components/admin/NetworkGasMatrixCard";
+import { Tooltip } from "../../components/ui/Tooltip";
+import { IconButton } from "../../components/ui/IconButton";
 
 export default function GasLiquidityPage() {
   const { hotWallets, gasRates } = useAdmin();
@@ -17,19 +19,23 @@ export default function GasLiquidityPage() {
     setSweepResult(null);
     setTimeout(() => {
       setIsSweeping(false);
-      setSweepResult(`Successfully swept 3 invoices on ${selectedChain === "ALL" ? "all networks" : selectedChain}. Tx broadcasted.`);
+      setSweepResult(`Swept invoices on ${selectedChain === "ALL" ? "all networks" : selectedChain}. Tx broadcasted.`);
       setTimeout(() => setSweepResult(null), 4000);
-    }, 1500);
+    }, 1200);
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Header & Controls */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-zinc-800/80">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-white">Gas Liquidity & Sweeper Engine</h1>
-          <p className="text-xs text-zinc-400 mt-1">
-            Monitor master hot wallet fuel balances, TRON Energy delegations, and trigger automated sweeping batches.
+          <h1 className="text-xl font-bold tracking-tight text-white flex items-center gap-2">
+            <Flame className="w-5 h-5 text-amber-400" />
+            <span>Gas Engine</span>
+            <Tooltip content="Automated background engine delegating TRON energy or feeding native gas for token sweeps." />
+          </h1>
+          <p className="text-xs text-zinc-400">
+            Hot wallet fuel balances, TRON Energy, and automated deposit sweeps.
           </p>
         </div>
 
@@ -37,7 +43,7 @@ export default function GasLiquidityPage() {
           <select
             value={selectedChain}
             onChange={(e) => setSelectedChain(e.target.value)}
-            className="bg-zinc-900 border border-zinc-800 text-xs text-zinc-200 rounded-xl px-3 py-2 focus:outline-none"
+            className="bg-zinc-900 border border-zinc-800 text-xs text-zinc-200 rounded-xl px-3 py-2 focus:outline-none cursor-pointer"
           >
             <option value="ALL">All Networks</option>
             <option value="TRON">TRON</option>
@@ -50,7 +56,7 @@ export default function GasLiquidityPage() {
             type="button"
             onClick={handleManualSweep}
             disabled={isSweeping}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-zinc-950 font-bold text-xs transition-colors disabled:opacity-50"
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-zinc-950 font-bold text-xs transition-colors disabled:opacity-50"
           >
             <RotateCw className={`w-3.5 h-3.5 ${isSweeping ? "animate-spin" : ""}`} />
             <span>{isSweeping ? "Sweeping..." : "Trigger Sweep"}</span>
@@ -59,7 +65,7 @@ export default function GasLiquidityPage() {
       </div>
 
       {sweepResult && (
-        <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-400 flex items-center gap-2">
+        <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-400 flex items-center gap-2">
           <CheckCircle2 className="w-4 h-4 shrink-0" />
           <span>{sweepResult}</span>
         </div>
@@ -70,18 +76,6 @@ export default function GasLiquidityPage() {
 
       {/* Network Gas & Coin Price Matrix */}
       <NetworkGasMatrixCard rates={gasRates} />
-
-      {/* Gas Policy Explanation */}
-      <div className="p-5 rounded-2xl bg-zinc-900/40 border border-zinc-800 space-y-2 text-xs text-zinc-400 leading-relaxed">
-        <div className="font-semibold text-white flex items-center gap-1.5">
-          <ShieldAlert className="w-4 h-4 text-amber-400" />
-          <span>Automated Gas Dispenser Architecture</span>
-        </div>
-        <p>
-          Deposit addresses are generated ephemerally without native gas. When an invoice payment is detected, the gateway&apos;s background engine automatically transfers native fuel (BNB, POL, SOL) or delegates TRON Energy to the deposit address before broadcasting the forwarding transaction to the merchant&apos;s cold wallet.
-        </p>
-      </div>
     </div>
   );
 }
-

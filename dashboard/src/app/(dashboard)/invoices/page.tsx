@@ -5,6 +5,8 @@ import { Search, Filter, RotateCcw, Receipt, ChevronDown } from "lucide-react";
 import { useEnvironment } from "../../../context/EnvironmentContext";
 import { useLanguage } from "../../../context/LanguageContext";
 import { InvoicesTable } from "../../../components/dashboard/InvoicesTable";
+import { IconButton } from "../../../components/ui/IconButton";
+import { Tooltip } from "../../../components/ui/Tooltip";
 import { Network } from "../../../types/merchant";
 
 export default function InvoicesPage() {
@@ -100,13 +102,12 @@ export default function InvoicesPage() {
 
           {/* Reset Button */}
           {isFiltered && (
-            <button
+            <IconButton
+              icon={RotateCcw}
+              tooltip={t("reset")}
               onClick={handleReset}
-              className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs font-semibold border border-zinc-700 transition-colors"
-            >
-              <RotateCcw className="w-3.5 h-3.5" />
-              <span>{t("reset")}</span>
-            </button>
+              size="md"
+            />
           )}
         </div>
       </div>

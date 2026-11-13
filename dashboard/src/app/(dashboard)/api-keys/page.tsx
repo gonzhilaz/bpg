@@ -4,6 +4,8 @@ import React, { useState } from "react";
 import { Key, Shield, RefreshCw, Terminal, Check, Copy, AlertTriangle, Lock } from "lucide-react";
 import { useEnvironment } from "../../../context/EnvironmentContext";
 import { ApiKeyCard } from "../../../components/dashboard/ApiKeyCard";
+import { IconButton } from "../../../components/ui/IconButton";
+import { Tooltip } from "../../../components/ui/Tooltip";
 
 export default function ApiKeysPage() {
   const { profile, mode } = useEnvironment();
@@ -61,22 +63,26 @@ console.log('Payment URL:', response.data.data.checkout_url);`;
   };
 
   return (
-    <div className="space-y-6 max-w-4xl">
+    <div className="space-y-4 max-w-4xl">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-zinc-800/80">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-white">API Credentials & Security</h1>
-          <p className="text-xs text-zinc-400 mt-1">
+          <h1 className="text-xl font-bold tracking-tight text-white flex items-center gap-2">
+            <Key className="w-5 h-5 text-cyan-400" />
+            <span>API Credentials</span>
+            <Tooltip content="Zero-Trust Architecture: Never expose your API Key or Secret in client-side code, mobile binaries, or public Git repos. Always route checkout requests through server-side." />
+          </h1>
+          <p className="text-xs text-zinc-400">
             Authenticate your backend store and verify HMAC-SHA256 webhook signatures.
           </p>
         </div>
 
         <button
           onClick={() => setShowRegenModal(true)}
-          className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs font-medium border border-zinc-700 transition-colors self-start sm:self-auto"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs font-semibold border border-zinc-700 transition-colors self-start sm:self-auto"
         >
           <RefreshCw className="w-3.5 h-3.5 text-amber-400" />
-          <span>Regenerate Key</span>
+          <span>Rotate Key</span>
         </button>
       </div>
 
@@ -118,30 +124,17 @@ console.log('Payment URL:', response.data.data.checkout_url);`;
               </button>
             </div>
 
-            <button
+            <IconButton
+              icon={copiedCode ? Check : Copy}
+              tooltip={copiedCode ? "Copied" : "Copy Code"}
               onClick={handleCopyCode}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs font-medium border border-zinc-700 transition-colors"
-            >
-              {copiedCode ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-              <span>{copiedCode ? "Copied" : "Copy"}</span>
-            </button>
+            />
           </div>
         </div>
 
         <pre className="p-4 rounded-xl bg-zinc-950 border border-zinc-800/80 text-xs text-zinc-300 font-mono overflow-x-auto leading-relaxed">
           {activeTab === "curl" ? curlExample : nodeExample}
         </pre>
-      </div>
-
-      {/* Security Guidance Card */}
-      <div className="p-5 rounded-2xl bg-zinc-900/40 border border-zinc-800 space-y-2">
-        <div className="flex items-center gap-2 text-xs font-semibold text-white">
-          <Lock className="w-4 h-4 text-emerald-400" />
-          <span>Zero-Trust Architecture</span>
-        </div>
-        <p className="text-xs text-zinc-400 leading-relaxed">
-          Never expose your API Key or Webhook Secret in client-side code, mobile binaries, or public Git repositories. Always route checkout requests through your server-side backend.
-        </p>
       </div>
 
       {/* Confirmation Modal for Regeneration */}

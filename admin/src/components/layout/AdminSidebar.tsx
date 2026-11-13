@@ -138,21 +138,8 @@ export function AdminSidebar() {
         })}
 
         <div className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider px-3 pt-6 mb-2">
-          Portals & Cross-Links
+          Internal Tools
         </div>
-
-        <a
-          href={getEnvUrl.merchant()}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center justify-between px-3 py-2 rounded-xl text-xs text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/50 transition-colors"
-        >
-          <div className="flex items-center gap-3">
-            <ExternalLink className="w-4 h-4 text-cyan-400" />
-            <span>{t("merchantPortal")}</span>
-          </div>
-          <span className="text-[10px] text-zinc-500 font-mono">LIVE</span>
-        </a>
 
         <a
           href={getEnvUrl.sandbox()}

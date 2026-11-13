@@ -15,6 +15,8 @@ import {
 } from "lucide-react";
 import { useAdmin } from "../context/AdminContext";
 import { PlatformMetricsCard } from "../components/admin/PlatformMetricsCard";
+import { Tooltip } from "../components/ui/Tooltip";
+import { IconButton } from "../components/ui/IconButton";
 
 export default function AdminOverviewPage() {
   const { metrics, hotWallets, watchers, merchants } = useAdmin();
@@ -61,11 +63,12 @@ export default function AdminOverviewPage() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Flame className="w-4 h-4 text-amber-400" />
-              <h3 className="text-xs font-bold text-white uppercase tracking-wider">Hot Wallet Gas Liquidity</h3>
+              <h3 className="text-xs font-bold text-white uppercase tracking-wider">Gas Liquidity</h3>
+              <Tooltip content="Operational native gas balances reserved for automatic on-chain sweep transactions." />
             </div>
             <Link
               href="/gas-liquidity"
-              className="text-xs text-cyan-400 hover:text-cyan-300 font-medium inline-flex items-center gap-1"
+              className="text-xs text-cyan-400 hover:text-cyan-300 font-semibold inline-flex items-center gap-1"
             >
               <span>Manage</span>
               <ArrowUpRight className="w-3.5 h-3.5" />
@@ -93,17 +96,20 @@ export default function AdminOverviewPage() {
             ))}
           </div>
 
-          {lowGasCount > 0 ? (
-            <div className="text-[11px] text-amber-300 bg-amber-500/10 border border-amber-500/20 px-3 py-1.5 rounded-xl flex items-center gap-2">
-              <AlertTriangle className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-              <span>{lowGasCount} network requires gas top-up before sweeping queues stall.</span>
-            </div>
-          ) : (
-            <div className="text-[11px] text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1.5 rounded-xl flex items-center gap-2">
-              <CheckCircle2 className="w-3.5 h-3.5" />
-              <span>All hot wallet gas reserves above critical thresholds.</span>
-            </div>
-          )}
+          <div className="flex items-center justify-between pt-1">
+            {lowGasCount > 0 ? (
+              <div className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2.5 py-1 rounded-xl">
+                <AlertTriangle className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                <span>{lowGasCount} Network Low Gas</span>
+                <Tooltip content="Polygon hot wallet gas is below safety threshold. Top-up required." />
+              </div>
+            ) : (
+              <div className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 rounded-xl">
+                <CheckCircle2 className="w-3.5 h-3.5" />
+                <span>All Reserves Healthy</span>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Watcher Node Sync Glance */}
@@ -112,10 +118,11 @@ export default function AdminOverviewPage() {
             <div className="flex items-center gap-2">
               <Activity className="w-4 h-4 text-cyan-400" />
               <h3 className="text-xs font-bold text-white uppercase tracking-wider">Multi-Chain Watchers</h3>
+              <Tooltip content="Background blockchain indexer daemons scanning blocks for deposit transactions." />
             </div>
             <Link
               href="/watchers"
-              className="text-xs text-cyan-400 hover:text-cyan-300 font-medium inline-flex items-center gap-1"
+              className="text-xs text-cyan-400 hover:text-cyan-300 font-semibold inline-flex items-center gap-1"
             >
               <span>Inspect</span>
               <ArrowUpRight className="w-3.5 h-3.5" />
@@ -126,7 +133,7 @@ export default function AdminOverviewPage() {
             {watchers.map((w) => (
               <div
                 key={w.network}
-                className="p-2.5 rounded-xl bg-zinc-950/60 border border-zinc-800/80 flex items-center justify-between"
+                className="p-2 rounded-xl bg-zinc-950/60 border border-zinc-800/80 flex items-center justify-between"
               >
                 <div className="flex items-center gap-1.5">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
@@ -137,49 +144,61 @@ export default function AdminOverviewPage() {
             ))}
           </div>
 
-          <div className="text-[11px] text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1.5 rounded-xl flex items-center gap-2">
-            <CheckCircle2 className="w-3.5 h-3.5" />
-            <span>{activeWatchersCount}/4 indexers active • Head block latency &lt; 250ms</span>
+          <div className="flex items-center justify-between pt-1">
+            <div className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 rounded-xl">
+              <CheckCircle2 className="w-3.5 h-3.5" />
+              <span>{activeWatchersCount}/4 Watchers Synced</span>
+              <Tooltip content="All RPC endpoints responding within sub-250ms latency." />
+            </div>
           </div>
         </div>
       </div>
 
       {/* 3. Deep Ops Quick Links */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <Link
           href="/database"
-          className="p-4 rounded-2xl bg-zinc-900/40 border border-zinc-800/80 hover:border-zinc-700 transition-all space-y-1 group"
+          className="p-3.5 rounded-2xl bg-zinc-900/60 border border-zinc-800 hover:border-zinc-700 transition-all space-y-1.5 group"
         >
           <div className="flex items-center justify-between">
-            <Database className="w-4 h-4 text-cyan-400" />
+            <div className="flex items-center gap-2">
+              <Database className="w-4 h-4 text-cyan-400" />
+              <span className="text-xs font-bold text-white">Database Engine</span>
+              <Tooltip content="Connection pools, row count audits, and zero-lock data pruning." />
+            </div>
             <ArrowUpRight className="w-3.5 h-3.5 text-zinc-500 group-hover:text-cyan-400 transition-colors" />
           </div>
-          <div className="text-xs font-bold text-white pt-1">Database Engine</div>
-          <p className="text-[11px] text-zinc-400">Connection pools, row count audits, and invoice pruning.</p>
+          <div className="text-[11px] text-zinc-400 font-mono">Pool 100 • 6 Tables Audited</div>
         </Link>
 
         <Link
           href="/finance"
-          className="p-4 rounded-2xl bg-zinc-900/40 border border-zinc-800/80 hover:border-zinc-700 transition-all space-y-1 group"
+          className="p-3.5 rounded-2xl bg-zinc-900/60 border border-zinc-800 hover:border-zinc-700 transition-all space-y-1.5 group"
         >
           <div className="flex items-center justify-between">
-            <TrendingUp className="w-4 h-4 text-emerald-400" />
+            <div className="flex items-center gap-2">
+              <TrendingUp className="w-4 h-4 text-emerald-400" />
+              <span className="text-xs font-bold text-white">Financial Revenue</span>
+              <Tooltip content="Cumulative platform commission ledger and sweep gas expenses." />
+            </div>
             <ArrowUpRight className="w-3.5 h-3.5 text-zinc-500 group-hover:text-emerald-400 transition-colors" />
           </div>
-          <div className="text-xs font-bold text-white pt-1">Financial Revenue</div>
-          <p className="text-[11px] text-zinc-400">Cumulative 0.4% platform commission ledger and gas expenses.</p>
+          <div className="text-[11px] text-zinc-400 font-mono">0.4% Platform Margin • Ledger</div>
         </Link>
 
         <Link
           href="/settings"
-          className="p-4 rounded-2xl bg-zinc-900/40 border border-zinc-800/80 hover:border-zinc-700 transition-all space-y-1 group"
+          className="p-3.5 rounded-2xl bg-zinc-900/60 border border-zinc-800 hover:border-zinc-700 transition-all space-y-1.5 group"
         >
           <div className="flex items-center justify-between">
-            <Shield className="w-4 h-4 text-amber-400" />
+            <div className="flex items-center gap-2">
+              <Shield className="w-4 h-4 text-amber-400" />
+              <span className="text-xs font-bold text-white">Platform Parameters</span>
+              <Tooltip content="Platform fee rates, RPC endpoints, and emergency circuit breakers." />
+            </div>
             <ArrowUpRight className="w-3.5 h-3.5 text-zinc-500 group-hover:text-amber-400 transition-colors" />
           </div>
-          <div className="text-xs font-bold text-white pt-1">Platform Parameters</div>
-          <p className="text-[11px] text-zinc-400">Default fee percentage, RPC endpoints, and maintenance mode.</p>
+          <div className="text-[11px] text-zinc-400 font-mono">Economics & Emergency Switches</div>
         </Link>
       </div>
     </div>
