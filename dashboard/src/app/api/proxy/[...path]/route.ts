@@ -68,3 +68,4 @@ async function handleProxy(request: NextRequest, { path }: { path: string[] }) {
     );
   }
 }
+

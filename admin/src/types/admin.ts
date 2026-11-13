@@ -27,6 +27,12 @@ export interface AdminMerchant {
   auto_payout: boolean;
   status: "ACTIVE" | "SUSPENDED";
   created_at: string;
+  webhook_url?: string;
+  fee_payer?: "customer" | "merchant";
+  payout_address_bsc?: string;
+  payout_address_polygon?: string;
+  payout_address_tron?: string;
+  payout_address_solana?: string;
 }
 
 export interface PlatformMetrics {
@@ -45,4 +51,3 @@ export interface NetworkGasItem {
   status: "OPTIMAL" | "CONGESTED";
   updated_at: string;
 }
-

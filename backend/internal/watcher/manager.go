@@ -27,15 +27,36 @@ func NewWatcherManager(
 	invRepo repository.InvoiceRepository,
 	invoiceSvc service.InvoiceService,
 ) *WatcherManager {
+	bscRPC := cfg.BSCRPCURL
+	polyRPC := cfg.PolygonRPCURL
+	tronGrid := cfg.TronGridAPIURL
+	solRPC := cfg.SolanaRPCURL
+
+	// Dynamic testnet / sandbox RPC switching
+	if cfg.AppEnv == "sandbox" || cfg.AppEnv == "testnet" || cfg.AppEnv == "development" {
+		if cfg.TestnetBSCRPC != "" {
+			bscRPC = cfg.TestnetBSCRPC
+		}
+		if cfg.TestnetPolygonRPC != "" {
+			polyRPC = cfg.TestnetPolygonRPC
+		}
+		if cfg.TestnetTronGridURL != "" {
+			tronGrid = cfg.TestnetTronGridURL
+		}
+		if cfg.TestnetSolanaRPC != "" {
+			solRPC = cfg.TestnetSolanaRPC
+		}
+	}
+
 	watchers := []NetworkWatcher{
 		// BSC EVM Indexer (USDT 18 Decimals)
-		NewEVMWatcher(domain.NetworkBSC, cfg.BSCRPCURL, BSC_USDT_CONTRACT, 18, invRepo, invoiceSvc),
+		NewEVMWatcher(domain.NetworkBSC, bscRPC, BSC_USDT_CONTRACT, 18, invRepo, invoiceSvc),
 		// Polygon EVM Indexer (USDT 6 Decimals)
-		NewEVMWatcher(domain.NetworkPolygon, cfg.PolygonRPCURL, POLYGON_USDT_CONTRACT, 6, invRepo, invoiceSvc),
+		NewEVMWatcher(domain.NetworkPolygon, polyRPC, POLYGON_USDT_CONTRACT, 6, invRepo, invoiceSvc),
 		// TRON Indexer (USDT TRC-20 6 Decimals)
-		NewTronWatcher(cfg.TronGridAPIURL, cfg.TronAPIKey, invRepo, invoiceSvc),
+		NewTronWatcher(tronGrid, cfg.TronAPIKey, invRepo, invoiceSvc),
 		// Solana Indexer (USDT/USDC SPL 6 Decimals)
-		NewSolanaWatcher(cfg.SolanaRPCURL, invRepo, invoiceSvc),
+		NewSolanaWatcher(solRPC, invRepo, invoiceSvc),
 	}
 
 	return &WatcherManager{

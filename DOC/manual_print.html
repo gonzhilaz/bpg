@@ -136,7 +136,7 @@
 <body>
   <h1 class="doc-title">Panduan Operasional & Dokumentasi Resmi 13C Crypto Payment Gateway</h1>
 <p>
-<strong>Versi</strong>: 1.4.0  </p>
+<strong>Versi</strong>: 1.5.0  </p>
 <p><strong>Tanggal</strong>: November 2026  </p>
 <p><strong>Klasifikasi</strong>: User Manual, Technical Specification & Integration Guide  </p>
 <p><strong>Repositori</strong>: [https://github.com/gonzhilaz/bpg.git](https://github.com/gonzhilaz/bpg.git)</p>
@@ -564,7 +564,32 @@ Portal ini dirancang untuk DevOps dan Operator Gateway dengan arsitektur <strong
 <p>Sesuai standar keamanan industri, file rahasia asli tidak boleh di-commit secara mentah ke repositori publik dan wajib disuntikkan via Secrets Vault pada level infrastruktur VPS/Cloud.</p>
 
 <hr class="divider" />
-<p><em>Dokumen manual ini diperbarui secara resmi untuk 13C Crypto Payment Gateway v1.3 Enterprise Edition.</em></p>
+
+<h3 class="sub-title">6.5 Tata Kelola Merchant Lengkap (Full CRUD Governance & Strict Icon Buttons)</h3>
+<p>Pada portal Super Admin <strong>`/merchants`</strong>, tata kelola merchant kini telah ditingkatkan menjadi CRUD penuh dengan kepatuhan antarmuka modern (Zero labeled text buttons; 100% `IconButton` dengan dark `Tooltip` informatif):</p>
+<ul><li><strong>Tambah Merchant Baru (`+ Add Merchant`)</strong>: Tombol ikon `Plus` di header memicu modal registrasi instan untuk merchant baru.</li></ul>
+<ul><li><strong>Lihat Rincian (`View Details`)</strong>: Ikon `Eye` membuka modal komprehensif menampilkan total volume, jumlah tagihan, prefix kunci API, alamat cold wallet per rantai, status auto-payout, dan URL webhook aktif.</li></ul>
+<p><em> <strong>Edit Merchant (`Edit Profile`)</strong>: Ikon `Pencil` memungkinkan pembaruan nama bisnis, status operasional, penanggung biaya gas/jaringan (</em>Fee Payer*), dan konfigurasi webhook.</p>
+<ul><li><strong>Rotasi Kunci API (`Rotate API Key`)</strong>: Ikon `Key` melakukan rotasi kunci API baru secara instan disertai notifikasi reveal-once yang aman.</li></ul>
+<ul><li><strong>Tangguhkan / Aktifkan (`Suspend / Activate`)</strong>: Ikon `Ban` atau `CheckCircle2` mengubah status operasional merchant dalam satu klik.</li></ul>
+<ul><li><strong>Hapus Merchant (`Delete Merchant`)</strong>: Ikon `Trash2` menghapus merchant dari direktori disertai modal konfirmasi pengamanan.</li></ul>
+
+<hr class="divider" />
+
+<h3 class="sub-title">6.6 Kluster RPC Dinamis Terintegrasi EXP & Switcher Testnet Sandbox</h3>
+<p>Untuk mendukung pengujian testnet sandbox tanpa batas dan toleransi kesalahan (<em>fault-tolerance</em>):</p>
+<ul><li><strong>Penyedia RPC Terintegrasi</strong>: Mengintegrasikan node-node cadangan dari jaringan EXP (`https://exp-api-jet.vercel.app/`):</li></ul>
+<p>  - <strong>TRON</strong>: TronGrid Official, Tron PublicNode, dan Nile Testnet.</p>
+<p>  - <strong>BSC</strong>: Binance Official, LlamaRPC, dan Chapel Testnet.</p>
+<p>  - <strong>Polygon</strong>: Polygon PoS Official, LlamaRPC, dan Amoy Testnet.</p>
+<p>  - <strong>Solana</strong>: Solana Mainnet-Beta dan Solana Devnet.</p>
+<p>  - <strong>Ethereum</strong>: Cloudflare ETH dan Sepolia Testnet.</p>
+<ul><li><strong>Filter Segmentasi Mainnet vs. Testnet</strong>: Memudahkan administrator beralih antara melihat semua node, node produksi, atau node pengujian sandbox.</li></ul>
+<p><em> <strong>Proteksi Anti-Replay Serangan Konkuren (Backend Go)</strong>: Validasi ketat `tx_hash` unik pada tabel pembayaran mencegah pencatatan ganda (</em>double-crediting*) saat pemindaian ulang blok blockchain terjadi.</p>
+<p><em> <strong>Proteksi Rute Backend Admin</strong>: Middleware `AdminAuth` mengunci seluruh endpoint `/api/v1/admin/</em>` dengan verifikasi `X-Admin-Key` dan token sesi master.</p>
+
+<hr class="divider" />
+<p><em>Dokumen manual ini diperbarui secara resmi untuk 13C Crypto Payment Gateway v1.5 Enterprise Edition.</em></p>
 
 </body>
 </html>

@@ -1,12 +1,13 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
-import { Users, Search, Plus, RotateCcw, ShieldCheck, Ban, CheckCircle2, ChevronDown } from "lucide-react";
+import { Users, Search, Plus, RotateCcw, Ban, CheckCircle2, ChevronDown, Building2 } from "lucide-react";
 import { useAdmin } from "../../context/AdminContext";
 import { useLanguage } from "../../context/LanguageContext";
 import { MerchantControlTable } from "../../components/admin/MerchantControlTable";
 import { StatTile } from "../../components/ui/StatTile";
 import { IconButton } from "../../components/ui/IconButton";
+import { Tooltip } from "../../components/ui/Tooltip";
 import { AdminMerchant } from "../../types/admin";
 
 export default function MerchantsPage() {
@@ -16,6 +17,7 @@ export default function MerchantsPage() {
   const [statusFilter, setStatusFilter] = useState<"ALL" | "ACTIVE" | "SUSPENDED">("ALL");
   const [showAddModal, setShowAddModal] = useState(false);
   const [newMerchantName, setNewMerchantName] = useState("");
+  const [newFeePayer, setNewFeePayer] = useState<"customer" | "merchant">("customer");
 
   const filteredMerchants = useMemo(() => {
     return merchants.filter((m) => {
@@ -42,11 +44,12 @@ export default function MerchantsPage() {
       id: `m_${Date.now()}`,
       name: newMerchantName.trim(),
       api_key_prefix: `13c_live_${Math.random().toString(36).substring(2, 6)}...`,
-      volume_usd: "0.00",
+      volume_usd: "$0.00",
       invoices_count: 0,
       auto_payout: true,
       status: "ACTIVE",
       created_at: "Just now",
+      fee_payer: newFeePayer,
     };
 
     setMerchants([newMerchant, ...merchants]);
@@ -59,19 +62,25 @@ export default function MerchantsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-white">Merchant Directory & Governance</h1>
+          <h1 className="text-2xl font-bold tracking-tight text-white flex items-center gap-2">
+            <span>{t("merchants")}</span>
+            <Tooltip content="Comprehensive merchant registry, real-time volume metrics, and instant access control." />
+          </h1>
           <p className="text-xs text-zinc-400 mt-1">
-            Audit registered merchants, inspect transaction throughput, and manage access controls.
+            Registered merchant profiles, API credentials, and governance.
           </p>
         </div>
 
-        <button
-          onClick={() => setShowAddModal(true)}
-          className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-zinc-950 text-xs font-bold transition-colors self-start sm:self-auto"
-        >
-          <Plus className="w-3.5 h-3.5" />
-          <span>Add Merchant</span>
-        </button>
+        {/* Preferred Icon Button for Add Merchant */}
+        <div className="flex items-center gap-2 self-start sm:self-auto">
+          <IconButton
+            icon={Plus}
+            tooltip="Add New Merchant"
+            onClick={() => setShowAddModal(true)}
+            variant="primary"
+            size="md"
+          />
+        </div>
       </div>
 
       {/* KPI Stats */}
@@ -140,21 +149,28 @@ export default function MerchantsPage() {
         </div>
       </div>
 
-      {/* Main Table */}
+      {/* Main Full-CRUD Table */}
       <MerchantControlTable initialMerchants={filteredMerchants} />
 
       {/* Add Merchant Modal */}
       {showAddModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-in fade-in duration-150">
-          <div className="w-full max-w-md bg-zinc-900 border border-zinc-800 rounded-2xl p-6 shadow-2xl space-y-4">
-            <h3 className="text-base font-bold text-white">Register New Merchant</h3>
-            <p className="text-xs text-zinc-400">
-              Generates a dedicated API key and merchant account on 13C Payment Gateway.
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-150">
+          <div className="w-full max-w-md bg-zinc-900 border border-zinc-800 rounded-2xl p-6 shadow-2xl space-y-4 font-sans text-xs">
+            <div className="flex items-center justify-between pb-2 border-b border-zinc-800">
+              <div className="flex items-center gap-2">
+                <Building2 className="w-4 h-4 text-cyan-400" />
+                <h3 className="text-base font-bold text-white">Register New Merchant</h3>
+              </div>
+              <IconButton icon={Plus} tooltip="Close" onClick={() => setShowAddModal(false)} className="rotate-45" size="xs" />
+            </div>
+
+            <p className="text-zinc-400">
+              Generates a dedicated API key and merchant profile with zero-custody routing.
             </p>
 
-            <form onSubmit={handleAddMerchant} className="space-y-4 pt-2">
-              <div className="space-y-1 text-xs">
-                <label className="text-zinc-300 font-medium">Business / Store Name</label>
+            <form onSubmit={handleAddMerchant} className="space-y-3.5 pt-1">
+              <div>
+                <label className="text-zinc-300 font-medium block mb-1">Business / Store Name</label>
                 <input
                   type="text"
                   required
@@ -165,17 +181,29 @@ export default function MerchantsPage() {
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-3 pt-3">
+              <div>
+                <label className="text-zinc-300 font-medium block mb-1">Fee Payer Policy</label>
+                <select
+                  value={newFeePayer}
+                  onChange={(e) => setNewFeePayer(e.target.value as "customer" | "merchant")}
+                  className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-cyan-500/50 cursor-pointer"
+                >
+                  <option value="customer">Customer Adds Gas Fee</option>
+                  <option value="merchant">Merchant Deducted from Sweeps</option>
+                </select>
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-3 border-t border-zinc-800">
                 <button
                   type="button"
                   onClick={() => setShowAddModal(false)}
-                  className="px-4 py-2 rounded-xl text-xs font-medium text-zinc-400 hover:text-white hover:bg-zinc-800"
+                  className="px-3.5 py-1.5 rounded-xl text-zinc-400 hover:text-white"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 rounded-xl text-xs font-bold text-zinc-950 bg-cyan-400 hover:bg-cyan-300 transition-colors"
+                  className="px-4 py-1.5 rounded-xl text-zinc-950 font-bold bg-cyan-400 hover:bg-cyan-300 transition-colors"
                 >
                   Create Account
                 </button>

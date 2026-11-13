@@ -217,7 +217,10 @@ func (s *invoiceService) RecordPayment(ctx context.Context, depositAddress strin
 		Confirmations: 1,
 		Status:        domain.TxStatusConfirmed,
 	}
-	_ = s.txRepo.Create(ctx, txRecord)
+	// Anti-Replay & Double-Spend Protection: abort if tx_hash already exists
+	if err := s.txRepo.Create(ctx, txRecord); err != nil {
+		return invoice, fmt.Errorf("transaction %s already processed or duplicate: %w", txHash, err)
+	}
 
 	invoice.ReceivedAmount = invoice.ReceivedAmount.Add(amount)
 

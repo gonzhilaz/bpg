@@ -116,8 +116,9 @@ func main() {
 		// Financial Reports (Public or session-scoped summary)
 		v1.GET("/reports/financial", adminHandler.GetFinancialReports)
 
-		// Platform Dev & DevOps Admin Routes
+		// Platform Dev & DevOps Admin Routes (Protected by Root Admin Auth)
 		adminRoutes := v1.Group("/admin")
+		adminRoutes.Use(middleware.AdminAuth(cfg.MasterSecretKey))
 		{
 			adminRoutes.GET("/database/health", adminHandler.GetDatabaseHealth)
 			adminRoutes.POST("/database/prune", adminHandler.PruneExpiredInvoices)

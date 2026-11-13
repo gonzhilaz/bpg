@@ -33,3 +33,4 @@ export function MerchantAuthGuard({ children }: { children: React.ReactNode }) {
 
   return <>{children}</>;
 }
+
