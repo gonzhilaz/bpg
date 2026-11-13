@@ -1,6 +1,6 @@
 # Panduan Operasional & Dokumentasi Resmi 13C Crypto Payment Gateway
 
-**Versi**: 1.2.0  
+**Versi**: 1.3.0  
 **Tanggal**: November 2026  
 **Klasifikasi**: User Manual, Technical Specification & Integration Guide  
 **Repositori**: [https://github.com/gonzhilaz/bpg.git](https://github.com/gonzhilaz/bpg.git)
@@ -22,6 +22,7 @@
    * 2.4 Pengaturan *Fee Payer* (Customer Surcharge vs. Merchant Absorbed)
    * 2.5 Pemantauan Laporan Keuangan (Financial Ledger) & Ekspor CSV
    * 2.6 Monitoring Riwayat Tagihan & Webhook Callback Logs
+   * 2.7 Antarmuka Modern: Filter Dropdown Ringkas, Tema Kontras Tinggi & Dukungan Bilingual
 
 3. **Bab 3: Tutorial Integrasi Toko Online (Merchant Integration)**
    * 3.1 Pembuatan Tagihan via REST API (cURL, Node.js, PHP, Python)
@@ -39,6 +40,7 @@
    * 5.4 Pemeliharaan Database (Pool Connection & Pruning Expired Records)
    * 5.5 Emergency Circuit Breaker (Prosedur Darurat Pembekuan Payout)
    * 5.6 Deployment Mandiri di Server VPS Menggunakan Docker Compose
+   * 5.7 Resolusi Dinamis Endpoint (Zero Hardcoded Localhost & Cloud Ready)
 
 ---
 
@@ -146,6 +148,19 @@ Kartu **Financial Ledger** menyediakan data audit pembukuan yang transparan:
 * **Tabel Settlement Transfers**: Menampilkan bukti tx hash on-chain dari penyapuan dana ke cold wallet Anda.
 * **Kartu Webhook Delivery Logs**: Menampilkan riwayat pengiriman notifikasi HTTP POST ke server toko Anda lengkap dengan kode HTTP respons (200 OK) dan tanda tangan HMAC.
 
+### 2.7 Antarmuka Modern: Filter Dropdown Ringkas, Tema Kontras Tinggi & Dukungan Bilingual
+1. **Filter Dropdown Ringkas (Invoices & Merchants)**:
+   * Menggantikan chip tombol yang memanjang secara horizontal menjadi komponen `<select>` dropdown yang padat dan hemat ruang.
+   * Filter Jaringan (`All Networks`, `BSC`, `Polygon`, `TRON`, `Solana`) dan Status (`All Statuses`, `Paid`, `Detected`, `Pending`, `Underpaid`) ditempatkan sejajar dengan kolom pencarian cepat dan tombol Reset otomatis.
+2. **Tema Kontras Tinggi (High-Contrast Light & Dark)**:
+   * **Dark Mode (Default)**: Palet deep carbon `#0B0E14` dan slate `#12161F` dengan aksen neon cyan/emerald untuk kenyamanan visual pengembang.
+   * **Light Mode**: Palet latar belakang putih bersih (`#FFFFFF` dan `#F8FAFC`) dengan kontras teks pekat `#09090B`, garis batas `#E4E4E7`, dan kartu data yang tajam tanpa silau.
+   * **Tombol Pengalih**: Ikon Matahari / Bulan di bilah navigasi atas (Header) dengan penyimpanan status instan di `localStorage`.
+3. **Dukungan Bilingual (English Default & Bahasa Indonesia)**:
+   * Tersedia tombol selektor bahasa di Header (`EN` | `ID`).
+   * Bahasa Inggris (`EN`) aktif secara default untuk standar internasional, dan dapat dialihkan ke Bahasa Indonesia (`ID`) dalam satu klik.
+   * Seluruh label navigasi, status tagihan, tooltip, dan pesan sistem diterjemahkan secara komprehensif.
+
 ---
 
 ## BAB 3: TUTORIAL INTEGRASI TOKO ONLINE (MERCHANT INTEGRATION)
@@ -194,7 +209,7 @@ async function createCryptoInvoice() {
 #### Contoh Implementasi PHP:
 ```php
 <?php
-$apiKey = 'cap_live_9a41b2c8e104f...';
+$apiKey = '13c_live_9a41b2c8e104f...';
 $payload = [
     'order_id'     => 'ORD-99120',
     'amount'       => 25.50,
@@ -354,6 +369,17 @@ docker compose up -d --build
 docker compose logs -f backend
 ```
 
+### 5.7 Resolusi Dinamis Endpoint (Zero Hardcoded Localhost & Cloud Ready)
+Seluruh modul frontend (`dashboard`, `admin`, `demo-sandbox`) tidak lagi menggunakan URL `localhost` hardcoded. Sistem menggunakan arsitektur `getEnvUrl` yang adaptif:
+* **Deteksi Lingkungan Otomatis**: Jika dijalankan di mesin lokal (`window.location.hostname === "localhost"`), sistem otomatis terhubung ke port lokal (`:8080`, `:3001`, `:3002`, `:3000`).
+* **Environment Variable Terpusat**: Saat dideploy di Vercel, VPS, atau domain custom, sistem memprioritaskan variabel lingkungan publik:
+  - `NEXT_PUBLIC_API_URL`: URL Backend API & Watcher Engine (contoh: `https://api.domainanda.com`).
+  - `NEXT_PUBLIC_MERCHANT_URL`: URL Merchant Portal (contoh: `https://merchant.domainanda.com`).
+  - `NEXT_PUBLIC_ADMIN_URL`: URL Super Admin Portal (contoh: `https://admin.domainanda.com`).
+  - `NEXT_PUBLIC_SANDBOX_URL`: URL Simulator Sandbox (contoh: `https://sandbox.domainanda.com`).
+  - `NEXT_PUBLIC_SWAGGER_URL`: URL Dokumentasi Interaktif Swagger API.
+* **Fallback Cloud Siap Pakai**: Tanpa konfigurasi variabel sekalipun di lingkungan staging cloud, sistem menyediakan fallback default ke cluster cloud live.
+
 ---
-*Dokumen manual ini dihasilkan secara otomatis dari spesifikasi arsitektur resmi 13C Crypto Payment Gateway v1.2.*
+*Dokumen manual ini dihasilkan secara otomatis dari spesifikasi arsitektur resmi 13C Crypto Payment Gateway v1.3.*
 

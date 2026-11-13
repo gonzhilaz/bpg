@@ -1,7 +1,8 @@
 import { ApiResponse, Invoice } from "../types/invoice";
 import { mockInvoices } from "../mocks/mockInvoice";
+import { getEnvUrl } from "../utils/env";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+const API_BASE_URL = getEnvUrl.api();
 
 export async function fetchInvoiceById(id: string): Promise<Invoice> {
   // Check if it's a demo mock ID first

@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { Database, Trash2, Check, RefreshCw, HardDrive, Layers, Server } from "lucide-react";
 import { Tooltip } from "../ui/Tooltip";
+import { getEnvUrl } from "../../utils/env";
 
 export function DatabaseHealthCard() {
   const [pruning, setPruning] = useState(false);
@@ -28,7 +29,7 @@ export function DatabaseHealthCard() {
     setPrunedMessage(null);
 
     try {
-      const res = await fetch("http://localhost:8080/api/v1/admin/database/prune?days=7", {
+      const res = await fetch(`${getEnvUrl.api()}/api/v1/admin/database/prune?days=7`, {
         method: "POST",
       });
       const data = await res.json();

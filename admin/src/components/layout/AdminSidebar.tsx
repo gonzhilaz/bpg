@@ -18,6 +18,8 @@ import {
   AlertTriangle,
 } from "lucide-react";
 import { useAdmin } from "../../context/AdminContext";
+import { useLanguage } from "../../context/LanguageContext";
+import { getEnvUrl } from "../../utils/env";
 
 interface NavItem {
   label: string;
@@ -30,21 +32,22 @@ interface NavItem {
 export function AdminSidebar() {
   const pathname = usePathname();
   const { isMobileNavOpen, setIsMobileNavOpen, circuitBreaker, merchants } = useAdmin();
+  const { t } = useLanguage();
 
   const navItems: NavItem[] = [
-    { label: "Overview", href: "/", icon: Shield },
-    { label: "Merchants", href: "/merchants", icon: Users, badge: `${merchants.length}` },
+    { label: t("overview"), href: "/", icon: Shield },
+    { label: t("merchants"), href: "/merchants", icon: Users, badge: `${merchants.length}` },
     {
-      label: "Gas & Liquidity",
+      label: t("gasEngine"),
       href: "/gas-liquidity",
       icon: Flame,
       badge: "1 Alert",
       badgeColor: "bg-amber-500/20 text-amber-300 border border-amber-500/30",
     },
-    { label: "Watchers", href: "/watchers", icon: Activity, badge: "4 Synced" },
-    { label: "Database", href: "/database", icon: Database },
-    { label: "Financial Revenue", href: "/finance", icon: TrendingUp },
-    { label: "Settings", href: "/settings", icon: Sliders },
+    { label: t("systemHealth"), href: "/watchers", icon: Activity, badge: "4 Synced" },
+    { label: t("database"), href: "/database", icon: Database },
+    { label: t("financial"), href: "/finance", icon: TrendingUp },
+    { label: t("appSettings"), href: "/settings", icon: Sliders },
   ];
 
   const NavContent = () => (
@@ -139,42 +142,42 @@ export function AdminSidebar() {
         </div>
 
         <a
-          href="http://localhost:3001"
+          href={getEnvUrl.merchant()}
           target="_blank"
           rel="noopener noreferrer"
           className="flex items-center justify-between px-3 py-2 rounded-xl text-xs text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/50 transition-colors"
         >
           <div className="flex items-center gap-3">
             <ExternalLink className="w-4 h-4 text-cyan-400" />
-            <span>Merchant Portal (3001)</span>
+            <span>{t("merchantPortal")}</span>
           </div>
-          <span className="text-[10px] text-zinc-500 font-mono">3001</span>
+          <span className="text-[10px] text-zinc-500 font-mono">LIVE</span>
         </a>
 
         <a
-          href="http://localhost:3000/sandbox"
+          href={getEnvUrl.sandbox()}
           target="_blank"
           rel="noopener noreferrer"
           className="flex items-center justify-between px-3 py-2 rounded-xl text-xs text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/50 transition-colors"
         >
           <div className="flex items-center gap-3">
             <Terminal className="w-4 h-4 text-emerald-400" />
-            <span>Simulator Sandbox</span>
+            <span>{t("simulatorSandbox")}</span>
           </div>
-          <span className="text-[10px] text-zinc-500 font-mono">3000</span>
+          <span className="text-[10px] text-zinc-500 font-mono">SIM</span>
         </a>
 
         <a
-          href="http://localhost:8080/swagger"
+          href={getEnvUrl.swagger()}
           target="_blank"
           rel="noopener noreferrer"
           className="flex items-center justify-between px-3 py-2 rounded-xl text-xs text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/50 transition-colors"
         >
           <div className="flex items-center gap-3">
             <FileCode2 className="w-4 h-4 text-cyan-400" />
-            <span>Swagger Engine</span>
+            <span>{t("swaggerDocs")}</span>
           </div>
-          <span className="text-[10px] text-zinc-500 font-mono">8080</span>
+          <span className="text-[10px] text-zinc-500 font-mono">API</span>
         </a>
       </div>
 

@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { Zap, Lock, Mail, ArrowRight, ShieldCheck } from "lucide-react";
+import { getEnvUrl } from "../../utils/env";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -16,7 +17,7 @@ export default function LoginPage() {
     setError(null);
 
     try {
-      const res = await fetch("http://localhost:8080/api/v1/auth/login", {
+      const res = await fetch(`${getEnvUrl.api()}/api/v1/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),

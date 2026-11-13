@@ -2,32 +2,40 @@
 
 import React from "react";
 import { usePathname } from "next/navigation";
-import { Menu, AlertTriangle, AlertOctagon, CheckCircle2, Flame } from "lucide-react";
+import { Menu, AlertTriangle, AlertOctagon, CheckCircle2, Flame, Sun, Moon, Globe } from "lucide-react";
 import { useAdmin } from "../../context/AdminContext";
+import { useTheme } from "../../context/ThemeContext";
+import { useLanguage } from "../../context/LanguageContext";
 
 export function AdminHeader() {
   const pathname = usePathname();
   const { setIsMobileNavOpen, circuitBreaker, setCircuitBreaker, hotWallets } = useAdmin();
+  const { theme, toggleTheme } = useTheme();
+  const { lang, setLang, t } = useLanguage();
 
   const getBreadcrumb = () => {
     switch (pathname) {
       case "/":
-        return "System Operations";
+        return t("overview");
       case "/merchants":
-        return "Merchant Governance";
+        return t("merchants");
       case "/gas-liquidity":
-        return "Gas Liquidity & Sweeper";
+        return t("gasEngine");
       case "/watchers":
-        return "Multi-Chain Watchers";
+        return t("systemHealth");
       case "/database":
-        return "Database & Storage";
+        return t("database");
       case "/finance":
-        return "Financial Revenue Ledger";
+        return t("financial");
       case "/settings":
-        return "Platform Settings";
+        return t("appSettings");
       default:
-        return "Admin Portal";
+        return t("portal");
     }
+  };
+
+  const toggleLang = () => {
+    setLang(lang === "EN" ? "ID" : "EN");
   };
 
   const hasLowGas = hotWallets.some((w) => w.status === "LOW");
@@ -51,14 +59,38 @@ export function AdminHeader() {
         </div>
       </div>
 
-      {/* Right: Status Badges & Circuit Breaker */}
-      <div className="flex items-center gap-3">
+      {/* Right: Status Badges, Language, Theme & Circuit Breaker */}
+      <div className="flex items-center gap-2.5">
         {hasLowGas && (
           <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-300 text-xs font-medium">
             <Flame className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
             <span>Polygon Gas Low</span>
           </div>
         )}
+
+        {/* Language Selector */}
+        <button
+          onClick={toggleLang}
+          className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-zinc-800/80 hover:bg-zinc-700/80 text-zinc-300 text-xs font-semibold border border-zinc-700/80 transition-colors"
+          title={`Switch to ${lang === "EN" ? "Indonesian" : "English"}`}
+        >
+          <Globe className="w-3.5 h-3.5 text-cyan-400" />
+          <span>{lang}</span>
+        </button>
+
+        {/* Theme Toggle */}
+        <button
+          onClick={toggleTheme}
+          className="p-1.5 rounded-xl bg-zinc-800/80 hover:bg-zinc-700/80 text-zinc-300 border border-zinc-700/80 transition-colors"
+          title={`Switch to ${theme === "dark" ? "Light Mode" : "Dark Mode"}`}
+          aria-label="Toggle theme"
+        >
+          {theme === "dark" ? (
+            <Sun className="w-4 h-4 text-amber-400" />
+          ) : (
+            <Moon className="w-4 h-4 text-cyan-400" />
+          )}
+        </button>
 
         <button
           type="button"

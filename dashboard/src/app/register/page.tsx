@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { Zap, Lock, Mail, Store, Key, Copy, Check, AlertTriangle, ArrowRight } from "lucide-react";
+import { getEnvUrl } from "../../utils/env";
 
 export default function RegisterPage() {
   const [name, setName] = useState("");
@@ -24,7 +25,7 @@ export default function RegisterPage() {
     setError(null);
 
     try {
-      const res = await fetch("http://localhost:8080/api/v1/auth/register", {
+      const res = await fetch(`${getEnvUrl.api()}/api/v1/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, email, password }),

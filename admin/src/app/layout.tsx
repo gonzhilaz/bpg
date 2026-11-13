@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { AdminProvider } from "../context/AdminContext";
+import { AdminAppProviders } from "../components/layout/AdminAppProviders";
 import { AdminSidebar } from "../components/layout/AdminSidebar";
 import { AdminHeader } from "../components/layout/AdminHeader";
 
@@ -17,7 +17,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="antialiased min-h-screen bg-[#0B0E14] text-zinc-100">
-        <AdminProvider>
+        <AdminAppProviders>
           <div className="min-h-screen bg-[#0B0E14] text-zinc-100 flex font-sans">
             {/* Sidebar */}
             <AdminSidebar />
@@ -30,7 +30,7 @@ export default function RootLayout({
               </main>
             </div>
           </div>
-        </AdminProvider>
+        </AdminAppProviders>
       </body>
     </html>
   );

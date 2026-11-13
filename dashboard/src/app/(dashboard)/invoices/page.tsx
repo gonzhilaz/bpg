@@ -1,13 +1,15 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
-import { Search, Filter, RotateCcw, Receipt } from "lucide-react";
+import { Search, Filter, RotateCcw, Receipt, ChevronDown } from "lucide-react";
 import { useEnvironment } from "../../../context/EnvironmentContext";
+import { useLanguage } from "../../../context/LanguageContext";
 import { InvoicesTable } from "../../../components/dashboard/InvoicesTable";
 import { Network } from "../../../types/merchant";
 
 export default function InvoicesPage() {
   const { invoices } = useEnvironment();
+  const { t } = useLanguage();
   const [search, setSearch] = useState("");
   const [selectedNetwork, setSelectedNetwork] = useState<string>("ALL");
   const [selectedStatus, setSelectedStatus] = useState<string>("ALL");
@@ -36,22 +38,21 @@ export default function InvoicesPage() {
     setSelectedStatus("ALL");
   };
 
-  const networks: (Network | "ALL")[] = ["ALL", "BSC", "POLYGON", "TRON", "SOLANA"];
-  const statuses = ["ALL", "PAID", "DETECTED", "PENDING", "UNDERPAID"];
+  const isFiltered = search !== "" || selectedNetwork !== "ALL" || selectedStatus !== "ALL";
 
   return (
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold tracking-tight text-white">Invoices & Orders</h1>
+        <h1 className="text-2xl font-bold tracking-tight text-white">{t("invoicesTitle")}</h1>
         <p className="text-xs text-zinc-400 mt-1">
-          Monitor incoming customer payments, blockchain detections, and confirmation states.
+          {t("invoicesSubtitle")}
         </p>
       </div>
 
-      {/* Filter & Search Bar */}
-      <div className="bg-zinc-900/60 border border-zinc-800 p-4 rounded-2xl space-y-4">
-        <div className="flex flex-col md:flex-row md:items-center gap-3">
+      {/* Filter Toolbar: Search + Dropdown Filters + Reset */}
+      <div className="bg-zinc-900/60 border border-zinc-800 p-4 rounded-2xl">
+        <div className="flex flex-col lg:flex-row lg:items-center gap-3">
           {/* Search Input */}
           <div className="relative flex-1">
             <Search className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -59,61 +60,54 @@ export default function InvoicesPage() {
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search by Order ID, Invoice ID, or Deposit Address..."
-              className="w-full bg-zinc-950/80 border border-zinc-800 rounded-xl pl-10 pr-4 py-2 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-cyan-500/50 transition-colors"
+              placeholder={t("searchInvoicePlaceholder")}
+              className="w-full bg-zinc-950/80 border border-zinc-800 rounded-xl pl-10 pr-4 py-2.5 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-cyan-500/50 transition-colors"
             />
           </div>
 
-          {(search !== "" || selectedNetwork !== "ALL" || selectedStatus !== "ALL") && (
+          {/* Network Dropdown */}
+          <div className="relative min-w-[170px]">
+            <Filter className="w-3.5 h-3.5 text-cyan-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <select
+              value={selectedNetwork}
+              onChange={(e) => setSelectedNetwork(e.target.value)}
+              className="w-full appearance-none bg-zinc-950/80 border border-zinc-800 rounded-xl pl-9 pr-8 py-2.5 text-xs text-white focus:outline-none focus:border-cyan-500/50 transition-colors cursor-pointer"
+            >
+              <option value="ALL">{t("filterNetwork")}</option>
+              <option value="BSC">BSC (BEP-20)</option>
+              <option value="POLYGON">Polygon (PoS)</option>
+              <option value="TRON">TRON (TRC-20)</option>
+              <option value="SOLANA">Solana (SPL)</option>
+            </select>
+            <ChevronDown className="w-3.5 h-3.5 text-zinc-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+          </div>
+
+          {/* Status Dropdown */}
+          <div className="relative min-w-[160px]">
+            <select
+              value={selectedStatus}
+              onChange={(e) => setSelectedStatus(e.target.value)}
+              className="w-full appearance-none bg-zinc-950/80 border border-zinc-800 rounded-xl px-3 pr-8 py-2.5 text-xs text-white focus:outline-none focus:border-cyan-500/50 transition-colors cursor-pointer"
+            >
+              <option value="ALL">{t("filterStatus")}</option>
+              <option value="PAID">{t("statusPaid")}</option>
+              <option value="DETECTED">{t("statusDetected")}</option>
+              <option value="PENDING">{t("statusPending")}</option>
+              <option value="UNDERPAID">{t("statusUnderpaid")}</option>
+            </select>
+            <ChevronDown className="w-3.5 h-3.5 text-zinc-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+          </div>
+
+          {/* Reset Button */}
+          {isFiltered && (
             <button
               onClick={handleReset}
-              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs font-medium border border-zinc-700 transition-colors"
+              className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs font-semibold border border-zinc-700 transition-colors"
             >
               <RotateCcw className="w-3.5 h-3.5" />
-              <span>Reset</span>
+              <span>{t("reset")}</span>
             </button>
           )}
-        </div>
-
-        {/* Network & Status Filter Chips */}
-        <div className="flex flex-wrap items-center justify-between gap-4 pt-2 border-t border-zinc-800/60">
-          <div className="flex flex-wrap items-center gap-1.5">
-            <span className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider mr-1">
-              Network:
-            </span>
-            {networks.map((net) => (
-              <button
-                key={net}
-                onClick={() => setSelectedNetwork(net)}
-                className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-colors ${
-                  selectedNetwork === net
-                    ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/40"
-                    : "bg-zinc-800/60 text-zinc-400 hover:text-zinc-200 border border-zinc-800"
-                }`}
-              >
-                {net}
-              </button>
-            ))}
-          </div>
-
-          <div className="flex flex-wrap items-center gap-1.5">
-            <span className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider mr-1">
-              Status:
-            </span>
-            {statuses.map((st) => (
-              <button
-                key={st}
-                onClick={() => setSelectedStatus(st)}
-                className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-colors ${
-                  selectedStatus === st
-                    ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/40"
-                    : "bg-zinc-800/60 text-zinc-400 hover:text-zinc-200 border border-zinc-800"
-                }`}
-              >
-                {st}
-              </button>
-            ))}
-          </div>
         </div>
       </div>
 
@@ -125,20 +119,19 @@ export default function InvoicesPage() {
           <div className="w-12 h-12 rounded-2xl bg-zinc-800/60 flex items-center justify-center text-zinc-400 mx-auto">
             <Receipt className="w-6 h-6" />
           </div>
-          <div className="text-sm font-semibold text-white">No invoices matched your criteria</div>
+          <div className="text-sm font-semibold text-white">{t("emptyData")}</div>
           <p className="text-xs text-zinc-400 max-w-sm mx-auto">
-            Try adjusting your search terms or clearing the network and status filters.
+            {t("emptyFilterDesc")}
           </p>
           <button
             onClick={handleReset}
             className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-400 text-xs font-semibold border border-cyan-500/30 transition-colors mt-2"
           >
             <RotateCcw className="w-3.5 h-3.5" />
-            <span>Reset All Filters</span>
+            <span>{t("reset")}</span>
           </button>
         </div>
       )}
     </div>
   );
 }
-

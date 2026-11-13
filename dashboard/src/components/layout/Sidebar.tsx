@@ -19,6 +19,8 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { useEnvironment } from "../../context/EnvironmentContext";
+import { useLanguage } from "../../context/LanguageContext";
+import { getEnvUrl } from "../../utils/env";
 
 interface NavItem {
   label: string;
@@ -31,15 +33,16 @@ export function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const { mode, profile, invoices, isMobileNavOpen, setIsMobileNavOpen } = useEnvironment();
+  const { t } = useLanguage();
 
   const navItems: NavItem[] = [
-    { label: "Overview", href: "/", icon: LayoutDashboard },
-    { label: "Invoices", href: "/invoices", icon: Receipt, badge: `${invoices.length}` },
-    { label: "Payouts", href: "/payouts", icon: ArrowUpRight },
-    { label: "Wallets & Gas", href: "/wallets", icon: Wallet },
-    { label: "API Keys", href: "/api-keys", icon: Key },
-    { label: "Webhooks", href: "/webhooks", icon: Webhook },
-    { label: "Financial Ledger", href: "/reports", icon: TrendingUp },
+    { label: t("overview"), href: "/", icon: LayoutDashboard },
+    { label: t("invoices"), href: "/invoices", icon: Receipt, badge: `${invoices.length}` },
+    { label: t("payouts"), href: "/payouts", icon: ArrowUpRight },
+    { label: t("wallets"), href: "/wallets", icon: Wallet },
+    { label: t("apiKeys"), href: "/api-keys", icon: Key },
+    { label: t("webhooks"), href: "/webhooks", icon: Webhook },
+    { label: t("analytics"), href: "/reports", icon: TrendingUp },
   ];
 
   const handleLogout = () => {
@@ -129,31 +132,31 @@ export function Sidebar() {
         })}
 
         <div className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider px-3 pt-6 mb-2">
-          Developer Tools
+          {t("portal")}
         </div>
 
         <a
-          href="http://localhost:3000/sandbox"
+          href={getEnvUrl.sandbox()}
           target="_blank"
           rel="noopener noreferrer"
           className="flex items-center justify-between px-3 py-2 rounded-xl text-xs text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/50 transition-colors"
         >
           <div className="flex items-center gap-3">
             <Terminal className="w-4 h-4 text-cyan-400" />
-            <span>Simulator Sandbox</span>
+            <span>{t("sandboxSimulator")}</span>
           </div>
           <ExternalLink className="w-3 h-3 text-zinc-400" />
         </a>
 
         <a
-          href="http://localhost:8080/swagger"
+          href={getEnvUrl.swagger()}
           target="_blank"
           rel="noopener noreferrer"
           className="flex items-center justify-between px-3 py-2 rounded-xl text-xs text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/50 transition-colors"
         >
           <div className="flex items-center gap-3">
             <FileCode2 className="w-4 h-4 text-emerald-400" />
-            <span>Swagger API Docs</span>
+            <span>{t("swaggerDocs")}</span>
           </div>
           <ExternalLink className="w-3 h-3 text-zinc-400" />
         </a>
@@ -168,7 +171,7 @@ export function Sidebar() {
           </div>
           <button
             onClick={handleLogout}
-            title="Log Out"
+            title={t("logout")}
             className="p-1.5 rounded-lg text-zinc-400 hover:text-rose-400 hover:bg-rose-500/10 transition-colors"
           >
             <LogOut className="w-4 h-4" />

@@ -5,9 +5,72 @@
   --foreground: #ededed;
 }
 
+:root[data-theme="light"],
+html.light {
+  --background: #f8fafc;
+  --foreground: #09090b;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
+/* Light Mode Overrides for High Contrast */
+html.light .bg-\[\#0B0E14\] {
+  background-color: #f8fafc !important;
+  color: #09090b !important;
+}
+
+html.light .bg-zinc-950,
+html.light .bg-zinc-900,
+html.light .bg-zinc-900\/80,
+html.light .bg-zinc-900\/60,
+html.light .bg-zinc-900\/40 {
+  background-color: #ffffff !important;
+  border-color: #e4e4e7 !important;
+  color: #09090b !important;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.05), 0 1px 2px -1px rgb(0 0 0 / 0.05);
+}
+
+html.light .bg-zinc-800,
+html.light .bg-zinc-800\/80,
+html.light .bg-zinc-800\/60,
+html.light .bg-zinc-800\/50 {
+  background-color: #f4f4f5 !important;
+  border-color: #e4e4e7 !important;
+  color: #18181b !important;
+}
+
+html.light .text-white {
+  color: #09090b !important;
+}
+
+html.light .text-zinc-100,
+html.light .text-zinc-200 {
+  color: #18181b !important;
+}
+
+html.light .text-zinc-400 {
+  color: #52525b !important;
+}
+
+html.light .text-zinc-500 {
+  color: #71717a !important;
+}
+
+html.light .border-zinc-800,
+html.light .border-zinc-800\/80,
+html.light .border-zinc-800\/50,
+html.light .border-zinc-700 {
+  border-color: #e4e4e7 !important;
+}
+
+html.light select,
+html.light input {
+  background-color: #ffffff !important;
+  color: #09090b !important;
+  border-color: #d4d4d8 !important;
+}

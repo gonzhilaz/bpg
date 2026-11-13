@@ -2,33 +2,42 @@
 
 import React from "react";
 import { usePathname } from "next/navigation";
-import { Menu, ShieldCheck, ExternalLink } from "lucide-react";
+import { Menu, ShieldCheck, ExternalLink, Sun, Moon, Globe } from "lucide-react";
 import { useEnvironment } from "../../context/EnvironmentContext";
+import { useTheme } from "../../context/ThemeContext";
+import { useLanguage } from "../../context/LanguageContext";
 import { EnvironmentToggle } from "../dashboard/EnvironmentToggle";
+import { getEnvUrl } from "../../utils/env";
 
 export function Header() {
   const pathname = usePathname();
   const { mode, setMode, setIsMobileNavOpen } = useEnvironment();
+  const { theme, toggleTheme } = useTheme();
+  const { lang, setLang, t } = useLanguage();
 
   const getBreadcrumb = () => {
     switch (pathname) {
       case "/":
-        return "Overview";
+        return t("overview");
       case "/invoices":
-        return "Invoices & Orders";
+        return t("invoices");
       case "/payouts":
-        return "Payouts & Settlements";
+        return t("payouts");
       case "/wallets":
-        return "Wallets & Gas";
+        return t("wallets");
       case "/api-keys":
-        return "API Credentials";
+        return t("apiKeys");
       case "/webhooks":
-        return "Webhook Logs";
+        return t("webhooks");
       case "/reports":
-        return "Financial Ledger";
+        return t("analytics");
       default:
-        return "Dashboard";
+        return t("overview");
     }
+  };
+
+  const toggleLang = () => {
+    setLang(lang === "EN" ? "ID" : "EN");
   };
 
   return (
@@ -44,26 +53,50 @@ export function Header() {
         </button>
 
         <div className="flex items-center gap-2 text-xs">
-          <span className="text-zinc-500 hidden sm:inline">Merchant</span>
+          <span className="text-zinc-500 hidden sm:inline">{t("portal")}</span>
           <span className="text-zinc-600 hidden sm:inline">/</span>
           <span className="font-semibold text-white tracking-wide">{getBreadcrumb()}</span>
         </div>
       </div>
 
-      {/* Right: Environment Toggle & Quick Status */}
-      <div className="flex items-center gap-3">
-        <div className="hidden md:flex items-center gap-2 text-xs font-medium text-emerald-400 bg-emerald-950/30 border border-emerald-800/40 px-3 py-1.5 rounded-xl">
+      {/* Right: Environment Toggle, Theme, Language & Quick Status */}
+      <div className="flex items-center gap-2.5">
+        <div className="hidden lg:flex items-center gap-2 text-xs font-medium text-emerald-400 bg-emerald-950/30 border border-emerald-800/40 px-3 py-1.5 rounded-xl">
           <ShieldCheck className="w-3.5 h-3.5" />
-          <span>Hot Wallet Connected</span>
+          <span>{t("connected")}</span>
         </div>
 
+        {/* Language Selector */}
+        <button
+          onClick={toggleLang}
+          className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-zinc-800/80 hover:bg-zinc-700/80 text-zinc-300 text-xs font-semibold border border-zinc-700/80 transition-colors"
+          title={`Switch to ${lang === "EN" ? "Indonesian" : "English"}`}
+        >
+          <Globe className="w-3.5 h-3.5 text-cyan-400" />
+          <span>{lang}</span>
+        </button>
+
+        {/* Theme Toggle */}
+        <button
+          onClick={toggleTheme}
+          className="p-1.5 rounded-xl bg-zinc-800/80 hover:bg-zinc-700/80 text-zinc-300 border border-zinc-700/80 transition-colors"
+          title={`Switch to ${theme === "dark" ? "Light Mode" : "Dark Mode"}`}
+          aria-label="Toggle theme"
+        >
+          {theme === "dark" ? (
+            <Sun className="w-4 h-4 text-amber-400" />
+          ) : (
+            <Moon className="w-4 h-4 text-cyan-400" />
+          )}
+        </button>
+
         <a
-          href="http://localhost:3002"
+          href={getEnvUrl.admin()}
           target="_blank"
           rel="noopener noreferrer"
           className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-zinc-800/80 hover:bg-zinc-700/80 text-zinc-300 text-xs font-medium border border-zinc-700/80 transition-colors"
         >
-          <span>Admin Portal</span>
+          <span>{t("adminPortal")}</span>
           <ExternalLink className="w-3 h-3 text-zinc-400" />
         </a>
 

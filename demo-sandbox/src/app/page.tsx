@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ArrowRight, ShieldCheck, Zap, Terminal, FileCode } from "lucide-react";
+import { getEnvUrl } from "../utils/env";
 
 export default function Home() {
   return (
@@ -28,7 +29,7 @@ export default function Home() {
             Sandbox Simulator
           </Link>
           <a
-            href="http://localhost:8080/swagger"
+            href={getEnvUrl.swagger()}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center justify-center gap-2 p-3 rounded-xl bg-zinc-800/80 hover:bg-zinc-800 text-zinc-300 border border-zinc-700 text-xs font-semibold transition-all"

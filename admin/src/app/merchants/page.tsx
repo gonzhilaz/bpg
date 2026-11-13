@@ -1,13 +1,15 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
-import { Users, Search, Plus, RotateCcw, ShieldCheck, Ban, CheckCircle2 } from "lucide-react";
+import { Users, Search, Plus, RotateCcw, ShieldCheck, Ban, CheckCircle2, ChevronDown } from "lucide-react";
 import { useAdmin } from "../../context/AdminContext";
+import { useLanguage } from "../../context/LanguageContext";
 import { MerchantControlTable } from "../../components/admin/MerchantControlTable";
 import { AdminMerchant } from "../../types/admin";
 
 export default function MerchantsPage() {
   const { merchants, setMerchants } = useAdmin();
+  const { t } = useLanguage();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<"ALL" | "ACTIVE" | "SUSPENDED">("ALL");
   const [showAddModal, setShowAddModal] = useState(false);
@@ -99,7 +101,7 @@ export default function MerchantsPage() {
         </div>
       </div>
 
-      {/* Search and Filters */}
+      {/* Search and Dropdown Filter */}
       <div className="bg-zinc-900/60 border border-zinc-800 p-4 rounded-2xl flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
         <div className="relative flex-1 max-w-md">
           <Search className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -112,20 +114,32 @@ export default function MerchantsPage() {
           />
         </div>
 
-        <div className="flex items-center gap-1.5">
-          {(["ALL", "ACTIVE", "SUSPENDED"] as const).map((st) => (
-            <button
-              key={st}
-              onClick={() => setStatusFilter(st)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-colors ${
-                statusFilter === st
-                  ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/40"
-                  : "bg-zinc-800/60 text-zinc-400 hover:text-zinc-200 border border-zinc-800"
-              }`}
+        <div className="flex items-center gap-2">
+          <div className="relative min-w-[150px]">
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value as "ALL" | "ACTIVE" | "SUSPENDED")}
+              className="w-full appearance-none bg-zinc-950 border border-zinc-800 rounded-xl px-3 pr-8 py-2 text-xs text-white focus:outline-none focus:border-cyan-500/50 cursor-pointer"
             >
-              {st}
+              <option value="ALL">{t("filterStatus")}</option>
+              <option value="ACTIVE">{t("statusActive")}</option>
+              <option value="SUSPENDED">{t("statusSuspended")}</option>
+            </select>
+            <ChevronDown className="w-3.5 h-3.5 text-zinc-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+          </div>
+
+          {(search !== "" || statusFilter !== "ALL") && (
+            <button
+              onClick={() => {
+                setSearch("");
+                setStatusFilter("ALL");
+              }}
+              className="p-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-white border border-zinc-700 transition-colors"
+              title={t("reset")}
+            >
+              <RotateCcw className="w-3.5 h-3.5" />
             </button>
-          ))}
+          )}
         </div>
       </div>
 

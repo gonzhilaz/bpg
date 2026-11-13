@@ -3,6 +3,7 @@
 import React from "react";
 import { ExternalLink } from "lucide-react";
 import { useEnvironment } from "../../context/EnvironmentContext";
+import { getEnvUrl } from "../../utils/env";
 
 export function SandboxBanner() {
   const { mode } = useEnvironment();
@@ -47,7 +48,7 @@ export function SandboxBanner() {
         </a>
         <span className="text-zinc-600">•</span>
         <a
-          href="http://localhost:3000/sandbox"
+          href={getEnvUrl.sandbox()}
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center gap-1 font-semibold underline hover:text-white"

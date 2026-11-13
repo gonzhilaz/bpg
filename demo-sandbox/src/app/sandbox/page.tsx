@@ -4,8 +4,9 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { ArrowLeft, Play, RefreshCw, CheckCircle2, ExternalLink, Zap } from "lucide-react";
 import { Network } from "../../types/invoice";
+import { getEnvUrl } from "../../utils/env";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+const API_BASE_URL = getEnvUrl.api();
 
 export default function SandboxPage() {
   const [orderId, setOrderId] = useState("ORD-98210");
