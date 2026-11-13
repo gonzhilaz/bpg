@@ -242,7 +242,9 @@ func (s *invoiceService) RecordPayment(ctx context.Context, depositAddress strin
 	// 1. Trigger Auto-Payout if PAID and Merchant has auto-payout enabled
 	if invoice.Status == domain.StatusPaid && s.payoutSvc != nil {
 		go func(inv *domain.Invoice) {
-			_, _ = s.payoutSvc.ProcessAutoPayout(context.Background(), inv)
+			pCtx, pCancel := context.WithTimeout(context.Background(), 2*time.Minute)
+			defer pCancel()
+			_, _ = s.payoutSvc.ProcessAutoPayout(pCtx, inv)
 		}(invoice)
 	}
 

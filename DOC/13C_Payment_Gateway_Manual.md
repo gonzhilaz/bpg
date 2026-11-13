@@ -171,7 +171,7 @@ Server e-commerce toko Anda cukup memanggil endpoint berikut:
 ```bash
 curl -X POST https://api.yourgateway.com/api/v1/invoices \
   -H "Content-Type: application/json" \
-  -H "X-API-KEY: cap_live_9a41b2c8e104f..." \
+  -H "X-API-KEY: 13c_live_9a41b2c8e104f..." \
   -d '{
     "order_id": "INV-2026-001",
     "amount": 50.00,

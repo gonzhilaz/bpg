@@ -257,7 +257,7 @@ export function RpcManagerCard() {
       {/* Add RPC Modal */}
       {showAddModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-in fade-in duration-150">
-          <div className="w-full max-w-md bg-zinc-900 border border-zinc-800 rounded-2xl p-5 shadow-2xl space-y-4">
+          <div className="w-full max-w-md max-h-[90vh] overflow-y-auto bg-zinc-900 border border-zinc-800 rounded-2xl p-5 shadow-2xl space-y-4">
             <div className="flex items-center justify-between pb-2 border-b border-zinc-800">
               <div className="flex items-center gap-2">
                 <Globe className="w-4 h-4 text-cyan-400" />

@@ -155,7 +155,7 @@ export default function MerchantsPage() {
       {/* Add Merchant Modal */}
       {showAddModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-150">
-          <div className="w-full max-w-md bg-zinc-900 border border-zinc-800 rounded-2xl p-6 shadow-2xl space-y-4 font-sans text-xs">
+          <div className="w-full max-w-md max-h-[90vh] overflow-y-auto bg-zinc-900 border border-zinc-800 rounded-2xl p-6 shadow-2xl space-y-4 font-sans text-xs">
             <div className="flex items-center justify-between pb-2 border-b border-zinc-800">
               <div className="flex items-center gap-2">
                 <Building2 className="w-4 h-4 text-cyan-400" />

@@ -77,8 +77,12 @@ func (d *webhookDispatcher) DispatchInvoiceEvent(ctx context.Context, invoice *d
 	mac.Write(bodyBytes)
 	signature := hex.EncodeToString(mac.Sum(nil))
 
-	// Deliver asynchronously with retries
-	go d.deliverWithRetry(context.Background(), invoice.CallbackURL, bodyBytes, signature, payload.Timestamp)
+	// Deliver asynchronously with bounded retries
+	go func() {
+		wCtx, wCancel := context.WithTimeout(context.Background(), 45*time.Second)
+		defer wCancel()
+		d.deliverWithRetry(wCtx, invoice.CallbackURL, bodyBytes, signature, payload.Timestamp)
+	}()
 }
 
 func (d *webhookDispatcher) deliverWithRetry(ctx context.Context, targetURL string, body []byte, signature string, ts int64) {

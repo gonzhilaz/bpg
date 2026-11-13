@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -194,13 +195,19 @@ func (h *AdminHandler) UpdateMerchantStatus(c *gin.Context) {
 		return
 	}
 
+	normalizedStatus := strings.ToUpper(strings.TrimSpace(req.Status))
+	if normalizedStatus != "ACTIVE" && normalizedStatus != "SUSPENDED" {
+		response.BadRequest(c, "Invalid status: must be ACTIVE or SUSPENDED", "")
+		return
+	}
+
 	merchant, err := h.merchantRepo.GetByID(c.Request.Context(), id)
 	if err != nil || merchant == nil {
 		response.NotFound(c, "Merchant not found")
 		return
 	}
 
-	merchant.Status = req.Status
+	merchant.Status = normalizedStatus
 	if err := h.merchantRepo.Update(c.Request.Context(), merchant); err != nil {
 		response.InternalServerError(c, "Failed to update status", err.Error())
 		return

@@ -45,10 +45,13 @@ func (h *MerchantHandler) Register(c *gin.Context) {
 	_, _ = rand.Read(apiKeyBytes)
 	_, _ = rand.Read(secretKeyBytes)
 
+	fullAPIKey := "13c_live_" + hex.EncodeToString(apiKeyBytes)
 	merchant := &domain.Merchant{
 		Name:                 req.Name,
-		APIKey:               "cap_" + hex.EncodeToString(apiKeyBytes),
+		APIKey:               fullAPIKey,
+		APIKeyPrefix:         fullAPIKey[:16] + "...",
 		SecretKey:            hex.EncodeToString(secretKeyBytes),
+		Status:               "ACTIVE",
 		PayoutAddressBSC:     req.PayoutAddressBSC,
 		PayoutAddressPolygon: req.PayoutAddressPolygon,
 		PayoutAddressTron:    req.PayoutAddressTron,
