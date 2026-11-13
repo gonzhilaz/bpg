@@ -13,13 +13,13 @@ import (
 	"github.com/shopspring/decimal"
 	"gorm.io/gorm"
 
-	"captain-gateway/internal/domain"
-	"captain-gateway/internal/handler"
-	"captain-gateway/internal/middleware"
-	"captain-gateway/internal/payout"
-	"captain-gateway/internal/repository"
-	"captain-gateway/internal/service"
-	"captain-gateway/internal/webhook"
+	"13c-gateway/internal/domain"
+	"13c-gateway/internal/handler"
+	"13c-gateway/internal/middleware"
+	"13c-gateway/internal/payout"
+	"13c-gateway/internal/repository"
+	"13c-gateway/internal/service"
+	"13c-gateway/internal/webhook"
 )
 
 func setupTestRouter(t *testing.T) (*gin.Engine, *gorm.DB) {
@@ -113,7 +113,7 @@ func TestCreateAndPayInvoice(t *testing.T) {
 
 	req := httptest.NewRequest(http.MethodPost, "/api/v1/invoices", bytes.NewReader(body))
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("X-API-KEY", "cap_demo_api_key_12345678")
+	req.Header.Set("X-API-KEY", "13c_demo_api_key_12345678")
 	w := httptest.NewRecorder()
 	r.ServeHTTP(w, req)
 

@@ -5,9 +5,9 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"captain-gateway/internal/middleware"
-	"captain-gateway/internal/service"
-	"captain-gateway/pkg/response"
+	"13c-gateway/internal/middleware"
+	"13c-gateway/internal/service"
+	"13c-gateway/pkg/response"
 )
 
 // AuthHandler handles authentication routes

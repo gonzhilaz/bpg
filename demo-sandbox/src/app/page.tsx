@@ -8,7 +8,7 @@ export default function Home() {
         <div className="space-y-3">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-medium">
             <Zap className="w-3.5 h-3.5" />
-            Captain Crypto Gateway
+            13C Crypto Gateway
           </div>
           <h1 className="text-3xl font-bold tracking-tight text-white">
             Demo & Sandbox Portal

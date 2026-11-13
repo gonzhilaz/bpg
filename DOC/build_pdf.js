@@ -2,9 +2,9 @@ const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
 
-const mdPath = path.join(__dirname, 'Captain_Payment_Gateway_Manual.md');
+const mdPath = path.join(__dirname, '13C_Payment_Gateway_Manual.md');
 const htmlPath = path.join(__dirname, 'manual_print.html');
-const pdfPath = path.join(__dirname, 'Captain_Payment_Gateway_Manual.pdf');
+const pdfPath = path.join(__dirname, '13C_Payment_Gateway_Manual.pdf');
 
 const mdContent = fs.readFileSync(mdPath, 'utf8');
 
@@ -47,7 +47,7 @@ const fullHtml = `<!DOCTYPE html>
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <title>Captain Crypto Payment Gateway Manual</title>
+  <title>13C Crypto Payment Gateway Manual</title>
   <style>
     @page {
       size: A4;

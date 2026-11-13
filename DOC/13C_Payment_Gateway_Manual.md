@@ -1,4 +1,4 @@
-# Panduan Operasional & Dokumentasi Resmi Captain Crypto Payment Gateway
+# Panduan Operasional & Dokumentasi Resmi 13C Crypto Payment Gateway
 
 **Versi**: 1.2.0  
 **Tanggal**: November 2026  
@@ -45,9 +45,9 @@
 ## BAB 1: GAMBARAN UMUM & SPESIFIKASI ARSITEKTUR
 
 ### 1.1 Prinsip Non-Custodial & Kedaulatan Dana
-Captain Crypto Payment Gateway dirancang untuk memecahkan kelemahan terbesar payment gateway sentralistik (seperti BitPay atau NOWPayments), yaitu risiko pembekuan dana sepihak (*fund freezing*) dan biaya perantara ganda.
+13C Crypto Payment Gateway dirancang untuk memecahkan kelemahan terbesar payment gateway sentralistik (seperti BitPay atau NOWPayments), yaitu risiko pembekuan dana sepihak (*fund freezing*) dan biaya perantara ganda.
 
-Dengan arsitektur **Non-Custodial Instant Forwarding**, sistem Captain tidak pernah mengendapkan saldo merchant di akun perantara. Setiap pembayaran yang diverifikasi on-chain langsung disapu (*swept*) ke **Cold Wallet Pribadi Merchant** yang aman.
+Dengan arsitektur **Non-Custodial Instant Forwarding**, sistem 13C tidak pernah mengendapkan saldo merchant di akun perantara. Setiap pembayaran yang diverifikasi on-chain langsung disapu (*swept*) ke **Cold Wallet Pribadi Merchant** yang aman.
 
 ```
 [Pembeli] ──────> [Alamat Tagihan Ephemeral] ──────> [Cold Wallet Merchant]
@@ -86,7 +86,7 @@ Untuk menjadi merchant, kunjungi halaman registrasi di `/register`:
 3. **PENTING (Protokol Reveal Once)**: Sistem akan menampilkan kartu peringatan khusus yang memuat **Production API Key** dan **Webhook Secret**.
    * *Kunci ini hanya ditampilkan satu kali demi alasan keamanan tingkat tinggi.*
    * Segera klik tombol salin (*copy*) dan simpan di password manager atau file konfigurasi `.env` server toko Anda.
-   * Di dalam database Captain, API Key disimpan dalam bentuk hash **SHA-256**, sehingga kunci asli tidak dapat dibaca oleh siapa pun jika database diretas.
+   * Di dalam database 13C Gateway, API Key disimpan dalam bentuk hash **SHA-256**, sehingga kunci asli tidak dapat dibaca oleh siapa pun jika database diretas.
 
 ### 2.2 Autentikasi & Arsitektur Multi-Route Sidebar
 Kunjungi halaman login di `/login`:
@@ -182,7 +182,7 @@ async function createCryptoInvoice() {
     fee_payer: 'customer',
     callback_url: 'https://tokosaya.com/api/crypto-webhook'
   }, {
-    headers: { 'X-API-KEY': process.env.CAPTAIN_API_KEY }
+    headers: { 'X-API-KEY': process.env.THIRTEENC_API_KEY }
   });
 
   const { id, deposit_address, pay_amount, pay_currency } = response.data.data;
@@ -232,7 +232,7 @@ Fitur Checkout Widget:
 * **1-Click Web3 Pay**: Pembeli pengguna MetaMask atau Phantom dapat membayar langsung tanpa mengetik alamat manual.
 
 ### 3.3 Penanganan & Validasi Tanda Tangan Webhook (HMAC-SHA256)
-Ketika pembayaran pembeli terkonfirmasi di blockchain, Captain mengirimkan callback HTTP POST ke `callback_url` toko Anda dengan header `X-Signature`.
+Ketika pembayaran pembeli terkonfirmasi di blockchain, 13C Gateway mengirimkan callback HTTP POST ke `callback_url` toko Anda dengan header `X-Signature`.
 
 #### Contoh Payload Webhook:
 ```json
@@ -284,7 +284,7 @@ Jika Anda ingin menguji transaksi nyata dari dompet Web3 tanpa biaya:
    * **TRON Nile Testnet**: [https://nileex.io/join/getJoinPage](https://nileex.io/join/getJoinPage)
    * **BSC Testnet Faucet**: [https://www.bnbchain.org/en/testnet-faucet](https://www.bnbchain.org/en/testnet-faucet)
    * **Solana Devnet Faucet**: [https://faucet.solana.com](https://faucet.solana.com)
-3. Lakukan transfer koin testnet ke alamat deposit invoice. Watcher daemon Captain di background akan menangkap transaksi on-chain tersebut secara otomatis.
+3. Lakukan transfer koin testnet ke alamat deposit invoice. Watcher daemon 13C di background akan menangkap transaksi on-chain tersebut secara otomatis.
 
 ---
 
@@ -355,5 +355,5 @@ docker compose logs -f backend
 ```
 
 ---
-*Dokumen manual ini dihasilkan secara otomatis dari spesifikasi arsitektur resmi Captain Crypto Payment Gateway v1.2.*
+*Dokumen manual ini dihasilkan secara otomatis dari spesifikasi arsitektur resmi 13C Crypto Payment Gateway v1.2.*
 

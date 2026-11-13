@@ -7,8 +7,8 @@ import (
 	"github.com/glebarez/sqlite"
 	"gorm.io/gorm"
 
-	"captain-gateway/internal/domain"
-	"captain-gateway/internal/repository"
+	"13c-gateway/internal/domain"
+	"13c-gateway/internal/repository"
 )
 
 func setupTestDB(t *testing.T) *gorm.DB {

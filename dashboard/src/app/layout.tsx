@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Captain Merchant Dashboard",
+  title: "13C Merchant Dashboard",
   description: "Non-custodial crypto payment gateway merchant portal",
 };
 

@@ -56,7 +56,7 @@ export function AdminSidebar() {
             <Shield className="w-4 h-4 fill-current" />
           </div>
           <div>
-            <div className="text-sm font-bold text-white tracking-tight">Captain Platform</div>
+            <div className="text-sm font-bold text-white tracking-tight">13C Platform</div>
             <div className="text-[10px] text-zinc-400 uppercase tracking-wider font-semibold">
               Super Admin & Dev
             </div>
@@ -187,7 +187,7 @@ export function AdminSidebar() {
               ROOT
             </span>
           </div>
-          <div className="text-[10px] text-zinc-400 font-mono">admin@captaingateway.internal</div>
+          <div className="text-[10px] text-zinc-400 font-mono">admin@13cgateway.internal</div>
         </div>
       </div>
     </div>
@@ -215,3 +215,4 @@ export function AdminSidebar() {
     </>
   );
 }
+

@@ -37,7 +37,7 @@ export default function MerchantsPage() {
     const newMerchant: AdminMerchant = {
       id: `m_${Date.now()}`,
       name: newMerchantName.trim(),
-      api_key_prefix: `cpt_live_${Math.random().toString(36).substring(2, 6)}...`,
+      api_key_prefix: `13c_live_${Math.random().toString(36).substring(2, 6)}...`,
       volume_usd: "0.00",
       invoices_count: 0,
       auto_payout: true,
@@ -138,7 +138,7 @@ export default function MerchantsPage() {
           <div className="w-full max-w-md bg-zinc-900 border border-zinc-800 rounded-2xl p-6 shadow-2xl space-y-4">
             <h3 className="text-base font-bold text-white">Register New Merchant</h3>
             <p className="text-xs text-zinc-400">
-              Generates a dedicated API key and merchant account on Captain Gateway.
+              Generates a dedicated API key and merchant account on 13C Payment Gateway.
             </p>
 
             <form onSubmit={handleAddMerchant} className="space-y-4 pt-2">

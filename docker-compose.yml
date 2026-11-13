@@ -4,12 +4,12 @@ services:
   # PostgreSQL Database
   postgres:
     image: postgres:16-alpine
-    container_name: captain-postgres
+    container_name: 13c-postgres
     restart: always
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-captainsecret123}
-      POSTGRES_DB: ${POSTGRES_DB:-captain_db}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-13csecret123}
+      POSTGRES_DB: ${POSTGRES_DB:-13c_db}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
@@ -20,12 +20,12 @@ services:
       timeout: 5s
       retries: 5
 
-  # Captain Backend Core & Blockchain Watchers
+  # 13C Backend Core & Blockchain Watchers
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: captain-backend
+    container_name: 13c-backend
     restart: always
     depends_on:
       postgres:
@@ -34,8 +34,8 @@ services:
       APP_ENV: production
       SERVER_PORT: "8080"
       DB_DRIVER: postgres
-      DATABASE_URL: "postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-captainsecret123}@postgres:5432/${POSTGRES_DB:-captain_db}?sslmode=disable"
-      MASTER_SECRET_KEY: ${MASTER_SECRET_KEY:-captain-production-master-secret-key-32bytes!}
+      DATABASE_URL: "postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-13csecret123}@postgres:5432/${POSTGRES_DB:-13c_db}?sslmode=disable"
+      MASTER_SECRET_KEY: ${MASTER_SECRET_KEY:-13c-production-master-secret-key-32bytes!}
       INVOICE_EXPIRY_MINUTES: "30"
       BSC_RPC_URL: ${BSC_RPC_URL:-https://bsc-dataseed.binance.org/}
       POLYGON_RPC_URL: ${POLYGON_RPC_URL:-https://polygon-rpc.com/}

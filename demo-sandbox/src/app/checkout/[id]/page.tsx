@@ -133,7 +133,7 @@ function CheckoutContent({ params }: { params: Promise<{ id: string }> }) {
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-pulse" />
             <span className="text-xs font-semibold tracking-wider text-zinc-300 uppercase">
-              Captain Pay
+              13C Pay
             </span>
           </div>
 

@@ -5,10 +5,10 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"captain-gateway/internal/crypto"
-	"captain-gateway/internal/domain"
-	"captain-gateway/internal/repository"
-	"captain-gateway/pkg/response"
+	"13c-gateway/internal/crypto"
+	"13c-gateway/internal/domain"
+	"13c-gateway/internal/repository"
+	"13c-gateway/pkg/response"
 )
 
 const (

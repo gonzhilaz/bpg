@@ -10,11 +10,11 @@ import (
 	"github.com/google/uuid"
 	"github.com/shopspring/decimal"
 
-	"captain-gateway/internal/crypto"
-	"captain-gateway/internal/domain"
-	"captain-gateway/internal/payout"
-	"captain-gateway/internal/repository"
-	"captain-gateway/internal/webhook"
+	"13c-gateway/internal/crypto"
+	"13c-gateway/internal/domain"
+	"13c-gateway/internal/payout"
+	"13c-gateway/internal/repository"
+	"13c-gateway/internal/webhook"
 )
 
 // CreateInvoiceRequest defines payload for creating a new invoice

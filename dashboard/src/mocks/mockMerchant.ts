@@ -37,9 +37,9 @@ export const mockNetworkGasRates: NetworkGasRate[] = [
 
 export const mockLiveProfile: MerchantProfile = {
   id: "m-80123-live",
-  name: "Captain Demo Store",
-  api_key: "cap_live_e89104fa28b57199c01128ad",
-  secret_key: "sec_live_99f2b8471a2e8c4598012f",
+  name: "13C Demo Store",
+  api_key: "13c_live_e89104fa28b57199c01128ad",
+  secret_key: "13c_sec_live_99f2b8471a2e8c4598012f",
   payout_address_bsc: "0x71C8A3951F6b4d3E118bFE7c251d18fF2113f019",
   payout_address_polygon: "0x71C8A3951F6b4d3E118bFE7c251d18fF2113f019",
   payout_address_tron: "TYUKBQ1AHuC6U1Qj88J7sE5FzW7xJg9vEa",
@@ -51,9 +51,9 @@ export const mockLiveProfile: MerchantProfile = {
 
 export const mockSandboxProfile: MerchantProfile = {
   id: "m-80123-test",
-  name: "Captain Demo Store (Sandbox)",
-  api_key: "cap_test_demo_api_key_12345678",
-  secret_key: "sec_test_demo_secret_key_87654321",
+  name: "13C Demo Store (Sandbox)",
+  api_key: "13c_test_demo_api_key_12345678",
+  secret_key: "13c_test_demo_secret_key_87654321",
   payout_address_bsc: "0x71C8A3951F6b4d3E118bFE7c251d18fF2113f019",
   payout_address_polygon: "0x71C8A3951F6b4d3E118bFE7c251d18fF2113f019",
   payout_address_tron: "TYUKBQ1AHuC6U1Qj88J7sE5FzW7xJg9vEa",

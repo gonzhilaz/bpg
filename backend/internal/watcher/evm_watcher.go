@@ -14,9 +14,9 @@ import (
 
 	"github.com/shopspring/decimal"
 
-	"captain-gateway/internal/domain"
-	"captain-gateway/internal/repository"
-	"captain-gateway/internal/service"
+	"13c-gateway/internal/domain"
+	"13c-gateway/internal/repository"
+	"13c-gateway/internal/service"
 )
 
 // EVMWatcher monitors BSC and Polygon networks for ERC-20/BEP-20 transfers

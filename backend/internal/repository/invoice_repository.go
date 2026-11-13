@@ -8,7 +8,7 @@ import (
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 
-	"captain-gateway/internal/domain"
+	"13c-gateway/internal/domain"
 )
 
 // InvoiceRepository defines DB operations for invoices

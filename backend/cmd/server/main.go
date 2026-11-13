@@ -12,20 +12,20 @@ import (
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 
-	"captain-gateway/configs"
-	"captain-gateway/internal/crypto"
-	"captain-gateway/internal/domain"
-	"captain-gateway/internal/handler"
-	"captain-gateway/internal/middleware"
-	"captain-gateway/internal/payout"
-	"captain-gateway/internal/repository"
-	"captain-gateway/internal/service"
-	"captain-gateway/internal/watcher"
-	"captain-gateway/internal/webhook"
+	"13c-gateway/configs"
+	"13c-gateway/internal/crypto"
+	"13c-gateway/internal/domain"
+	"13c-gateway/internal/handler"
+	"13c-gateway/internal/middleware"
+	"13c-gateway/internal/payout"
+	"13c-gateway/internal/repository"
+	"13c-gateway/internal/service"
+	"13c-gateway/internal/watcher"
+	"13c-gateway/internal/webhook"
 )
 
 func main() {
-	log.Println("[INFO] Starting Captain Crypto Payment Gateway...")
+	log.Println("[INFO] Starting 13C Crypto Payment Gateway...")
 
 	cfg := configs.LoadConfig()
 	if cfg.AppEnv == "production" {
@@ -176,14 +176,14 @@ func seedDefaultMerchant(db *gorm.DB) {
 	db.Model(&domain.Merchant{}).Count(&count)
 	if count == 0 {
 		defaultMerchant := domain.Merchant{
-			Email:                "demo@captain.local",
-			Name:                 "Captain Demo Store",
+			Email:                "demo@13c.local",
+			Name:                 "13C Demo Store",
 			Role:                 "admin",
 			Status:               "ACTIVE",
-			APIKey:               "cap_demo_api_key_12345678",
-			APIKeyHash:           crypto.HashSHA256("cap_demo_api_key_12345678"),
-			APIKeyPrefix:         "cap_demo_...",
-			SecretKey:            "cap_demo_secret_key_87654321",
+			APIKey:               "13c_demo_api_key_12345678",
+			APIKeyHash:           crypto.HashSHA256("13c_demo_api_key_12345678"),
+			APIKeyPrefix:         "13c_demo_...",
+			SecretKey:            "13c_demo_secret_key_87654321",
 			PayoutAddressBSC:     "0x71C8A3951F6b4d3E118bFE7c251d18fF2113f019",
 			PayoutAddressPolygon: "0x71C8A3951F6b4d3E118bFE7c251d18fF2113f019",
 			PayoutAddressTron:    "TYUKBQ1AHuC6U1Qj88J7sE5FzW7xJg9vEa",
@@ -193,7 +193,7 @@ func seedDefaultMerchant(db *gorm.DB) {
 			WebhookURL:          "http://localhost:3000/api/webhooks/crypto",
 		}
 		db.Create(&defaultMerchant)
-		log.Println("[INFO] Seeded default merchant with API Key: cap_demo_api_key_12345678")
+		log.Println("[INFO] Seeded default merchant with API Key: 13c_demo_api_key_12345678")
 	}
 }
 
@@ -201,7 +201,7 @@ const swaggerHTML = `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Captain Crypto Payment Gateway API Docs</title>
+  <title>13C Crypto Payment Gateway API Docs</title>
   <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5.11.0/swagger-ui.css" />
   <link rel="icon" type="image/png" href="https://unpkg.com/swagger-ui-dist@5.11.0/favicon-32x32.png" />
   <style>

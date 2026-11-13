@@ -11,9 +11,9 @@ import (
 
 	"github.com/shopspring/decimal"
 
-	"captain-gateway/internal/domain"
-	"captain-gateway/internal/repository"
-	"captain-gateway/internal/service"
+	"13c-gateway/internal/domain"
+	"13c-gateway/internal/repository"
+	"13c-gateway/internal/service"
 )
 
 // SolanaWatcher monitors Solana SPL token transfers to active deposit addresses

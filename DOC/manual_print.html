@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <title>Captain Crypto Payment Gateway Manual</title>
+  <title>13C Crypto Payment Gateway Manual</title>
   <style>
     @page {
       size: A4;
@@ -134,7 +134,7 @@
   </style>
 </head>
 <body>
-  <h1 class="doc-title">Panduan Operasional & Dokumentasi Resmi Captain Crypto Payment Gateway</h1>
+  <h1 class="doc-title">Panduan Operasional & Dokumentasi Resmi 13C Crypto Payment Gateway</h1>
 <p>
 <strong>Versi</strong>: 1.2.0  </p>
 <p><strong>Tanggal</strong>: November 2026  </p>
@@ -181,9 +181,9 @@
 <h2 class="section-title">BAB 1: GAMBARAN UMUM & SPESIFIKASI ARSITEKTUR</h2>
 
 <h3 class="sub-title">1.1 Prinsip Non-Custodial & Kedaulatan Dana</h3>
-<p>Captain Crypto Payment Gateway dirancang untuk memecahkan kelemahan terbesar payment gateway sentralistik (seperti BitPay atau NOWPayments), yaitu risiko pembekuan dana sepihak (<em>fund freezing</em>) dan biaya perantara ganda.</p>
+<p>13C Crypto Payment Gateway dirancang untuk memecahkan kelemahan terbesar payment gateway sentralistik (seperti BitPay atau NOWPayments), yaitu risiko pembekuan dana sepihak (<em>fund freezing</em>) dan biaya perantara ganda.</p>
 <p>
-Dengan arsitektur <strong>Non-Custodial Instant Forwarding</strong>, sistem Captain tidak pernah mengendapkan saldo merchant di akun perantara. Setiap pembayaran yang diverifikasi on-chain langsung disapu (<em>swept</em>) ke <strong>Cold Wallet Pribadi Merchant</strong> yang aman.</p>
+Dengan arsitektur <strong>Non-Custodial Instant Forwarding</strong>, sistem 13C tidak pernah mengendapkan saldo merchant di akun perantara. Setiap pembayaran yang diverifikasi on-chain langsung disapu (<em>swept</em>) ke <strong>Cold Wallet Pribadi Merchant</strong> yang aman.</p>
 
 <pre class="code-block"><code>
 <p>[Pembeli] ──────&gt; [Alamat Tagihan Ephemeral] ──────&gt; [Cold Wallet Merchant]</p>
@@ -222,7 +222,7 @@ Dengan arsitektur <strong>Non-Custodial Instant Forwarding</strong>, sistem Capt
 <p>3. <strong>PENTING (Protokol Reveal Once)</strong>: Sistem akan menampilkan kartu peringatan khusus yang memuat <strong>Production API Key</strong> dan <strong>Webhook Secret</strong>.</p>
 <p>   <em> </em>Kunci ini hanya ditampilkan satu kali demi alasan keamanan tingkat tinggi.*</p>
 <p>   <em> Segera klik tombol salin (</em>copy*) dan simpan di password manager atau file konfigurasi `.env` server toko Anda.</p>
-<p>   * Di dalam database Captain, API Key disimpan dalam bentuk hash <strong>SHA-256</strong>, sehingga kunci asli tidak dapat dibaca oleh siapa pun jika database diretas.</p>
+<p>   * Di dalam database 13C Gateway, API Key disimpan dalam bentuk hash <strong>SHA-256</strong>, sehingga kunci asli tidak dapat dibaca oleh siapa pun jika database diretas.</p>
 
 <h3 class="sub-title">2.2 Autentikasi & Arsitektur Multi-Route Sidebar</h3>
 <p>Kunjungi halaman login di `/login`:</p>
@@ -318,7 +318,7 @@ async function createCryptoInvoice() {</p>
 <p>    fee_payer: 'customer',</p>
 <p>    callback_url: 'https://tokosaya.com/api/crypto-webhook'</p>
 <p>  }, {</p>
-<p>    headers: { 'X-API-KEY': process.env.CAPTAIN_API_KEY }</p>
+<p>    headers: { 'X-API-KEY': process.env.THIRTEENC_API_KEY }</p>
 <p>  });</p>
 <p>
   const { id, deposit_address, pay_amount, pay_currency } = response.data.data;</p>
@@ -368,7 +368,7 @@ Fitur Checkout Widget:</p>
 <ul><li><strong>1-Click Web3 Pay</strong>: Pembeli pengguna MetaMask atau Phantom dapat membayar langsung tanpa mengetik alamat manual.</li></ul>
 
 <h3 class="sub-title">3.3 Penanganan & Validasi Tanda Tangan Webhook (HMAC-SHA256)</h3>
-<p>Ketika pembayaran pembeli terkonfirmasi di blockchain, Captain mengirimkan callback HTTP POST ke `callback_url` toko Anda dengan header `X-Signature`.</p>
+<p>Ketika pembayaran pembeli terkonfirmasi di blockchain, 13C Gateway mengirimkan callback HTTP POST ke `callback_url` toko Anda dengan header `X-Signature`.</p>
 
 <h4 class="sub2-title">Contoh Payload Webhook:</h4>
 <pre class="code-block"><code>json
@@ -420,7 +420,7 @@ function verifyWebhook(req, secretKey) {</p>
 <p>   * <strong>TRON Nile Testnet</strong>: [https://nileex.io/join/getJoinPage](https://nileex.io/join/getJoinPage)</p>
 <p>   * <strong>BSC Testnet Faucet</strong>: [https://www.bnbchain.org/en/testnet-faucet](https://www.bnbchain.org/en/testnet-faucet)</p>
 <p>   * <strong>Solana Devnet Faucet</strong>: [https://faucet.solana.com](https://faucet.solana.com)</p>
-<p>3. Lakukan transfer koin testnet ke alamat deposit invoice. Watcher daemon Captain di background akan menangkap transaksi on-chain tersebut secara otomatis.</p>
+<p>3. Lakukan transfer koin testnet ke alamat deposit invoice. Watcher daemon 13C di background akan menangkap transaksi on-chain tersebut secara otomatis.</p>
 
 <hr class="divider" />
 
@@ -491,7 +491,7 @@ Portal ini dirancang untuk DevOps dan Operator Gateway dengan arsitektur <strong
 </code></pre>
 
 <hr class="divider" />
-<p><em>Dokumen manual ini dihasilkan secara otomatis dari spesifikasi arsitektur resmi Captain Crypto Payment Gateway v1.2.</em></p>
+<p><em>Dokumen manual ini dihasilkan secara otomatis dari spesifikasi arsitektur resmi 13C Crypto Payment Gateway v1.2.</em></p>
 
 
 </body>

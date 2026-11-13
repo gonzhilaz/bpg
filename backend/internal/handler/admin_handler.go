@@ -11,10 +11,10 @@ import (
 	"github.com/shopspring/decimal"
 	"gorm.io/gorm"
 
-	"captain-gateway/internal/domain"
-	"captain-gateway/internal/payout"
-	"captain-gateway/internal/repository"
-	"captain-gateway/pkg/response"
+	"13c-gateway/internal/domain"
+	"13c-gateway/internal/payout"
+	"13c-gateway/internal/repository"
+	"13c-gateway/pkg/response"
 )
 
 // AdminHandler handles platform management, devops, database, and financial audit endpoints

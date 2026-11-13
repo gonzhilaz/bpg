@@ -74,3 +74,4 @@ export default function WalletsPage() {
     </div>
   );
 }
+

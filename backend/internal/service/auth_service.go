@@ -9,9 +9,9 @@ import (
 
 	"github.com/google/uuid"
 
-	"captain-gateway/internal/crypto"
-	"captain-gateway/internal/domain"
-	"captain-gateway/internal/repository"
+	"13c-gateway/internal/crypto"
+	"13c-gateway/internal/domain"
+	"13c-gateway/internal/repository"
 )
 
 // RegisterRequest defines merchant self-service onboarding payload

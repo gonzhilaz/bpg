@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"captain-gateway/internal/domain"
+	"13c-gateway/internal/domain"
 )
 
 func TestAESGCMEncryption(t *testing.T) {

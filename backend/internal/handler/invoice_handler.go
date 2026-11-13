@@ -7,10 +7,10 @@ import (
 	"github.com/google/uuid"
 	"github.com/shopspring/decimal"
 
-	"captain-gateway/internal/domain"
-	"captain-gateway/internal/middleware"
-	"captain-gateway/internal/service"
-	"captain-gateway/pkg/response"
+	"13c-gateway/internal/domain"
+	"13c-gateway/internal/middleware"
+	"13c-gateway/internal/service"
+	"13c-gateway/pkg/response"
 )
 
 // InvoiceHandler handles invoice HTTP endpoints

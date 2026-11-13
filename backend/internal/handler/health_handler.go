@@ -6,7 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"captain-gateway/pkg/response"
+	"13c-gateway/pkg/response"
 )
 
 // HealthHandler provides health check endpoints
@@ -24,7 +24,7 @@ func (h *HealthHandler) Check(c *gin.Context) {
 	data := gin.H{
 		"status":  "operational",
 		"uptime":  time.Since(h.startTime).String(),
-		"service": "captain-crypto-gateway",
+		"service": "13c-crypto-gateway",
 		"version": "1.0.0",
 	}
 	response.Success(c, http.StatusOK, "Gateway is running healthy", data)

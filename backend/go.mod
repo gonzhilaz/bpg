@@ -1,4 +1,4 @@
-module captain-gateway
+module 13c-gateway
 
 go 1.26.5
 

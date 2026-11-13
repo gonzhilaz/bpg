@@ -7,7 +7,7 @@ import (
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 
-	"captain-gateway/internal/domain"
+	"13c-gateway/internal/domain"
 )
 
 // MerchantRepository defines DB operations for merchants

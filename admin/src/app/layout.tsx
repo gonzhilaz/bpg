@@ -5,8 +5,8 @@ import { AdminSidebar } from "../components/layout/AdminSidebar";
 import { AdminHeader } from "../components/layout/AdminHeader";
 
 export const metadata: Metadata = {
-  title: "Captain Platform Super Admin",
-  description: "Dev control dashboard for Captain Crypto Payment Gateway",
+  title: "13C Platform Super Admin",
+  description: "Dev control dashboard for 13C Crypto Payment Gateway",
 };
 
 export default function RootLayout({

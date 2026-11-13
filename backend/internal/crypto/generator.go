@@ -3,7 +3,7 @@ package crypto
 import (
 	"fmt"
 
-	"captain-gateway/internal/domain"
+	"13c-gateway/internal/domain"
 )
 
 // GeneratedWallet contains public deposit address and AES-256 encrypted private key

@@ -6,10 +6,10 @@ import (
 	"sync"
 	"time"
 
-	"captain-gateway/configs"
-	"captain-gateway/internal/domain"
-	"captain-gateway/internal/repository"
-	"captain-gateway/internal/service"
+	"13c-gateway/configs"
+	"13c-gateway/internal/domain"
+	"13c-gateway/internal/repository"
+	"13c-gateway/internal/service"
 )
 
 // WatcherManager orchestrates multi-chain indexers concurrently

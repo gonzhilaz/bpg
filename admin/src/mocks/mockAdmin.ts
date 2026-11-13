@@ -116,8 +116,8 @@ export const mockWatchers: WatcherStatus[] = [
 export const mockMerchantsList: AdminMerchant[] = [
   {
     id: "m-001",
-    name: "Captain Demo Store",
-    api_key_prefix: "cap_live_e891...",
+    name: "13C Demo Store",
+    api_key_prefix: "13c_live_e891...",
     volume_usd: "$124,000.00",
     invoices_count: 840,
     auto_payout: true,
@@ -127,7 +127,7 @@ export const mockMerchantsList: AdminMerchant[] = [
   {
     id: "m-002",
     name: "CryptoGadgets Indonesia",
-    api_key_prefix: "cap_live_99a2...",
+    api_key_prefix: "13c_live_99a2...",
     volume_usd: "$82,500.00",
     invoices_count: 512,
     auto_payout: true,
@@ -137,7 +137,7 @@ export const mockMerchantsList: AdminMerchant[] = [
   {
     id: "m-003",
     name: "SaaS Cloud Hosting",
-    api_key_prefix: "cap_live_41bf...",
+    api_key_prefix: "13c_live_41bf...",
     volume_usd: "$42,000.00",
     invoices_count: 198,
     auto_payout: true,

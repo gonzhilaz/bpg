@@ -12,7 +12,7 @@ import (
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 
-	"captain-gateway/internal/domain"
+	"13c-gateway/internal/domain"
 )
 
 // InitDatabase initializes GORM connection and runs AutoMigration

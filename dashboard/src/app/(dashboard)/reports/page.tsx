@@ -28,7 +28,7 @@ export default function ReportsPage() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
           <div className="p-4 rounded-xl bg-zinc-950/60 border border-zinc-800/80 space-y-1.5">
-            <div className="font-semibold text-zinc-300">Captain Gateway</div>
+            <div className="font-semibold text-zinc-300">13C Payment Gateway</div>
             <div className="text-xl font-bold text-emerald-400 font-mono">0.40% Flat</div>
             <p className="text-zinc-500 text-[11px] leading-relaxed">
               Zero monthly maintenance fees. Zero chargeback fraud risk. Direct non-custodial forwarding to your cold wallet.
@@ -47,3 +47,4 @@ export default function ReportsPage() {
     </div>
   );
 }
+

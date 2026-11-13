@@ -94,9 +94,9 @@ func GenerateSecureAPIKey(env string) (rawKey string, hash string, prefixDisplay
 	if _, err := rand.Read(bytes); err != nil {
 		return "", "", "", fmt.Errorf("failed to generate random bytes: %w", err)
 	}
-	prefix := "cap_live"
+	prefix := "13c_live"
 	if env == "test" || env == "sandbox" {
-		prefix = "cap_test"
+		prefix = "13c_test"
 	}
 	rawKey = fmt.Sprintf("%s_%s", prefix, hex.EncodeToString(bytes))
 	hash = HashSHA256(rawKey)

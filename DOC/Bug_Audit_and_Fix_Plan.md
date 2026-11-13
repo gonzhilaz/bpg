@@ -1,8 +1,8 @@
 # Laporan Audit Teknis, Bug History & Rencana Remediasi (Remediation Plan)
 
-**Proyek**: Captain Crypto Payment Gateway  
-**Tanggal Audit**: 12 November 2026  
-**Dokumen Pendamping**: [DOC/Captain_Payment_Gateway_Manual.pdf](file:///d:/DEVELOPMENT/Projects/Captain/DOC/Captain_Payment_Gateway_Manual.pdf)
+**Proyek**: 13C Crypto Payment Gateway  
+**Tanggal Audit**: 13 November 2026  
+**Dokumen Pendamping**: [DOC/13C_Payment_Gateway_Manual.pdf](file:///d:/DEVELOPMENT/Projects/Captain/DOC/13C_Payment_Gateway_Manual.pdf)
 
 ---
 

@@ -8,8 +8,8 @@ import (
 	"github.com/google/uuid"
 	"github.com/shopspring/decimal"
 
-	"captain-gateway/internal/domain"
-	"captain-gateway/internal/repository"
+	"13c-gateway/internal/domain"
+	"13c-gateway/internal/repository"
 )
 
 // PayoutService orchestrates instant auto-payout from Master Hot Wallet to merchant cold wallet

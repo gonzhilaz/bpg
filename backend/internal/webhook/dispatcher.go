@@ -12,7 +12,7 @@ import (
 	"strconv"
 	"time"
 
-	"captain-gateway/internal/domain"
+	"13c-gateway/internal/domain"
 )
 
 // WebhookPayload represents the notification body delivered to merchant
@@ -95,7 +95,7 @@ func (d *webhookDispatcher) deliverWithRetry(targetURL string, body []byte, sign
 		req.Header.Set("Content-Type", "application/json")
 		req.Header.Set("X-Signature", signature)
 		req.Header.Set("X-Timestamp", strconv.FormatInt(ts, 10))
-		req.Header.Set("User-Agent", "Captain-Crypto-Gateway/1.0")
+		req.Header.Set("User-Agent", "13C-Crypto-Gateway/1.0")
 
 		resp, err := d.client.Do(req)
 		if err == nil && resp.StatusCode >= 200 && resp.StatusCode < 300 {

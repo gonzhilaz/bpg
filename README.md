@@ -1,9 +1,9 @@
-# Captain Crypto Payment Gateway
+# 13C Crypto Payment Gateway
 
 Sistem payment gateway cryptocurrency non-custodial selevel OxaPay dengan arsitektur modular multi-aplikasi:
 
 ```
-Captain/
+13C-Gateway/
 ├── backend/        # Core API Go & Background Watchers (BSC, Polygon, TRON, Solana) [Port 8080]
 ├── dashboard/      # Merchant Portal Dashboard (Next.js - Port 3001) [Live & Sandbox Toggle]
 ├── admin/          # Super Admin & Dev Operations Dashboard (Next.js - Port 3002)

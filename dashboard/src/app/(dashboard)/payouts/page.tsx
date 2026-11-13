@@ -77,7 +77,7 @@ export default function PayoutsPage() {
         <ShieldCheck className="w-4 h-4 text-cyan-400 shrink-0 mt-0.5" />
         <div>
           <span className="font-semibold text-white">Direct Cold Wallet Delivery: </span>
-          Captain Gateway never pools customer deposits in a central custody account. Funds are forwarded directly from the temporary payment address to your cold wallet via signed on-chain transactions.
+          13C Payment Gateway never pools customer deposits in a central custody account. Funds are forwarded directly from the temporary payment address to your cold wallet via signed on-chain transactions.
         </div>
       </div>
 
@@ -86,3 +86,4 @@ export default function PayoutsPage() {
     </div>
   );
 }
+

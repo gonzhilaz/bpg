@@ -13,7 +13,7 @@ export default function ApiKeysPage() {
   const [isRegenerating, setIsRegenerating] = useState(false);
   const [regenSuccess, setRegenSuccess] = useState(false);
 
-  const curlExample = `curl -X POST https://api.captaingateway.com/api/v1/invoices \\
+  const curlExample = `curl -X POST https://api.13cgateway.com/api/v1/invoices \\
   -H "Content-Type: application/json" \\
   -H "X-API-KEY: ${profile.api_key}" \\
   -d '{
@@ -27,7 +27,7 @@ export default function ApiKeysPage() {
   const nodeExample = `const axios = require('axios');
 
 const response = await axios.post(
-  'https://api.captaingateway.com/api/v1/invoices',
+  'https://api.13cgateway.com/api/v1/invoices',
   {
     order_id: 'ORD-9901',
     amount: '25.00',
@@ -182,3 +182,4 @@ console.log('Payment URL:', response.data.data.checkout_url);`;
     </div>
   );
 }
+

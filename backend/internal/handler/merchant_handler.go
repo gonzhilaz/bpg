@@ -7,9 +7,9 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"captain-gateway/internal/domain"
-	"captain-gateway/internal/repository"
-	"captain-gateway/pkg/response"
+	"13c-gateway/internal/domain"
+	"13c-gateway/internal/repository"
+	"13c-gateway/pkg/response"
 )
 
 // MerchantHandler manages merchant profiles and payout addresses

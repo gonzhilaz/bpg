@@ -5,8 +5,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"captain-gateway/internal/service"
-	"captain-gateway/pkg/response"
+	"13c-gateway/internal/service"
+	"13c-gateway/pkg/response"
 )
 
 // RateHandler handles coin prices and network gas fee endpoints

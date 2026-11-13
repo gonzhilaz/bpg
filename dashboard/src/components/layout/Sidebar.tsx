@@ -43,7 +43,7 @@ export function Sidebar() {
   ];
 
   const handleLogout = () => {
-    localStorage.removeItem("captain_token");
+    localStorage.removeItem("13c_token");
     router.push("/login");
   };
 
@@ -56,7 +56,7 @@ export function Sidebar() {
             <Zap className="w-4 h-4 fill-current" />
           </div>
           <div>
-            <div className="text-sm font-bold text-white tracking-tight">Captain Gateway</div>
+            <div className="text-sm font-bold text-white tracking-tight">13C Gateway</div>
             <div className="text-[10px] text-zinc-400 uppercase tracking-wider font-semibold">
               Merchant Portal
             </div>
@@ -200,3 +200,4 @@ export function Sidebar() {
     </>
   );
 }
+

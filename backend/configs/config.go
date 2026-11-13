@@ -46,11 +46,11 @@ func LoadConfig() *Config {
 	return &Config{
 		ServerPort:       getEnv("SERVER_PORT", "8080"),
 		AppEnv:           getEnv("APP_ENV", "development"),
-		MasterSecretKey:  getEnv("MASTER_SECRET_KEY", "captain-default-master-secret-key-32bytes!"),
+		MasterSecretKey:  getEnv("MASTER_SECRET_KEY", "13c-default-master-secret-key-32bytes!"),
 		DatabaseDriver:   getEnv("DB_DRIVER", "sqlite"),
-		DatabaseURL:      getEnv("DATABASE_URL", "data/captain.db"),
+		DatabaseURL:      getEnv("DATABASE_URL", "data/13c.db"),
 		InvoiceExpiryMin: expiryMin,
-		JWTSecret:        getEnv("JWT_SECRET", "captain-super-secure-jwt-secret-key-256bit!"),
+		JWTSecret:        getEnv("JWT_SECRET", "13c-super-secure-jwt-secret-key-256bit!"),
 
 		BSCRPCURL:      getEnv("BSC_RPC_URL", "https://bsc-dataseed.binance.org/"),
 		PolygonRPCURL:  getEnv("POLYGON_RPC_URL", "https://polygon-rpc.com/"),

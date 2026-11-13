@@ -11,7 +11,7 @@ import (
 
 	"github.com/shopspring/decimal"
 
-	"captain-gateway/internal/domain"
+	"13c-gateway/internal/domain"
 )
 
 // NetworkGasInfo represents gas pricing and coin metrics per network
