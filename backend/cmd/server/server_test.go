@@ -35,6 +35,7 @@ func setupTestRouter(t *testing.T) (*gin.Engine, *gorm.DB) {
 		&domain.Invoice{},
 		&domain.BlockchainTransaction{},
 		&domain.PayoutTransfer{},
+		&domain.WithdrawalRequest{},
 	)
 	if err != nil {
 		t.Fatalf("failed to auto migrate: %v", err)

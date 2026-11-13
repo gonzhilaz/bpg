@@ -18,6 +18,10 @@ type Config struct {
 	InvoiceExpiryMin int
 	JWTSecret        string
 
+	// Software Licensing & Kill-Switch
+	LicenseKey       string
+	LicenseServerURL string
+
 	// Blockchain RPCs (Mainnet)
 	BSCRPCURL        string
 	PolygonRPCURL    string
@@ -51,6 +55,8 @@ func LoadConfig() *Config {
 		DatabaseURL:      getEnv("DATABASE_URL", "data/13c.db"),
 		InvoiceExpiryMin: expiryMin,
 		JWTSecret:        getEnv("JWT_SECRET", "13c-super-secure-jwt-secret-key-256bit!"),
+		LicenseKey:       getEnv("LICENSE_KEY", "eyJsaWNlbnNlX2lkIjoiMTNDLUxJQy1hNzBlNjg3MS00ZDBkLTQ2MmMtOWNlMy1mOTEzOGU3ZTM3MGMiLCJsaWNlbnNlZSI6IkNhcHRhaW4gQ2xpZW50IiwiZG9tYWluIjoiKiIsInRpZXIiOiJFTlRFUlBSSVNFIiwiaXNzdWVkX2F0IjoiMjAyNi0xMS0xM1QxMDo0NzoxOS45NzZaIiwiZXhwaXJlc19hdCI6IjIwMjctMTEtMTNUMTA6NDc6MTkuOTc3WiIsImhlYXJ0YmVhdF91cmwiOiJodHRwczovLzEzYy1saWNlbnNlLXNlcnZlci52ZXJjZWwuYXBwL2FwaS92ZXJpZnkifQ.l-5h5r5BGSPjngqNNCesB0VmeyXpw-LR9esH7lOwBQwiS3rEAP3QLRN_h6tSM0NFjgbaJUnsy0GhQTgYaYM4Cg"),
+		LicenseServerURL: getEnv("LICENSE_SERVER_URL", "https://13c-license-server.vercel.app/api/verify"),
 
 		BSCRPCURL:      getEnv("BSC_RPC_URL", "https://bsc-dataseed.binance.org/"),
 		PolygonRPCURL:  getEnv("POLYGON_RPC_URL", "https://polygon-rpc.com/"),

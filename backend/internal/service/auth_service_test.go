@@ -16,7 +16,7 @@ func setupTestDB(t *testing.T) *gorm.DB {
 	if err != nil {
 		t.Fatalf("failed to open in-memory db: %v", err)
 	}
-	_ = db.AutoMigrate(&domain.Merchant{}, &domain.Invoice{}, &domain.PayoutTransfer{})
+	_ = db.AutoMigrate(&domain.Merchant{}, &domain.Invoice{}, &domain.PayoutTransfer{}, &domain.WithdrawalRequest{})
 	return db
 }
 

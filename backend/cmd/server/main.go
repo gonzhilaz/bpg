@@ -16,6 +16,7 @@ import (
 	"13c-gateway/internal/crypto"
 	"13c-gateway/internal/domain"
 	"13c-gateway/internal/handler"
+	"13c-gateway/internal/license"
 	"13c-gateway/internal/middleware"
 	"13c-gateway/internal/payout"
 	"13c-gateway/internal/repository"
@@ -40,16 +41,27 @@ func main() {
 	// Seed default merchant for instant testing if table is empty
 	seedDefaultMerchant(db)
 
+	// Initialize License Engine & Remote Kill-Switch
+	watcherCtx, cancelWatchers := context.WithCancel(context.Background())
+	licenseMgr := license.GetManager()
+	if err := licenseMgr.VerifyAndActivate(cfg.LicenseKey, cfg.LicenseServerURL); err != nil {
+		log.Printf("[LICENSE WARN] Gateway starting in UNLICENSED mode: %v", err)
+	}
+	licenseMgr.StartHeartbeatDaemon(watcherCtx)
+	licenseHandler := handler.NewLicenseHandler(cfg.LicenseServerURL)
+
 	// Initialize Repositories
 	merchantRepo := repository.NewMerchantRepository(db)
 	invoiceRepo := repository.NewInvoiceRepository(db)
 	txRepo := repository.NewTransactionRepository(db)
 	payoutRepo := repository.NewPayoutRepository(db)
+	withdrawalRepo := repository.NewWithdrawalRepository(db)
 
 	// Initialize Services
 	rateSvc := service.NewRateService()
 	payoutSvc := payout.NewPayoutService(payoutRepo)
 	webhookDispatcher := webhook.NewDispatcher()
+	withdrawalSvc := service.NewWithdrawalService(withdrawalRepo, merchantRepo)
 
 	invoiceSvc := service.NewInvoiceService(
 		invoiceRepo,
@@ -60,9 +72,9 @@ func main() {
 		cfg.MasterSecretKey,
 		cfg.InvoiceExpiryMin,
 	)
+	invoiceSvc.SetWithdrawalRepo(withdrawalRepo)
 
 	// Initialize Multi-Chain Background Watchers (BSC, Polygon, TRON, Solana)
-	watcherCtx, cancelWatchers := context.WithCancel(context.Background())
 	watcherManager := watcher.NewWatcherManager(cfg, invoiceRepo, invoiceSvc)
 	watcherManager.Start(watcherCtx)
 
@@ -73,10 +85,11 @@ func main() {
 	authSvc := service.NewAuthService(merchantRepo, cfg.JWTSecret)
 	authHandler := handler.NewAuthHandler(authSvc)
 	adminHandler := handler.NewAdminHandler(db, merchantRepo, invoiceRepo, payoutSvc)
+	withdrawalHandler := handler.NewWithdrawalHandler(withdrawalSvc)
 
 	// Setup Router
 	r := gin.New()
-	r.Use(gin.Logger(), gin.Recovery(), middleware.CORSMiddleware())
+	r.Use(gin.Logger(), gin.Recovery(), middleware.CORSMiddleware(), middleware.LicenseEnforcement())
 
 	// Public Health Endpoint
 	r.GET("/health", healthHandler.Check)
@@ -93,6 +106,10 @@ func main() {
 	// API Routes
 	v1 := r.Group("/api/v1")
 	{
+		// System Licensing & Activation
+		v1.GET("/license/status", licenseHandler.GetStatus)
+		v1.POST("/license/activate", licenseHandler.Activate)
+
 		// Authentication (Self-service merchant onboarding & login)
 		authRoutes := v1.Group("/auth")
 		{
@@ -103,6 +120,9 @@ func main() {
 			{
 				authProtected.GET("/me", authHandler.Me)
 				authProtected.POST("/regenerate-key", authHandler.RegenerateKey)
+				authProtected.GET("/escrow/summary", withdrawalHandler.GetEscrowSummary)
+				authProtected.POST("/withdrawals", withdrawalHandler.RequestWithdrawal)
+				authProtected.GET("/withdrawals", withdrawalHandler.ListMerchantWithdrawals)
 			}
 		}
 
@@ -125,6 +145,9 @@ func main() {
 			adminRoutes.POST("/sweeps/manual", adminHandler.TriggerManualSweep)
 			adminRoutes.GET("/merchants", adminHandler.ListMerchants)
 			adminRoutes.PUT("/merchants/:id/status", adminHandler.UpdateMerchantStatus)
+			adminRoutes.GET("/withdrawals", withdrawalHandler.AdminListWithdrawals)
+			adminRoutes.POST("/withdrawals/:id/approve", withdrawalHandler.AdminApproveWithdrawal)
+			adminRoutes.POST("/withdrawals/:id/reject", withdrawalHandler.AdminRejectWithdrawal)
 		}
 
 		// Protected Merchant Invoicing (API Key Auth)
@@ -132,6 +155,9 @@ func main() {
 		authorized.Use(middleware.APIKeyAuth(merchantRepo))
 		{
 			authorized.POST("/invoices", invoiceHandler.Create)
+			authorized.GET("/escrow/summary", withdrawalHandler.GetEscrowSummary)
+			authorized.POST("/withdrawals", withdrawalHandler.RequestWithdrawal)
+			authorized.GET("/withdrawals", withdrawalHandler.ListMerchantWithdrawals)
 		}
 	}
 
@@ -191,6 +217,7 @@ func seedDefaultMerchant(db *gorm.DB) {
 			PayoutAddressSolana:  "7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU",
 			AutoPayoutEnabled:   true,
 			FeePayer:             "customer",
+			SettlementMode:       "INSTANT_FORWARD",
 			WebhookURL:          "http://localhost:3000/api/webhooks/crypto",
 		}
 		db.Create(&defaultMerchant)

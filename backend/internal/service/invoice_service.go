@@ -55,16 +55,18 @@ type InvoiceService interface {
 	CreateInvoice(ctx context.Context, merchant *domain.Merchant, req *CreateInvoiceRequest) (*InvoiceResponse, error)
 	GetInvoice(ctx context.Context, id uuid.UUID) (*InvoiceResponse, error)
 	RecordPayment(ctx context.Context, depositAddress string, amount decimal.Decimal, txHash string, network domain.Network, blockNumber uint64) (*domain.Invoice, error)
+	SetWithdrawalRepo(repo repository.WithdrawalRepository)
 }
 
 type invoiceService struct {
-	invRepo    repository.InvoiceRepository
-	txRepo     repository.TransactionRepository
-	rateSvc    RateService
-	payoutSvc  payout.PayoutService
-	dispatcher webhook.Dispatcher
-	secretKey  string
-	expiryMin  int
+	invRepo        repository.InvoiceRepository
+	txRepo         repository.TransactionRepository
+	withdrawalRepo repository.WithdrawalRepository
+	rateSvc        RateService
+	payoutSvc      payout.PayoutService
+	dispatcher     webhook.Dispatcher
+	secretKey      string
+	expiryMin      int
 }
 
 // NewInvoiceService creates a new invoice service with payout and webhook integration
@@ -86,6 +88,10 @@ func NewInvoiceService(
 		secretKey:  secretKey,
 		expiryMin:  expiryMin,
 	}
+}
+
+func (s *invoiceService) SetWithdrawalRepo(repo repository.WithdrawalRepository) {
+	s.withdrawalRepo = repo
 }
 
 func (s *invoiceService) CreateInvoice(ctx context.Context, merchant *domain.Merchant, req *CreateInvoiceRequest) (*InvoiceResponse, error) {
@@ -239,13 +245,22 @@ func (s *invoiceService) RecordPayment(ctx context.Context, depositAddress strin
 		return nil, err
 	}
 
-	// 1. Trigger Auto-Payout if PAID and Merchant has auto-payout enabled
-	if invoice.Status == domain.StatusPaid && s.payoutSvc != nil {
-		go func(inv *domain.Invoice) {
-			pCtx, pCancel := context.WithTimeout(context.Background(), 2*time.Minute)
-			defer pCancel()
-			_, _ = s.payoutSvc.ProcessAutoPayout(pCtx, inv)
-		}(invoice)
+	// 1. Credit Escrow Balance OR Trigger Instant Sweep based on Merchant SettlementMode
+	if invoice.Status == domain.StatusPaid && invoice.Merchant != nil {
+		if invoice.Merchant.SettlementMode == "INSTANT_FORWARD" {
+			if s.payoutSvc != nil {
+				go func(inv *domain.Invoice) {
+					pCtx, pCancel := context.WithTimeout(context.Background(), 2*time.Minute)
+					defer pCancel()
+					_, _ = s.payoutSvc.ProcessAutoPayout(pCtx, inv)
+				}(invoice)
+			}
+		} else {
+			// Default: ESCROW_BALANCE (Pool funds in gateway master vault, credit merchant internal ledger)
+			if s.withdrawalRepo != nil {
+				_ = s.withdrawalRepo.CreditEscrowBalance(ctx, invoice.Merchant.ID, invoice.PayAmount)
+			}
+		}
 	}
 
 	// 2. Dispatch HMAC-Signed Webhook to Merchant callback URL

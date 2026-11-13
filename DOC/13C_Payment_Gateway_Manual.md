@@ -1,6 +1,6 @@
 # Panduan Operasional & Dokumentasi Resmi 13C Crypto Payment Gateway
 
-**Versi**: 1.5.0  
+**Versi**: 1.6.0  
 **Tanggal**: November 2026  
 **Klasifikasi**: User Manual, Technical Specification & Integration Guide  
 **Repositori**: [https://github.com/gonzhilaz/bpg.git](https://github.com/gonzhilaz/bpg.git)
@@ -453,4 +453,37 @@ Untuk mendukung pengujian testnet sandbox tanpa batas dan toleransi kesalahan (*
 * **Proteksi Rute Backend Admin**: Middleware `AdminAuth` mengunci seluruh endpoint `/api/v1/admin/*` dengan verifikasi `X-Admin-Key` dan token sesi master.
 
 ---
-*Dokumen manual ini diperbarui secara resmi untuk 13C Crypto Payment Gateway v1.5 Enterprise Edition.*
+
+## BAB 7: SISTEM ESCROW, BUKU BESAR SALDO INTERNAL & WORKFLOW WITHDRAWAL
+
+### 7.1 Arsitektur Hybrid: Non-Custodial vs. Escrow Balance
+Sistem 13C mendukung mode penyelesaian dana ganda per merchant:
+1. **`ESCROW_BALANCE` (Default)**: Setiap pembayaran invoice yang diverifikasi on-chain otomatis dikreditkan ke buku besar saldo internal merchant (`BalanceUSD`). Dana tertampung aman di Master Vault platform, menghemat biaya gas fee blockchain secara masif.
+2. **`INSTANT_FORWARD`**: Mode lama di mana setiap tagihan langsung disapu seketika ke cold wallet merchant di blockchain.
+
+### 7.2 Permintaan Penarikan Dana (Merchant Withdrawal)
+* Merchant dapat mengajukan penarikan dana melalui halaman **`/withdrawals`** di Merchant Portal.
+* **Batas Minimum Penarikan**: Ditetapkan minimal **$50.00 USD** per batch.
+* **Mekanisme Penguncian Saldo Atomik**: Saat permintaan dibuat, sistem secara atomik memindahkan dana dari `BalanceUSD` ke `LockedBalanceUSD` untuk mencegah pembelanjaan ganda (*anti-double spend*).
+
+### 7.3 Tata Kelola Persetujuan Super Admin (Dev/Admin Payout Governance)
+* Seluruh permintaan withdrawal masuk ke antrean Super Admin di rute **`/withdrawals`**.
+* **Persetujuan & Siaran On-Chain (`Approve & Broadcast`)**: Admin menyetujui permintaan dengan 1 klik (`IconButton` checkmark). Sistem memotong `LockedBalanceUSD`, menyiarkan transaksi payout on-chain dari Hot Wallet platform, dan mencatat `TxHash`.
+* **Penolakan & Pengembalian Saldo (`Reject & Refund`)**: Admin dapat menolak permintaan disertai catatan alasan. Saldo yang terkunci otomatis dikembalikan utuh ke `BalanceUSD` merchant.
+
+---
+
+## BAB 8: SISTEM LISENSI KRIPTOGRAFIS ED25519 & REMOTE KILL-SWITCH
+
+### 8.1 Verifikasi Kunci Asimetris Ed25519 (Offline Signature)
+* **Master Developer Public Key**: Kunci publik 32-byte milik developer tertanam secara permanen pada biner Go backend (`internal/license`).
+* **Format Token Lisensi**: Token terdiri dari `<PayloadBase64>.<SignatureBase64>` yang hanya dapat dihasilkan menggunakan Kunci Privat milik Developer.
+* Tanpa token lisensi valid yang ditandatangani developer, seluruh API gateway menolak pemrosesan transaksi dengan HTTP 402 (*License Required*).
+
+### 8.2 Remote Heartbeat Daemon & Instant Kill-Switch Controller (Vercel Hosted)
+* **Aplikasi Controller Mandiri (`license-server/`)**: Disediakan aplikasi Next.js mandiri yang siap di-deploy secara instan ke akun **Vercel** pribadi developer.
+* **Mekanisme Heartbeat**: Setiap 6 jam, backend gateway melakukan ping terenkripsi ke endpoint verifikasi Vercel (`/api/verify`).
+* **Kill-Switch Seketika**: Jika klien melanggar perjanjian atau belum menyelesaikan pembayaran, developer dapat menekan tombol **"Kill Switch"** di dashboard Vercel. Pada ping berikutnya, sistem klien langsung terkunci secara permanen hingga developer menekan **"Restore"**.
+
+---
+*Dokumen manual ini diperbarui secara resmi untuk 13C Crypto Payment Gateway v1.6 Enterprise Edition.*

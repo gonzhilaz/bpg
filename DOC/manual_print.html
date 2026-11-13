@@ -136,7 +136,7 @@
 <body>
   <h1 class="doc-title">Panduan Operasional & Dokumentasi Resmi 13C Crypto Payment Gateway</h1>
 <p>
-<strong>Versi</strong>: 1.5.0  </p>
+<strong>Versi</strong>: 1.6.0  </p>
 <p><strong>Tanggal</strong>: November 2026  </p>
 <p><strong>Klasifikasi</strong>: User Manual, Technical Specification & Integration Guide  </p>
 <p><strong>Repositori</strong>: [https://github.com/gonzhilaz/bpg.git](https://github.com/gonzhilaz/bpg.git)</p>
@@ -589,7 +589,40 @@ Portal ini dirancang untuk DevOps dan Operator Gateway dengan arsitektur <strong
 <p><em> <strong>Proteksi Rute Backend Admin</strong>: Middleware `AdminAuth` mengunci seluruh endpoint `/api/v1/admin/</em>` dengan verifikasi `X-Admin-Key` dan token sesi master.</p>
 
 <hr class="divider" />
-<p><em>Dokumen manual ini diperbarui secara resmi untuk 13C Crypto Payment Gateway v1.5 Enterprise Edition.</em></p>
+
+<h2 class="section-title">BAB 7: SISTEM ESCROW, BUKU BESAR SALDO INTERNAL & WORKFLOW WITHDRAWAL</h2>
+
+<h3 class="sub-title">7.1 Arsitektur Hybrid: Non-Custodial vs. Escrow Balance</h3>
+<p>Sistem 13C mendukung mode penyelesaian dana ganda per merchant:</p>
+<p>1. <strong>`ESCROW_BALANCE` (Default)</strong>: Setiap pembayaran invoice yang diverifikasi on-chain otomatis dikreditkan ke buku besar saldo internal merchant (`BalanceUSD`). Dana tertampung aman di Master Vault platform, menghemat biaya gas fee blockchain secara masif.</p>
+<p>2. <strong>`INSTANT_FORWARD`</strong>: Mode lama di mana setiap tagihan langsung disapu seketika ke cold wallet merchant di blockchain.</p>
+
+<h3 class="sub-title">7.2 Permintaan Penarikan Dana (Merchant Withdrawal)</h3>
+<ul><li>Merchant dapat mengajukan penarikan dana melalui halaman <strong>`/withdrawals`</strong> di Merchant Portal.</li></ul>
+<ul><li><strong>Batas Minimum Penarikan</strong>: Ditetapkan minimal <strong>$50.00 USD</strong> per batch.</li></ul>
+<p><em> <strong>Mekanisme Penguncian Saldo Atomik</strong>: Saat permintaan dibuat, sistem secara atomik memindahkan dana dari `BalanceUSD` ke `LockedBalanceUSD` untuk mencegah pembelanjaan ganda (</em>anti-double spend*).</p>
+
+<h3 class="sub-title">7.3 Tata Kelola Persetujuan Super Admin (Dev/Admin Payout Governance)</h3>
+<ul><li>Seluruh permintaan withdrawal masuk ke antrean Super Admin di rute <strong>`/withdrawals`</strong>.</li></ul>
+<ul><li><strong>Persetujuan & Siaran On-Chain (`Approve & Broadcast`)</strong>: Admin menyetujui permintaan dengan 1 klik (`IconButton` checkmark). Sistem memotong `LockedBalanceUSD`, menyiarkan transaksi payout on-chain dari Hot Wallet platform, dan mencatat `TxHash`.</li></ul>
+<ul><li><strong>Penolakan & Pengembalian Saldo (`Reject & Refund`)</strong>: Admin dapat menolak permintaan disertai catatan alasan. Saldo yang terkunci otomatis dikembalikan utuh ke `BalanceUSD` merchant.</li></ul>
+
+<hr class="divider" />
+
+<h2 class="section-title">BAB 8: SISTEM LISENSI KRIPTOGRAFIS ED25519 & REMOTE KILL-SWITCH</h2>
+
+<h3 class="sub-title">8.1 Verifikasi Kunci Asimetris Ed25519 (Offline Signature)</h3>
+<ul><li><strong>Master Developer Public Key</strong>: Kunci publik 32-byte milik developer tertanam secara permanen pada biner Go backend (`internal/license`).</li></ul>
+<ul><li><strong>Format Token Lisensi</strong>: Token terdiri dari `<PayloadBase64>.<SignatureBase64>` yang hanya dapat dihasilkan menggunakan Kunci Privat milik Developer.</li></ul>
+<p><em> Tanpa token lisensi valid yang ditandatangani developer, seluruh API gateway menolak pemrosesan transaksi dengan HTTP 402 (</em>License Required*).</p>
+
+<h3 class="sub-title">8.2 Remote Heartbeat Daemon & Instant Kill-Switch Controller (Vercel Hosted)</h3>
+<ul><li><strong>Aplikasi Controller Mandiri (`license-server/`)</strong>: Disediakan aplikasi Next.js mandiri yang siap di-deploy secara instan ke akun <strong>Vercel</strong> pribadi developer.</li></ul>
+<ul><li><strong>Mekanisme Heartbeat</strong>: Setiap 6 jam, backend gateway melakukan ping terenkripsi ke endpoint verifikasi Vercel (`/api/verify`).</li></ul>
+<ul><li><strong>Kill-Switch Seketika</strong>: Jika klien melanggar perjanjian atau belum menyelesaikan pembayaran, developer dapat menekan tombol <strong>"Kill Switch"</strong> di dashboard Vercel. Pada ping berikutnya, sistem klien langsung terkunci secara permanen hingga developer menekan <strong>"Restore"</strong>.</li></ul>
+
+<hr class="divider" />
+<p><em>Dokumen manual ini diperbarui secara resmi untuk 13C Crypto Payment Gateway v1.6 Enterprise Edition.</em></p>
 
 </body>
 </html>

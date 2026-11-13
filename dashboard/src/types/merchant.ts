@@ -64,3 +64,23 @@ export interface WebhookLog {
   signature: string;
   timestamp: string;
 }
+
+export interface WithdrawalItem {
+  id: string;
+  amount: string;
+  currency: string;
+  network: Network;
+  target_address: string;
+  status: "PENDING" | "APPROVED" | "REJECTED" | "COMPLETED";
+  tx_hash?: string;
+  admin_notes?: string;
+  requested_at: string;
+}
+
+export interface EscrowSummary {
+  available_balance_usd: string;
+  locked_balance_usd: string;
+  total_escrow_usd: string;
+  min_withdrawal_usd: string;
+  settlement_mode: string;
+}

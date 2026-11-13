@@ -51,3 +51,17 @@ export interface NetworkGasItem {
   status: "OPTIMAL" | "CONGESTED";
   updated_at: string;
 }
+
+export interface AdminWithdrawalRequest {
+  id: string;
+  merchant_id: string;
+  merchant_name?: string;
+  amount: string;
+  currency: string;
+  network: Network;
+  target_address: string;
+  status: "PENDING" | "APPROVED" | "REJECTED" | "COMPLETED";
+  tx_hash?: string;
+  admin_notes?: string;
+  requested_at: string;
+}

@@ -15,6 +15,7 @@ import {
   FileCode2,
   X,
   LogOut,
+  WalletCards,
 } from "lucide-react";
 import { useAdmin } from "../../context/AdminContext";
 import { useLanguage } from "../../context/LanguageContext";
@@ -38,6 +39,7 @@ export function AdminSidebar() {
   const navItems: NavItem[] = [
     { label: t("overview"), href: "/", icon: Shield },
     { label: t("merchants"), href: "/merchants", icon: Users, badge: `${merchants.length}` },
+    { label: "Escrow & Payouts", href: "/withdrawals", icon: WalletCards },
     {
       label: t("gasEngine"),
       href: "/gas-liquidity",

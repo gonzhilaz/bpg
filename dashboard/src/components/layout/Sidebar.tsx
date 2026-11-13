@@ -17,6 +17,7 @@ import {
   LogOut,
   X,
   ExternalLink,
+  WalletCards,
 } from "lucide-react";
 import { useEnvironment } from "../../context/EnvironmentContext";
 import { useLanguage } from "../../context/LanguageContext";
@@ -39,6 +40,7 @@ export function Sidebar() {
   const navItems: NavItem[] = [
     { label: t("overview"), href: "/", icon: LayoutDashboard },
     { label: t("invoices"), href: "/invoices", icon: Receipt, badge: `${invoices.length}` },
+    { label: "Withdrawals", href: "/withdrawals", icon: WalletCards },
     { label: t("payouts"), href: "/payouts", icon: ArrowUpRight },
     { label: t("wallets"), href: "/wallets", icon: Wallet },
     { label: t("apiKeys"), href: "/api-keys", icon: Key },
