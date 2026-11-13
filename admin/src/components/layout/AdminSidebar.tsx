@@ -27,6 +27,7 @@ interface NavItem {
   icon: React.ElementType;
   badge?: string;
   badgeColor?: string;
+  alertCount?: number;
 }
 
 export function AdminSidebar() {
@@ -41,10 +42,9 @@ export function AdminSidebar() {
       label: t("gasEngine"),
       href: "/gas-liquidity",
       icon: Flame,
-      badge: "1 Alert",
-      badgeColor: "bg-amber-500/20 text-amber-300 border border-amber-500/30",
+      alertCount: 1,
     },
-    { label: t("systemHealth"), href: "/watchers", icon: Activity, badge: "4 Synced" },
+    { label: t("systemHealth"), href: "/watchers", icon: Activity, badge: "4" },
     { label: t("database"), href: "/database", icon: Database },
     { label: t("financial"), href: "/finance", icon: TrendingUp },
     { label: t("appSettings"), href: "/settings", icon: Sliders },
@@ -124,15 +124,15 @@ export function AdminSidebar() {
                 <Icon className={`w-4 h-4 ${isActive ? "text-cyan-400" : "text-zinc-400"}`} />
                 <span>{item.label}</span>
               </div>
-              {item.badge && (
-                <span
-                  className={`px-1.5 py-0.5 text-[10px] rounded-md font-mono ${
-                    item.badgeColor || "bg-zinc-800 text-zinc-400"
-                  }`}
-                >
+              {item.alertCount !== undefined && item.alertCount > 0 ? (
+                <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 text-[10px] font-bold rounded-full bg-rose-600 text-white shadow-sm shadow-rose-600/50">
+                  {item.alertCount}
+                </span>
+              ) : item.badge ? (
+                <span className="px-2 py-0.5 text-[10px] font-mono rounded-full bg-zinc-800/80 text-zinc-400">
                   {item.badge}
                 </span>
-              )}
+              ) : null}
             </Link>
           );
         })}

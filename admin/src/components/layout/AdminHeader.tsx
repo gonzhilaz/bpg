@@ -2,14 +2,15 @@
 
 import React from "react";
 import { usePathname } from "next/navigation";
-import { Menu, AlertTriangle, AlertOctagon, CheckCircle2, Flame, Sun, Moon, Globe } from "lucide-react";
+import { Menu, AlertOctagon, Sun, Moon, Globe } from "lucide-react";
 import { useAdmin } from "../../context/AdminContext";
 import { useTheme } from "../../context/ThemeContext";
 import { useLanguage } from "../../context/LanguageContext";
+import { AdminNotificationDropdown } from "./AdminNotificationDropdown";
 
 export function AdminHeader() {
   const pathname = usePathname();
-  const { setIsMobileNavOpen, circuitBreaker, setCircuitBreaker, hotWallets } = useAdmin();
+  const { setIsMobileNavOpen, circuitBreaker, setCircuitBreaker } = useAdmin();
   const { theme, toggleTheme } = useTheme();
   const { lang, setLang, t } = useLanguage();
 
@@ -38,8 +39,6 @@ export function AdminHeader() {
     setLang(lang === "EN" ? "ID" : "EN");
   };
 
-  const hasLowGas = hotWallets.some((w) => w.status === "LOW");
-
   return (
     <header className="h-16 px-4 md:px-6 border-b border-zinc-800/80 bg-zinc-900/60 backdrop-blur-md sticky top-0 z-30 flex items-center justify-between">
       {/* Left: Mobile Menu & Dynamic Breadcrumb */}
@@ -59,14 +58,10 @@ export function AdminHeader() {
         </div>
       </div>
 
-      {/* Right: Status Badges, Language, Theme & Circuit Breaker */}
+      {/* Right: Notifications, Language, Theme & Circuit Breaker */}
       <div className="flex items-center gap-2.5">
-        {hasLowGas && (
-          <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-300 text-xs font-medium">
-            <Flame className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
-            <span>Polygon Gas Low</span>
-          </div>
-        )}
+        {/* Notification Bell Dropdown */}
+        <AdminNotificationDropdown />
 
         {/* Language Selector */}
         <button

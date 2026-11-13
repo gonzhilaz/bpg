@@ -33,9 +33,9 @@ export function PlatformMetricsCard({ metrics }: Props) {
       )}
 
       {/* Grid Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         {/* Total Volume */}
-        <div className="bg-zinc-900/80 border border-zinc-800 p-4 rounded-2xl shadow-xl space-y-1">
+        <div className="bg-zinc-900/80 border border-zinc-800 p-3.5 rounded-2xl shadow-sm space-y-1">
           <div className="text-[11px] font-medium text-zinc-400 uppercase tracking-wider flex items-center justify-between">
             <span className="flex items-center gap-1.5">
               <DollarSign className="w-3.5 h-3.5 text-cyan-400" />
@@ -43,12 +43,12 @@ export function PlatformMetricsCard({ metrics }: Props) {
             </span>
             <Tooltip content="Gross cryptocurrency payment volume processed across all merchants." />
           </div>
-          <div className="text-2xl font-bold font-mono text-white">${metrics.total_volume_usd}</div>
+          <div className="text-xl font-bold font-mono text-white">${metrics.total_volume_usd}</div>
           <div className="text-[11px] text-zinc-500">All networks combined</div>
         </div>
 
         {/* Platform Fee Revenue */}
-        <div className="bg-zinc-900/80 border border-zinc-800 p-4 rounded-2xl shadow-xl space-y-1">
+        <div className="bg-zinc-900/80 border border-zinc-800 p-3.5 rounded-2xl shadow-sm space-y-1">
           <div className="text-[11px] font-medium text-zinc-400 uppercase tracking-wider flex items-center justify-between">
             <span className="flex items-center gap-1.5">
               <Percent className="w-3.5 h-3.5 text-emerald-400" />
@@ -56,14 +56,14 @@ export function PlatformMetricsCard({ metrics }: Props) {
             </span>
             <Tooltip content="Platform commission cut (0.4%) automatically retained from payouts." />
           </div>
-          <div className="text-2xl font-bold font-mono text-emerald-400">
+          <div className="text-xl font-bold font-mono text-emerald-400">
             ${metrics.platform_fee_revenue_usd}
           </div>
           <div className="text-[11px] text-zinc-500">0.4% platform margin</div>
         </div>
 
         {/* Active Merchants */}
-        <div className="bg-zinc-900/80 border border-zinc-800 p-4 rounded-2xl shadow-xl space-y-1">
+        <div className="bg-zinc-900/80 border border-zinc-800 p-3.5 rounded-2xl shadow-sm space-y-1">
           <div className="text-[11px] font-medium text-zinc-400 uppercase tracking-wider flex items-center justify-between">
             <span className="flex items-center gap-1.5">
               <Users className="w-3.5 h-3.5 text-cyan-400" />
@@ -71,7 +71,7 @@ export function PlatformMetricsCard({ metrics }: Props) {
             </span>
             <Tooltip content="Verified merchants currently processing transactions." />
           </div>
-          <div className="text-2xl font-bold font-mono text-white">
+          <div className="text-xl font-bold font-mono text-white">
             {metrics.active_merchants_count}
           </div>
           <div className="text-[11px] text-zinc-500 flex items-center gap-1 text-emerald-400">
@@ -81,7 +81,7 @@ export function PlatformMetricsCard({ metrics }: Props) {
         </div>
 
         {/* Circuit Breaker Control Card */}
-        <div className="bg-zinc-900/80 border border-zinc-800 p-4 rounded-2xl shadow-xl space-y-2 flex flex-col justify-between">
+        <div className="bg-zinc-900/80 border border-zinc-800 p-3.5 rounded-2xl shadow-sm space-y-1.5 flex flex-col justify-between">
           <div className="text-[11px] font-medium text-zinc-400 uppercase tracking-wider flex items-center justify-between">
             <span className="flex items-center gap-1.5">
               <AlertOctagon className="w-3.5 h-3.5 text-amber-400" />
@@ -93,7 +93,7 @@ export function PlatformMetricsCard({ metrics }: Props) {
           <button
             type="button"
             onClick={() => setCircuitBreaker(!circuitBreaker)}
-            className={`w-full py-2 px-3 rounded-xl text-xs font-semibold transition-colors flex items-center justify-center gap-2 ${
+            className={`w-full py-1.5 px-3 rounded-xl text-xs font-semibold transition-colors flex items-center justify-center gap-2 ${
               circuitBreaker
                 ? "bg-rose-500 text-white hover:bg-rose-600"
                 : "bg-zinc-800 text-zinc-300 hover:bg-zinc-700 border border-zinc-700"

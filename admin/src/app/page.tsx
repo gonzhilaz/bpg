@@ -23,27 +23,27 @@ export default function AdminOverviewPage() {
   const activeWatchersCount = watchers.filter((w) => w.status === "ACTIVE").length;
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-4">
       {/* Page Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-zinc-800/80">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-white">System Operations</h1>
-          <p className="text-xs text-zinc-400 mt-1">
+          <h1 className="text-xl font-bold tracking-tight text-white">System Operations</h1>
+          <p className="text-xs text-zinc-400">
             Real-time infrastructure health, platform liquidity reserves, and merchant governance.
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           <Link
             href="/merchants"
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-400 text-xs font-semibold border border-cyan-500/30 transition-colors"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-400 text-xs font-semibold border border-cyan-500/30 transition-colors"
           >
             <Users className="w-3.5 h-3.5" />
             <span>Merchants ({merchants.length})</span>
           </Link>
           <Link
             href="/gas-liquidity"
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs font-medium border border-zinc-700 transition-colors"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs font-medium border border-zinc-700 transition-colors"
           >
             <Flame className="w-3.5 h-3.5 text-amber-400" />
             <span>Gas Reserves</span>
@@ -55,13 +55,13 @@ export default function AdminOverviewPage() {
       <PlatformMetricsCard metrics={metrics} />
 
       {/* 2. Platform Subsystem Health Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
         {/* Gas Reserves Glance */}
-        <div className="p-5 rounded-2xl bg-zinc-900/60 border border-zinc-800 space-y-3">
+        <div className="p-4 rounded-2xl bg-zinc-900/60 border border-zinc-800 space-y-2.5">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Flame className="w-4 h-4 text-amber-400" />
-              <h3 className="text-sm font-semibold text-white">Hot Wallet Gas Liquidity</h3>
+              <h3 className="text-xs font-bold text-white uppercase tracking-wider">Hot Wallet Gas Liquidity</h3>
             </div>
             <Link
               href="/gas-liquidity"
@@ -76,7 +76,7 @@ export default function AdminOverviewPage() {
             {hotWallets.map((w) => (
               <div
                 key={w.network}
-                className="p-2.5 rounded-xl bg-zinc-950/60 border border-zinc-800/80 flex items-center justify-between"
+                className="p-2 rounded-xl bg-zinc-950/60 border border-zinc-800/80 flex items-center justify-between"
               >
                 <div className="flex items-center gap-1.5">
                   <span
@@ -107,11 +107,11 @@ export default function AdminOverviewPage() {
         </div>
 
         {/* Watcher Node Sync Glance */}
-        <div className="p-5 rounded-2xl bg-zinc-900/60 border border-zinc-800 space-y-3">
+        <div className="p-4 rounded-2xl bg-zinc-900/60 border border-zinc-800 space-y-2.5">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Activity className="w-4 h-4 text-cyan-400" />
-              <h3 className="text-sm font-semibold text-white">Multi-Chain Watchers</h3>
+              <h3 className="text-xs font-bold text-white uppercase tracking-wider">Multi-Chain Watchers</h3>
             </div>
             <Link
               href="/watchers"

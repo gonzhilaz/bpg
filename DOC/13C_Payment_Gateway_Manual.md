@@ -1,6 +1,6 @@
 # Panduan Operasional & Dokumentasi Resmi 13C Crypto Payment Gateway
 
-**Versi**: 1.3.0  
+**Versi**: 1.4.0  
 **Tanggal**: November 2026  
 **Klasifikasi**: User Manual, Technical Specification & Integration Guide  
 **Repositori**: [https://github.com/gonzhilaz/bpg.git](https://github.com/gonzhilaz/bpg.git)
@@ -338,11 +338,14 @@ Pada halaman **Gas Liquidity & Sweeper Engine**:
 * **Low Gas Alert**: Jika saldo native menipis di bawah ambang batas aman, sistem menampilkan peringatan kuning `Low Gas` di sidebar dan topbar.
 * **Manual Sweeper Trigger**: Jika ada tagihan yang belum tersapu akibat gangguan jaringan, pilih jaringan pada dropdown dan klik tombol **Trigger Sweep** untuk menyapu transaksi on-chain seketika.
 
-### 5.4 Pemeliharaan Database (Database Engine & Pruning)
-Pada kartu **Database Engine**:
-* Pantau jumlah koneksi pool aktif (`open_connections`, `in_use`, `idle`).
-* Pantau volume pertumbuhan baris tabel (`invoices`, `payouts`, `transactions`, `merchants`).
-* **Pruning Rutin**: Klik tombol **Prune Expired** untuk membersihkan rekaman tagihan yang kedaluwarsa lebih dari 7 hari tanpa menghapus riwayat invoice yang sukses.
+### 5.4 Pemeliharaan Database Tingkat Administrator (DBA Storage Suite)
+Pada modul **Database Engine & Storage Maintenance**:
+* **Live Connection Pool & I/O Telemetry**: Memantau kapasitas pool koneksi aktif, idle, queue, rasio *Buffer Cache Hit* (99.85%), dan latensi kueri rata-rata (1.4 ms).
+* **Table Storage & Bloat Inspector**: Audit terperinci per tabel (`invoices`, `payouts`, `transactions`, `webhook_deliveries`, `audit_logs`) mencakup jumlah baris, ukuran data, ukuran indeks B-Tree, persentase *bloat / dead tuples*, dan status *auto-vacuum*.
+* **Operasi VACUUM & REINDEX**: Satu klik untuk membersihkan *dead tuples*, menyusun ulang indeks terfragmentasi, dan memperbarui statistik biaya kueri PostgreSQL tanpa *table lock*.
+* **Mesin Pruning dengan Dry-Run Simulation**: Pilihan retensi data (7, 14, 30, 90 hari) dengan tombol **Simulate Dry-Run** yang menghitung perkiraan baris dan ruang *disk* yang akan direklamasi sebelum eksekusi permanen dijalankan.
+* **Disaster Recovery & Compressed Snapshots (`pg_dump`)**: Pembuatan *snapshot point-in-time* instan terkompresi dengan validasi *checksum* kriptografis SHA-256 dan opsi unduhan langsung.
+* **Audit Migrasi SQL**: Riwayat eksekusi skrip migrasi skema lengkap dengan durasi eksekusi dalam milidetik dan status integritas skema.
 
 ### 5.5 Emergency Circuit Breaker
 Pada kartu **Platform Overview**:

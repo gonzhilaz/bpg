@@ -1,76 +1,161 @@
 @import "tailwindcss";
 
 :root {
-  --background: #0b0e14;
-  --foreground: #ededed;
+  --bg-app: #0B0E14;
+  --bg-sidebar: #0E121A;
+  --bg-header: rgba(14, 18, 26, 0.85);
+  --bg-card: #121620;
+  --bg-card-subtle: #181F2C;
+  --bg-input: #090C12;
+  --border-subtle: #1F2839;
+  --border-strong: #2D3950;
+  --text-primary: #F8FAFC;
+  --text-secondary: #94A3B8;
+  --text-muted: #64748B;
+  color-scheme: dark;
 }
 
 :root[data-theme="light"],
 html.light {
-  --background: #f8fafc;
-  --foreground: #09090b;
+  --bg-app: #F8FAFC;
+  --bg-sidebar: #FFFFFF;
+  --bg-header: rgba(255, 255, 255, 0.92);
+  --bg-card: #FFFFFF;
+  --bg-card-subtle: #F1F5F9;
+  --bg-input: #FFFFFF;
+  --border-subtle: #E2E8F0;
+  --border-strong: #CBD5E1;
+  --text-primary: #0F172A;
+  --text-secondary: #475569;
+  --text-muted: #64748B;
+  color-scheme: light;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background-color: var(--bg-app);
+  color: var(--text-primary);
   font-family: Arial, Helvetica, sans-serif;
-  transition: background-color 0.2s ease, color 0.2s ease;
+  transition: background-color 0.15s ease, color 0.15s ease;
 }
 
-/* Light Mode Overrides for High Contrast */
+/* ========================================================
+   LIGHT MODE TOTAL OVERRIDES (ELIMINATES INCONSISTENT THEME)
+   ======================================================== */
+html.light body,
 html.light .bg-\[\#0B0E14\] {
-  background-color: #f8fafc !important;
-  color: #09090b !important;
+  background-color: #F8FAFC !important;
+  color: #0F172A !important;
 }
 
+/* Sidebar & Navigation */
+html.light .bg-\[\#0E121A\],
+html.light aside,
+html.light nav {
+  background-color: #FFFFFF !important;
+  border-color: #E2E8F0 !important;
+  color: #0F172A !important;
+}
+
+/* Header */
+html.light header {
+  background-color: rgba(255, 255, 255, 0.92) !important;
+  border-color: #E2E8F0 !important;
+  color: #0F172A !important;
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.03);
+}
+
+/* Cards & Surface Containers */
 html.light .bg-zinc-950,
+html.light .bg-zinc-950\/80,
+html.light .bg-zinc-950\/60,
 html.light .bg-zinc-900,
+html.light .bg-zinc-900\/90,
 html.light .bg-zinc-900\/80,
 html.light .bg-zinc-900\/60,
 html.light .bg-zinc-900\/40 {
-  background-color: #ffffff !important;
-  border-color: #e4e4e7 !important;
-  color: #09090b !important;
-  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.05), 0 1px 2px -1px rgb(0 0 0 / 0.05);
+  background-color: #FFFFFF !important;
+  border-color: #E2E8F0 !important;
+  color: #0F172A !important;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.04), 0 1px 2px -1px rgb(0 0 0 / 0.02);
 }
 
+/* Secondary Panels, Pills & Hover States */
 html.light .bg-zinc-800,
 html.light .bg-zinc-800\/80,
 html.light .bg-zinc-800\/60,
-html.light .bg-zinc-800\/50 {
-  background-color: #f4f4f5 !important;
-  border-color: #e4e4e7 !important;
-  color: #18181b !important;
+html.light .bg-zinc-800\/50,
+html.light .bg-zinc-800\/40,
+html.light .bg-zinc-800\/30 {
+  background-color: #F1F5F9 !important;
+  border-color: #E2E8F0 !important;
+  color: #1E293B !important;
 }
 
+html.light .hover\:bg-zinc-800:hover,
+html.light .hover\:bg-zinc-800\/50:hover,
+html.light .hover\:bg-zinc-700:hover,
+html.light .hover\:bg-zinc-700\/80:hover {
+  background-color: #E2E8F0 !important;
+  color: #0F172A !important;
+}
+
+/* Typography Hierarchy */
 html.light .text-white {
-  color: #09090b !important;
+  color: #0F172A !important;
 }
 
 html.light .text-zinc-100,
 html.light .text-zinc-200 {
-  color: #18181b !important;
+  color: #1E293B !important;
+}
+
+html.light .text-zinc-300 {
+  color: #334155 !important;
 }
 
 html.light .text-zinc-400 {
-  color: #52525b !important;
+  color: #475569 !important;
 }
 
 html.light .text-zinc-500 {
-  color: #71717a !important;
+  color: #64748B !important;
 }
 
+/* Borders */
 html.light .border-zinc-800,
 html.light .border-zinc-800\/80,
+html.light .border-zinc-800\/60,
 html.light .border-zinc-800\/50,
-html.light .border-zinc-700 {
-  border-color: #e4e4e7 !important;
+html.light .border-zinc-700,
+html.light .border-zinc-700\/80,
+html.light .border-zinc-700\/60 {
+  border-color: #E2E8F0 !important;
 }
 
+/* Inputs, Selects & Forms */
+html.light input,
 html.light select,
-html.light input {
-  background-color: #ffffff !important;
-  color: #09090b !important;
-  border-color: #d4d4d8 !important;
+html.light textarea {
+  background-color: #FFFFFF !important;
+  color: #0F172A !important;
+  border-color: #CBD5E1 !important;
+}
+
+html.light input::placeholder,
+html.light textarea::placeholder {
+  color: #94A3B8 !important;
+}
+
+/* Tables */
+html.light table thead tr {
+  border-color: #E2E8F0 !important;
+  background-color: #F8FAFC !important;
+}
+
+html.light table tbody tr {
+  border-color: #F1F5F9 !important;
+}
+
+html.light table tbody tr:hover {
+  background-color: #F8FAFC !important;
 }
