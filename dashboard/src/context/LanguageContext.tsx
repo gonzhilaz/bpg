@@ -39,6 +39,12 @@ const translations: Record<Language, Record<string, string>> = {
     adminPortal: "Admin Portal",
     connected: "Hot Wallet Connected",
     sandboxActive: "Sandbox & Testnet Active",
+    environment: "Environment",
+    live: "Live",
+    sandbox: "Sandbox",
+    save: "Save",
+    saved: "Saved!",
+    cancel: "Cancel",
 
     // Invoices Page
     invoicesTitle: "Invoices & Orders",
@@ -61,20 +67,46 @@ const translations: Record<Language, Record<string, string>> = {
     feePayerCustomer: "Customer Pays Gas",
 
     // Wallets & Gas
-    walletsTitle: "Hot Wallets & Network Gas",
-    walletsSubtitle: "Real-time native gas balances, automated sweep triggers, and current network gas prices.",
+    walletsTitle: "Wallets & Gas",
+    walletsSubtitle: "Cold wallet settlement addresses, fee payer rules, and live network gas rates.",
     gasEstimates: "Real-Time Gas Estimates",
     sweepTriggers: "Automated Sweep Configuration",
+    payoutWallets: "Payout Wallets",
+    feePayer: "Fee Payer",
+    customer: "Customer",
+    merchant: "Merchant",
+    autoPayout: "Auto-Payout",
 
     // Payouts
-    payoutsTitle: "Payouts & Merchant Settlements",
-    payoutsSubtitle: "Automated merchant settlements directly to cold treasury destinations.",
+    payoutsTitle: "Payouts & Settlements",
+    payoutsSubtitle: "Blockchain payout transactions and settlement verification.",
     requestPayout: "Request Payout",
+    totalSettled: "Total Settled",
+    settlementEngine: "Settlement Engine",
+    gasPolicy: "Gas Policy",
+    coldWallets: "Cold Wallets",
+
+    // Financial Reports
+    financialLedger: "Financial Ledger",
+    financialTitle: "Financial Accounting",
+    financialSubtitle: "Revenue breakdowns, fee deductions, and net settlement reconciliations.",
+    feeEfficiency: "Fee Efficiency",
+    grossSales: "Gross Sales",
+    netSettled: "Net Settled",
+    fee: "Fee (0.4%)",
+    sweepGas: "Sweep Gas",
 
     // API Keys
     apiKeysTitle: "API Credentials & Security",
     apiKeysSubtitle: "Strict 1 merchant = 1 API Key architecture with HMAC-SHA256 signature enforcement.",
     regenerateKey: "Rotate API Key",
+
+    // Webhooks
+    webhooksTitle: "Webhook Delivery Logs",
+    webhooksSubtitle: "Real-time HTTP push notifications dispatched upon payment events.",
+    webhookEndpoint: "Webhook Endpoint",
+    webhookLogs: "Webhook Logs",
+    testPing: "Test Ping",
 
     // Theme & Language
     lightMode: "Light Mode",
@@ -109,6 +141,12 @@ const translations: Record<Language, Record<string, string>> = {
     adminPortal: "Portal Admin",
     connected: "Hot Wallet Terhubung",
     sandboxActive: "Sandbox & Testnet Aktif",
+    environment: "Lingkungan",
+    live: "Utama (Live)",
+    sandbox: "Simulasi (Sandbox)",
+    save: "Simpan",
+    saved: "Tersimpan!",
+    cancel: "Batal",
 
     // Invoices Page
     invoicesTitle: "Faktur & Pesanan",
@@ -131,20 +169,46 @@ const translations: Record<Language, Record<string, string>> = {
     feePayerCustomer: "Biaya Gas oleh Pelanggan",
 
     // Wallets & Gas
-    walletsTitle: "Hot Wallet & Biaya Gas Jaringan",
-    walletsSubtitle: "Saldo saldo gas asli, pemicu sweep otomatis, dan estimasi biaya gas jaringan terkini.",
+    walletsTitle: "Dompet & Gas",
+    walletsSubtitle: "Alamat dompet dingin tujuan pencairan, penanggung gas, dan harga gas jaringan terkini.",
     gasEstimates: "Estimasi Biaya Gas Real-Time",
     sweepTriggers: "Konfigurasi Sweep Otomatis",
+    payoutWallets: "Dompet Pencairan",
+    feePayer: "Penanggung Gas",
+    customer: "Pelanggan",
+    merchant: "Merchant",
+    autoPayout: "Pencairan Otomatis",
 
     // Payouts
-    payoutsTitle: "Pencairan & Penyelesaian Merchant",
-    payoutsSubtitle: "Penyelesaian otomatis langsung ke alamat dompet dingin (cold treasury) merchant.",
+    payoutsTitle: "Pencairan & Penyelesaian",
+    payoutsSubtitle: "Transaksi pencairan blockchain dan verifikasi penerimaan dompet dingin.",
     requestPayout: "Ajukan Pencairan",
+    totalSettled: "Total Dicairkan",
+    settlementEngine: "Mesin Pencairan",
+    gasPolicy: "Kebijakan Gas",
+    coldWallets: "Dompet Dingin",
+
+    // Financial Reports
+    financialLedger: "Buku Besar Finansial",
+    financialTitle: "Akuntansi Finansial",
+    financialSubtitle: "Rincian pendapatan, potongan margin sistem, dan rekonsiliasi pencairan bersih.",
+    feeEfficiency: "Efisiensi Biaya",
+    grossSales: "Penjualan Kotor",
+    netSettled: "Pencairan Bersih",
+    fee: "Biaya Layanan (0.4%)",
+    sweepGas: "Gas Jaringan",
 
     // API Keys
     apiKeysTitle: "Kredensial API & Keamanan",
     apiKeysSubtitle: "Arsitektur ketat 1 Merchant = 1 API Key dengan validasi tanda tangan HMAC-SHA256.",
     regenerateKey: "Rotasi API Key",
+
+    // Webhooks
+    webhooksTitle: "Catatan Webhook",
+    webhooksSubtitle: "Notifikasi push HTTP real-time saat transaksi pembayaran terkonfirmasi.",
+    webhookEndpoint: "Titik Akhir Webhook",
+    webhookLogs: "Catatan Webhook",
+    testPing: "Uji Ping",
 
     // Theme & Language
     lightMode: "Mode Terang",
@@ -188,4 +252,3 @@ export function useLanguage() {
   }
   return context;
 }
-

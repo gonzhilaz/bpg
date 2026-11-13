@@ -386,3 +386,46 @@ Seluruh modul frontend (`dashboard`, `admin`, `demo-sandbox`) tidak lagi menggun
 ---
 *Dokumen manual ini dihasilkan secara otomatis dari spesifikasi arsitektur resmi 13C Crypto Payment Gateway v1.3.*
 
+
+
+---
+
+## BAB 6: MANAJEMEN DINAMIS RPC, KEAMANAN 2FA & ENKODING API
+
+### 6.1 Manajemen Dinamis Multi-Chain RPC Node
+Pada rute Super Admin **`/watchers`**, administrator kini memiliki kontrol penuh untuk mengelola kluster RPC multi-rantai (TRON, BSC, Polygon, Solana, atau rantai EVM kustom):
+1. **Tambah Node Baru (`+ Add RPC Node`)**: Memungkinkan pendaftaran penyedia RPC cadangan (misal QuickNode Dedicated, Alchemy, Infura, atau node privat) dengan memilih jaringan, nama penyedia, dan URL endpoint HTTP/WSS.
+2. **Uji Latensi Real-Time (`Test Ping`)**: Tombol ikon petir mengirim kueri blok tinggi secara langsung untuk mengukur latensi round-trip (ms).
+3. **Penghapusan Node (`Delete`)**: Menghapus penyedia yang tidak stabil atau sering mengalami gangguan tanpa memutus layanan gateway.
+4. **Persistensi Data**: Seluruh node kustom tersimpan secara aman dan sinkron antar-sesi pemantauan.
+
+---
+
+### 6.2 Autentikasi Ganda (2FA) Super Admin & Merchant Guard
+Untuk mencegah akses tidak sah pada infrastruktur inti pembayaran:
+* **Root Dev Admin Console**: Rute admin kini diproteksi dengan otentikasi ganda:
+  - Validasi **Admin ID** internal (`admin@13cgateway.internal`).
+  - **Master Secret Key** dengan batas minimum entropi.
+  - **Kode 2FA TOTP (6-digit)** yang disinkronkan dengan aplikasi authenticator RFC 6238.
+  - **Proteksi Anti-Brute Force**: Penguncian akun otomatis selama 60 detik jika terjadi 5 kali kegagalan input berturut-turut.
+* **Merchant Dashboard Guard**: Pengguna yang belum memiliki token sesi valid (`13c_token`) akan dialihkan secara otomatis ke layar masuk (`/login`), mencegah akses langsung ke riwayat faktur atau kunci API.
+* **Fitur Keluar Sesi Bersih (Sign Out)**: Tombol logout pada sidebar Admin dan Merchant membersihkan seluruh token memori dan storage seketika.
+
+---
+
+### 6.3 Enkoding & Proteksi Link API via Next.js BFF Reverse Proxy (Anti-Inspection)
+Untuk menjawab tantangan keamanan terhadap inspeksi DevTools peramban oleh pihak luar:
+1. **Penyembunyian Alamat Asli Server**: Klien tidak lagi menghubungi backend Go secara langsung pada port publik. Seluruh lalu lintas dialihkan melalui **Next.js Backend-For-Frontend (BFF)** pada rute `/api/proxy/[...path]`.
+2. **Inspeksi Network DevTools Terproteksi**: Pihak luar yang membuka Network Tab peramban hanya melihat rute proksi internal relatif, bukan IP server VPS, port mikroservis, atau struktur backend internal.
+3. **Header Keamanan Tambahan**: Server proksi menyematkan header anti-sniffing (`X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Cache-Control: no-store`) dan memfilter metadata rentan sebelum merespons peramban.
+4. **Verifikasi Tanda Tangan HMAC Kriptografis**: Walaupun peramban dapat membaca header, penyerang tidak dapat memalsukan permintaan karena setiap transaksi divalidasi dengan tanda tangan HMAC-SHA256 yang membutuhkan kunci rahasia yang tidak pernah diekspos ke publik.
+
+---
+
+### 6.4 Lokasi Dokumen Rahasia & Kredensial Basis Data di `/doc`
+Seluruh panduan arsitektur kredensial basis data, parameter string koneksi SSL PostgreSQL, konfigurasi KMS hot wallet, dan template variabel lingkungan produksi kini didokumentasikan secara terpusat pada file:
+👉 **`DOC/SECURITY_AND_CREDENTIALS.md`**
+Sesuai standar keamanan industri, file rahasia asli tidak boleh di-commit secara mentah ke repositori publik dan wajib disuntikkan via Secrets Vault pada level infrastruktur VPS/Cloud.
+
+---
+*Dokumen manual ini diperbarui secara resmi untuk 13C Crypto Payment Gateway v1.3 Enterprise Edition.*

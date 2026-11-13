@@ -6,12 +6,11 @@ import { Menu, ShieldCheck, Sun, Moon, Globe } from "lucide-react";
 import { useEnvironment } from "../../context/EnvironmentContext";
 import { useTheme } from "../../context/ThemeContext";
 import { useLanguage } from "../../context/LanguageContext";
-import { EnvironmentToggle } from "../dashboard/EnvironmentToggle";
 import { MerchantNotificationDropdown } from "./MerchantNotificationDropdown";
 
 export function Header() {
   const pathname = usePathname();
-  const { mode, setMode, setIsMobileNavOpen } = useEnvironment();
+  const { setIsMobileNavOpen } = useEnvironment();
   const { theme, toggleTheme } = useTheme();
   const { lang, setLang, t } = useLanguage();
 
@@ -59,7 +58,7 @@ export function Header() {
         </div>
       </div>
 
-      {/* Right: Notifications, Language, Theme, Environment Toggle */}
+      {/* Right: Notifications, Language, Theme */}
       <div className="flex items-center gap-2.5">
         <div className="hidden lg:flex items-center gap-2 text-xs font-medium text-emerald-400 bg-emerald-950/30 border border-emerald-800/40 px-3 py-1.5 rounded-xl">
           <ShieldCheck className="w-3.5 h-3.5" />
@@ -92,10 +91,6 @@ export function Header() {
             <Moon className="w-4 h-4 text-cyan-400" />
           )}
         </button>
-
-        <div className="h-5 w-px bg-zinc-800 hidden sm:block" />
-
-        <EnvironmentToggle mode={mode} onToggle={setMode} />
       </div>
     </header>
   );

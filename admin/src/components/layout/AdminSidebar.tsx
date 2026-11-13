@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   Shield,
   Users,
@@ -13,9 +13,8 @@ import {
   Sliders,
   Terminal,
   FileCode2,
-  ExternalLink,
   X,
-  AlertTriangle,
+  LogOut,
 } from "lucide-react";
 import { useAdmin } from "../../context/AdminContext";
 import { useLanguage } from "../../context/LanguageContext";
@@ -32,6 +31,7 @@ interface NavItem {
 
 export function AdminSidebar() {
   const pathname = usePathname();
+  const router = useRouter();
   const { isMobileNavOpen, setIsMobileNavOpen, circuitBreaker, merchants } = useAdmin();
   const { t } = useLanguage();
 
@@ -49,6 +49,11 @@ export function AdminSidebar() {
     { label: t("financial"), href: "/finance", icon: TrendingUp },
     { label: t("appSettings"), href: "/settings", icon: Sliders },
   ];
+
+  const handleLogout = () => {
+    sessionStorage.removeItem("13c_admin_session");
+    router.push("/login");
+  };
 
   const NavContent = () => (
     <div className="flex flex-col h-full bg-[#0E121A] border-r border-zinc-800/80 text-zinc-300">
@@ -168,16 +173,25 @@ export function AdminSidebar() {
         </a>
       </div>
 
-      {/* Admin User Footer Profile */}
+      {/* Admin User Footer Profile & Sign Out */}
       <div className="p-3 border-t border-zinc-800/80">
-        <div className="p-2.5 rounded-xl bg-zinc-900/60 border border-zinc-800 space-y-1">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-white">Dev Admin Console</span>
-            <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
-              ROOT
-            </span>
+        <div className="p-2.5 rounded-xl bg-zinc-900/60 border border-zinc-800 flex items-center justify-between">
+          <div className="min-w-0 flex-1 mr-2">
+            <div className="flex items-center gap-1.5">
+              <span className="text-xs font-semibold text-white">Dev Admin</span>
+              <span className="text-[9px] font-bold px-1 py-0.2 rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
+                ROOT
+              </span>
+            </div>
+            <div className="text-[10px] text-zinc-400 font-mono truncate">admin@13cgateway.internal</div>
           </div>
-          <div className="text-[10px] text-zinc-400 font-mono">admin@13cgateway.internal</div>
+          <button
+            onClick={handleLogout}
+            title={t("logout")}
+            className="p-1.5 rounded-lg text-zinc-400 hover:text-rose-400 hover:bg-rose-500/10 transition-colors"
+          >
+            <LogOut className="w-4 h-4" />
+          </button>
         </div>
       </div>
     </div>
@@ -205,4 +219,3 @@ export function AdminSidebar() {
     </>
   );
 }
-

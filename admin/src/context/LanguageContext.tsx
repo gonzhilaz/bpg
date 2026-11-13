@@ -29,6 +29,7 @@ const translations: Record<Language, Record<string, string>> = {
     all: "ALL",
     status: "Status",
     actions: "Actions",
+    action: "Action",
     loading: "Loading...",
     emptyData: "No records found",
     emptyFilterDesc: "Try adjusting your search criteria or resetting filters.",
@@ -42,6 +43,50 @@ const translations: Record<Language, Record<string, string>> = {
     filterStatus: "All Statuses",
     statusActive: "Active",
     statusSuspended: "Suspended",
+    save: "Save",
+    cancel: "Cancel",
+    delete: "Delete",
+    connected: "Connected",
+
+    // Overview & Metrics
+    totalVolume: "Total Volume",
+    feeRevenue: "Fee Revenue",
+    circuitBreaker: "Circuit Breaker",
+    gasLiquidity: "Gas Liquidity",
+    multiChainWatchers: "Multi-Chain Watchers",
+    databaseEngine: "Database Engine",
+    financialRevenue: "Financial Revenue",
+    platformParameters: "Platform Parameters",
+    gasReserves: "Gas Reserves",
+
+    // Merchants
+    registerMerchant: "Add Merchant",
+    totalMerchants: "Total Merchants",
+    activeMerchants: "Active Merchants",
+    suspended: "Suspended",
+    searchMerchantPlaceholder: "Search merchant name or API key...",
+
+    // Gas Engine
+    triggerSweep: "Trigger Sweep",
+    allNetworks: "All Networks",
+    gasPriceMatrix: "Gas & Price Matrix",
+
+    // Watchers & RPC
+    activeRpcProviders: "Active RPC Providers",
+    addRpc: "Add RPC Node",
+    rpcEndpoint: "RPC Endpoint",
+    provider: "Provider",
+    network: "Network",
+    latency: "Latency",
+    testPing: "Test Ping",
+    restart: "Restart",
+
+    // Database & Maintenance
+    poolActive: "Pool Active",
+    tableStorage: "Table Footprint",
+    maintenanceOps: "Maintenance Ops",
+    backupManager: "Backup & DR",
+    sqlMigrations: "SQL Migrations",
   },
   ID: {
     // Nav & Common
@@ -61,6 +106,7 @@ const translations: Record<Language, Record<string, string>> = {
     all: "SEMUA",
     status: "Status",
     actions: "Aksi",
+    action: "Aksi",
     loading: "Memuat...",
     emptyData: "Data tidak ditemukan",
     emptyFilterDesc: "Coba sesuaikan kata kunci pencarian atau atur ulang filter Anda.",
@@ -74,6 +120,50 @@ const translations: Record<Language, Record<string, string>> = {
     filterStatus: "Semua Status",
     statusActive: "Aktif",
     statusSuspended: "Ditangguhkan",
+    save: "Simpan",
+    cancel: "Batal",
+    delete: "Hapus",
+    connected: "Terhubung",
+
+    // Overview & Metrics
+    totalVolume: "Total Volume",
+    feeRevenue: "Pendapatan Biaya",
+    circuitBreaker: "Sakelar Darurat",
+    gasLiquidity: "Likuiditas Gas",
+    multiChainWatchers: "Pemantau Multi-Rantai",
+    databaseEngine: "Mesin Basis Data",
+    financialRevenue: "Pendapatan Finansial",
+    platformParameters: "Parameter Platform",
+    gasReserves: "Cadangan Gas",
+
+    // Merchants
+    registerMerchant: "Tambah Merchant",
+    totalMerchants: "Total Merchant",
+    activeMerchants: "Merchant Aktif",
+    suspended: "Ditangguhkan",
+    searchMerchantPlaceholder: "Cari nama merchant atau kunci API...",
+
+    // Gas Engine
+    triggerSweep: "Picu Sweep",
+    allNetworks: "Semua Jaringan",
+    gasPriceMatrix: "Matriks Gas & Harga",
+
+    // Watchers & RPC
+    activeRpcProviders: "Penyedia RPC Aktif",
+    addRpc: "Tambah Node RPC",
+    rpcEndpoint: "Endpoint RPC",
+    provider: "Penyedia",
+    network: "Jaringan",
+    latency: "Latensi",
+    testPing: "Uji Ping",
+    restart: "Mulai Ulang",
+
+    // Database & Maintenance
+    poolActive: "Pool Aktif",
+    tableStorage: "Ukuran Tabel",
+    maintenanceOps: "Operasi Pemeliharaan",
+    backupManager: "Cadangan & DR",
+    sqlMigrations: "Migrasi SQL",
   },
 };
 
@@ -112,4 +202,3 @@ export function useLanguage() {
   }
   return context;
 }
-

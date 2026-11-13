@@ -523,5 +523,48 @@ Portal ini dirancang untuk DevOps dan Operator Gateway dengan arsitektur <strong
 <p><em>Dokumen manual ini dihasilkan secara otomatis dari spesifikasi arsitektur resmi 13C Crypto Payment Gateway v1.3.</em></p>
 
 
+
+<hr class="divider" />
+
+<h2 class="section-title">BAB 6: MANAJEMEN DINAMIS RPC, KEAMANAN 2FA & ENKODING API</h2>
+
+<h3 class="sub-title">6.1 Manajemen Dinamis Multi-Chain RPC Node</h3>
+<p>Pada rute Super Admin <strong>`/watchers`</strong>, administrator kini memiliki kontrol penuh untuk mengelola kluster RPC multi-rantai (TRON, BSC, Polygon, Solana, atau rantai EVM kustom):</p>
+<p>1. <strong>Tambah Node Baru (`+ Add RPC Node`)</strong>: Memungkinkan pendaftaran penyedia RPC cadangan (misal QuickNode Dedicated, Alchemy, Infura, atau node privat) dengan memilih jaringan, nama penyedia, dan URL endpoint HTTP/WSS.</p>
+<p>2. <strong>Uji Latensi Real-Time (`Test Ping`)</strong>: Tombol ikon petir mengirim kueri blok tinggi secara langsung untuk mengukur latensi round-trip (ms).</p>
+<p>3. <strong>Penghapusan Node (`Delete`)</strong>: Menghapus penyedia yang tidak stabil atau sering mengalami gangguan tanpa memutus layanan gateway.</p>
+<p>4. <strong>Persistensi Data</strong>: Seluruh node kustom tersimpan secara aman dan sinkron antar-sesi pemantauan.</p>
+
+<hr class="divider" />
+
+<h3 class="sub-title">6.2 Autentikasi Ganda (2FA) Super Admin & Merchant Guard</h3>
+<p>Untuk mencegah akses tidak sah pada infrastruktur inti pembayaran:</p>
+<ul><li><strong>Root Dev Admin Console</strong>: Rute admin kini diproteksi dengan otentikasi ganda:</li></ul>
+<p>  - Validasi <strong>Admin ID</strong> internal (`admin@13cgateway.internal`).</p>
+<p>  - <strong>Master Secret Key</strong> dengan batas minimum entropi.</p>
+<p>  - <strong>Kode 2FA TOTP (6-digit)</strong> yang disinkronkan dengan aplikasi authenticator RFC 6238.</p>
+<p>  - <strong>Proteksi Anti-Brute Force</strong>: Penguncian akun otomatis selama 60 detik jika terjadi 5 kali kegagalan input berturut-turut.</p>
+<ul><li><strong>Merchant Dashboard Guard</strong>: Pengguna yang belum memiliki token sesi valid (`13c_token`) akan dialihkan secara otomatis ke layar masuk (`/login`), mencegah akses langsung ke riwayat faktur atau kunci API.</li></ul>
+<ul><li><strong>Fitur Keluar Sesi Bersih (Sign Out)</strong>: Tombol logout pada sidebar Admin dan Merchant membersihkan seluruh token memori dan storage seketika.</li></ul>
+
+<hr class="divider" />
+
+<h3 class="sub-title">6.3 Enkoding & Proteksi Link API via Next.js BFF Reverse Proxy (Anti-Inspection)</h3>
+<p>Untuk menjawab tantangan keamanan terhadap inspeksi DevTools peramban oleh pihak luar:</p>
+<p>1. <strong>Penyembunyian Alamat Asli Server</strong>: Klien tidak lagi menghubungi backend Go secara langsung pada port publik. Seluruh lalu lintas dialihkan melalui <strong>Next.js Backend-For-Frontend (BFF)</strong> pada rute `/api/proxy/[...path]`.</p>
+<p>2. <strong>Inspeksi Network DevTools Terproteksi</strong>: Pihak luar yang membuka Network Tab peramban hanya melihat rute proksi internal relatif, bukan IP server VPS, port mikroservis, atau struktur backend internal.</p>
+<p>3. <strong>Header Keamanan Tambahan</strong>: Server proksi menyematkan header anti-sniffing (`X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Cache-Control: no-store`) dan memfilter metadata rentan sebelum merespons peramban.</p>
+<p>4. <strong>Verifikasi Tanda Tangan HMAC Kriptografis</strong>: Walaupun peramban dapat membaca header, penyerang tidak dapat memalsukan permintaan karena setiap transaksi divalidasi dengan tanda tangan HMAC-SHA256 yang membutuhkan kunci rahasia yang tidak pernah diekspos ke publik.</p>
+
+<hr class="divider" />
+
+<h3 class="sub-title">6.4 Lokasi Dokumen Rahasia & Kredensial Basis Data di `/doc`</h3>
+<p>Seluruh panduan arsitektur kredensial basis data, parameter string koneksi SSL PostgreSQL, konfigurasi KMS hot wallet, dan template variabel lingkungan produksi kini didokumentasikan secara terpusat pada file:</p>
+<p>👉 <strong>`DOC/SECURITY_AND_CREDENTIALS.md`</strong></p>
+<p>Sesuai standar keamanan industri, file rahasia asli tidak boleh di-commit secara mentah ke repositori publik dan wajib disuntikkan via Secrets Vault pada level infrastruktur VPS/Cloud.</p>
+
+<hr class="divider" />
+<p><em>Dokumen manual ini diperbarui secara resmi untuk 13C Crypto Payment Gateway v1.3 Enterprise Edition.</em></p>
+
 </body>
 </html>

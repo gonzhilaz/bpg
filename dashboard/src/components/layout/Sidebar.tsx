@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { useEnvironment } from "../../context/EnvironmentContext";
 import { useLanguage } from "../../context/LanguageContext";
+import { Tooltip } from "../ui/Tooltip";
 import { getEnvUrl } from "../../utils/env";
 
 interface NavItem {
@@ -32,7 +33,7 @@ interface NavItem {
 export function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
-  const { mode, profile, invoices, isMobileNavOpen, setIsMobileNavOpen } = useEnvironment();
+  const { mode, setMode, profile, invoices, isMobileNavOpen, setIsMobileNavOpen } = useEnvironment();
   const { t } = useLanguage();
 
   const navItems: NavItem[] = [
@@ -66,7 +67,7 @@ export function Sidebar() {
           </div>
         </div>
 
-        {/* Mobile Close Button */}
+        {/* Mobile Close Button (Hamburger Drawer) */}
         <button
           onClick={() => setIsMobileNavOpen(false)}
           className="lg:hidden p-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800"
@@ -76,24 +77,47 @@ export function Sidebar() {
         </button>
       </div>
 
-      {/* Environment Indicator Pill */}
-      <div className="px-4 py-3 border-b border-zinc-800/50">
-        <div
-          className={`flex items-center justify-between px-3 py-1.5 rounded-xl border text-xs font-medium ${
-            mode === "LIVE"
-              ? "bg-emerald-950/30 border-emerald-800/50 text-emerald-400"
-              : "bg-amber-950/30 border-amber-800/50 text-amber-300"
-          }`}
-        >
-          <div className="flex items-center gap-2">
+      {/* Interactive Environment Toggle (Sidebar & Mobile Hamburger) */}
+      <div className="px-3.5 py-3 border-b border-zinc-800/50 space-y-1.5">
+        <div className="flex items-center justify-between text-[10px] font-bold text-zinc-400 uppercase tracking-wider px-1">
+          <span>{t("environment")}</span>
+          <Tooltip content="Toggle between real blockchain transactions (Live) and testnet simulation (Sandbox)." />
+        </div>
+
+        <div className="grid grid-cols-2 p-1 bg-zinc-950/80 border border-zinc-800 rounded-xl text-xs font-semibold gap-1">
+          <button
+            type="button"
+            onClick={() => setMode("LIVE")}
+            className={`flex items-center justify-center gap-1.5 py-1.5 rounded-lg transition-all ${
+              mode === "LIVE"
+                ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 shadow-sm"
+                : "text-zinc-400 hover:text-zinc-200"
+            }`}
+          >
             <span
               className={`w-2 h-2 rounded-full ${
-                mode === "LIVE" ? "bg-emerald-400" : "bg-amber-400 animate-ping"
+                mode === "LIVE" ? "bg-emerald-400 animate-pulse" : "bg-zinc-600"
               }`}
             />
-            <span className="uppercase text-[11px] font-bold tracking-wider">{mode} MODE</span>
-          </div>
-          <span className="text-[10px] text-zinc-400">{mode === "LIVE" ? "Mainnet" : "Testnet"}</span>
+            <span>Live</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setMode("SANDBOX")}
+            className={`flex items-center justify-center gap-1.5 py-1.5 rounded-lg transition-all ${
+              mode === "SANDBOX"
+                ? "bg-amber-500/15 text-amber-300 border border-amber-500/30 shadow-sm"
+                : "text-zinc-400 hover:text-zinc-200"
+            }`}
+          >
+            <span
+              className={`w-2 h-2 rounded-full ${
+                mode === "SANDBOX" ? "bg-amber-400 animate-pulse" : "bg-zinc-600"
+              }`}
+            />
+            <span>Sandbox</span>
+          </button>
         </div>
       </div>
 
@@ -188,7 +212,7 @@ export function Sidebar() {
         <NavContent />
       </aside>
 
-      {/* Mobile Slide-Over Drawer with Backdrop */}
+      {/* Mobile Slide-Over Drawer with Backdrop (Hamburger) */}
       {isMobileNavOpen && (
         <div className="lg:hidden fixed inset-0 z-50 flex">
           <div
@@ -203,4 +227,3 @@ export function Sidebar() {
     </>
   );
 }
-

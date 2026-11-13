@@ -2,8 +2,8 @@
   "openapi": "3.0.3",
   "info": {
     "title": "13C Crypto Payment Gateway API",
-    "description": "High-performance non-custodial crypto payment gateway. Supports dynamic ephemeral deposit addresses, auto-forwarding & manual sweeps to cold wallets, multi-chain indexers (BSC, Polygon, TRON, Solana), fee payer configurations (customer surcharge vs merchant absorbed), SHA-256 hashed API keys, and cryptographic HMAC webhooks.",
-    "version": "1.2.0"
+    "description": "High-performance non-custodial crypto payment gateway. Supports dynamic ephemeral deposit addresses, auto-forwarding & manual sweeps to cold wallets, multi-chain indexers (BSC, Polygon, TRON, Solana), fee payer configurations (customer surcharge vs merchant absorbed), SHA-256 hashed API keys, cryptographic HMAC webhooks, and Super Admin infrastructure management.",
+    "version": "1.3.0"
   },
   "servers": [
     {
@@ -48,7 +48,7 @@
     },
     "/api/v1/auth/login": {
       "post": {
-        "summary": "Merchant & Admin Login",
+        "summary": "Merchant Login",
         "description": "Authenticates credentials and sets secure HttpOnly JWT session cookie.",
         "requestBody": {
           "required": true,
@@ -70,32 +70,86 @@
         }
       }
     },
-    "/api/v1/auth/me": {
-      "get": {
-        "summary": "Get Authenticated Profile",
-        "description": "Returns current merchant profile from JWT session",
-        "security": [{ "BearerAuth": [] }],
-        "responses": {
-          "200": { "description": "Current merchant details" }
-        }
-      }
-    },
-    "/api/v1/auth/regenerate-key": {
+    "/api/v1/admin/auth/root-login": {
       "post": {
-        "summary": "Regenerate API Key",
-        "description": "Rotates merchant API credentials and returns a new raw key (revealed once).",
-        "security": [{ "BearerAuth": [] }],
+        "summary": "Root Dev Admin 2FA Login",
+        "description": "Authenticates master admin key and 6-digit TOTP code with brute-force lockout protection.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["admin_user", "master_key", "totp_code"],
+                "properties": {
+                  "admin_user": { "type": "string", "example": "admin@13cgateway.internal" },
+                  "master_key": { "type": "string", "example": "admin123" },
+                  "totp_code": { "type": "string", "example": "131313" }
+                }
+              }
+            }
+          }
+        },
         "responses": {
-          "200": { "description": "New API Key generated" }
+          "200": { "description": "Admin root session token returned" },
+          "401": { "description": "Invalid master secret or TOTP code" },
+          "429": { "description": "Too many failed attempts. Temporary lockout." }
         }
       }
     },
-    "/api/v1/rates/gas": {
+    "/api/v1/admin/rpc/nodes": {
       "get": {
-        "summary": "Live Coin Prices & Gas Surcharge Matrix",
-        "description": "Returns real-time ticker prices (BNB, POL, TRX, SOL) and estimated sweep gas fees per network.",
+        "summary": "List Configured RPC Nodes",
+        "description": "Returns all active multi-chain JSON-RPC endpoints and latency metrics.",
         "responses": {
-          "200": { "description": "List of network gas metrics and live USD coin prices" }
+          "200": { "description": "List of active and backup RPC nodes" }
+        }
+      },
+      "post": {
+        "summary": "Add Dynamic RPC Node",
+        "description": "Registers a new RPC provider endpoint for indexers and sweeper broadcasting.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["network", "provider", "endpoint"],
+                "properties": {
+                  "network": { "type": "string", "example": "POLYGON" },
+                  "provider": { "type": "string", "example": "QuickNode Dedicated" },
+                  "endpoint": { "type": "string", "example": "https://polygon-mainnet.g.alchemy.com/v2/..." }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "RPC node added and validated" }
+        }
+      }
+    },
+    "/api/v1/admin/rpc/nodes/{id}": {
+      "delete": {
+        "summary": "Remove RPC Node",
+        "description": "Deletes a designated RPC provider endpoint from indexer polling pool.",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "RPC node removed" }
+        }
+      }
+    },
+    "/api/v1/admin/rpc/nodes/{id}/ping": {
+      "post": {
+        "summary": "Ping RPC Latency",
+        "description": "Executes on-demand round-trip block height query to benchmark provider response time.",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Latency in milliseconds returned" }
         }
       }
     },
@@ -124,12 +178,7 @@
         "summary": "Get Invoice Status",
         "description": "Public endpoint used by checkout screen to track payment progress",
         "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": { "type": "string", "format": "uuid" }
-          }
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } }
         ],
         "responses": {
           "200": { "description": "Invoice details and payment status" }
@@ -181,21 +230,27 @@
     "/api/v1/admin/database/health": {
       "get": {
         "summary": "Database Pool & Storage Health",
-        "description": "Returns active connection pool metrics, table counts, and driver mode.",
+        "description": "Returns active connection pool metrics, table counts, and dead tuple bloat.",
         "responses": {
-          "200": { "description": "Database metrics" }
+          "200": { "description": "Database telemetry metrics" }
         }
       }
     },
-    "/api/v1/admin/database/prune": {
+    "/api/v1/admin/database/vacuum": {
       "post": {
-        "summary": "Prune Expired Invoices",
-        "description": "Deletes expired invoice records older than N days (default 7).",
-        "parameters": [
-          { "name": "days", "in": "query", "schema": { "type": "integer", "default": 7 } }
-        ],
+        "summary": "Trigger Vacuum & Reindex",
+        "description": "Reclaims storage space from dead tuples and rebuilds B-Tree table indexes.",
         "responses": {
-          "200": { "description": "Pruned count returned" }
+          "200": { "description": "Vacuum maintenance completed" }
+        }
+      }
+    },
+    "/api/v1/admin/database/backup": {
+      "post": {
+        "summary": "Export Point-in-Time Database Backup",
+        "description": "Generates a compressed pg_dump snapshot with SHA-256 integrity verification.",
+        "responses": {
+          "200": { "description": "Backup archive ready with checksum" }
         }
       }
     },
