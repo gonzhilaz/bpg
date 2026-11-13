@@ -70,3 +70,4 @@ func VerifyJWT(tokenString string, secret string) (*JWTClaims, error) {
 	}
 	return nil, errors.New("invalid or expired token claims")
 }
+

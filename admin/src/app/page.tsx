@@ -1,103 +1,187 @@
+"use client";
+
 import React from "react";
-import { Shield, ExternalLink, ArrowUpRight, Terminal } from "lucide-react";
+import Link from "next/link";
 import {
-  mockPlatformMetrics,
-  mockHotWallets,
-  mockWatchers,
-  mockMerchantsList,
-  mockNetworkGasList,
-} from "../mocks/mockAdmin";
+  Shield,
+  Flame,
+  Activity,
+  Database,
+  TrendingUp,
+  Users,
+  ArrowUpRight,
+  AlertTriangle,
+  CheckCircle2,
+} from "lucide-react";
+import { useAdmin } from "../context/AdminContext";
 import { PlatformMetricsCard } from "../components/admin/PlatformMetricsCard";
-import { HotWalletGasCard } from "../components/admin/HotWalletGasCard";
-import { WatcherHealthCard } from "../components/admin/WatcherHealthCard";
-import { MerchantControlTable } from "../components/admin/MerchantControlTable";
-import { NetworkGasMatrixCard } from "../components/admin/NetworkGasMatrixCard";
-import { PlatformFinancialReportCard } from "../components/admin/PlatformFinancialReportCard";
-import { DatabaseHealthCard } from "../components/admin/DatabaseHealthCard";
 
-export default function AdminPage() {
+export default function AdminOverviewPage() {
+  const { metrics, hotWallets, watchers, merchants } = useAdmin();
+
+  const lowGasCount = hotWallets.filter((w) => w.status === "LOW").length;
+  const activeWatchersCount = watchers.filter((w) => w.status === "ACTIVE").length;
+
   return (
-    <div className="min-h-screen bg-[#0B0E14] text-zinc-100 font-sans pb-16">
-      {/* Navbar */}
-      <header className="border-b border-zinc-800/80 bg-zinc-900/60 backdrop-blur-md sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <span className="w-8 h-8 rounded-xl bg-gradient-to-tr from-cyan-400 to-emerald-400 flex items-center justify-center text-zinc-950 font-bold">
-              <Shield className="w-4 h-4 fill-current" />
-            </span>
-            <div>
-              <div className="text-sm font-bold text-white tracking-tight">Captain Platform</div>
-              <div className="text-[10px] text-zinc-400 tracking-wider uppercase font-semibold">
-                Super Admin & Dev Portal
-              </div>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <a
-              href="http://localhost:3001"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs font-medium border border-zinc-700 transition-colors"
-            >
-              <span>Merchant Portal</span>
-              <ExternalLink className="w-3 h-3 text-zinc-400" />
-            </a>
-
-            <a
-              href="http://localhost:3000/sandbox"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs font-medium border border-zinc-700 transition-colors"
-            >
-              <Terminal className="w-3 h-3 text-cyan-400" />
-              <span>Simulator</span>
-            </a>
-
-            <a
-              href="http://localhost:8080/swagger"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-400 text-xs font-medium border border-cyan-500/30 transition-colors"
-            >
-              <span>Swagger</span>
-              <ArrowUpRight className="w-3 h-3" />
-            </a>
-          </div>
-        </div>
-      </header>
-
-      {/* Main Container */}
-      <main className="max-w-7xl mx-auto px-6 pt-8 space-y-8">
+    <div className="space-y-8">
+      {/* Page Header */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-white">System Operations</h1>
-          <p className="text-xs text-zinc-400">
-            Real-time infrastructure monitoring, hot wallet liquidity, and merchant administration
+          <p className="text-xs text-zinc-400 mt-1">
+            Real-time infrastructure health, platform liquidity reserves, and merchant governance.
           </p>
         </div>
 
-        {/* 1. Platform Metrics & Emergency Switch */}
-        <PlatformMetricsCard metrics={mockPlatformMetrics} />
+        <div className="flex items-center gap-3">
+          <Link
+            href="/merchants"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-400 text-xs font-semibold border border-cyan-500/30 transition-colors"
+          >
+            <Users className="w-3.5 h-3.5" />
+            <span>Merchants ({merchants.length})</span>
+          </Link>
+          <Link
+            href="/gas-liquidity"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs font-medium border border-zinc-700 transition-colors"
+          >
+            <Flame className="w-3.5 h-3.5 text-amber-400" />
+            <span>Gas Reserves</span>
+          </Link>
+        </div>
+      </div>
 
-        {/* 2. Platform Revenue & Financial Ledger */}
-        <PlatformFinancialReportCard />
+      {/* 1. Platform Key Performance Metrics & Emergency Switch */}
+      <PlatformMetricsCard metrics={metrics} />
 
-        {/* 3. On-Chain Gas & Live Coin Price Matrix */}
-        <NetworkGasMatrixCard rates={mockNetworkGasList} />
+      {/* 2. Platform Subsystem Health Cards Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Gas Reserves Glance */}
+        <div className="p-5 rounded-2xl bg-zinc-900/60 border border-zinc-800 space-y-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Flame className="w-4 h-4 text-amber-400" />
+              <h3 className="text-sm font-semibold text-white">Hot Wallet Gas Liquidity</h3>
+            </div>
+            <Link
+              href="/gas-liquidity"
+              className="text-xs text-cyan-400 hover:text-cyan-300 font-medium inline-flex items-center gap-1"
+            >
+              <span>Manage</span>
+              <ArrowUpRight className="w-3.5 h-3.5" />
+            </Link>
+          </div>
 
-        {/* 4. Hot Wallet Gas Reserves */}
-        <HotWalletGasCard wallets={mockHotWallets} />
+          <div className="grid grid-cols-2 gap-2 text-xs font-mono">
+            {hotWallets.map((w) => (
+              <div
+                key={w.network}
+                className="p-2.5 rounded-xl bg-zinc-950/60 border border-zinc-800/80 flex items-center justify-between"
+              >
+                <div className="flex items-center gap-1.5">
+                  <span
+                    className={`w-1.5 h-1.5 rounded-full ${
+                      w.status === "HEALTHY" ? "bg-emerald-400" : "bg-amber-400 animate-ping"
+                    }`}
+                  />
+                  <span className="font-sans font-medium text-zinc-300">{w.network}</span>
+                </div>
+                <span className={w.status === "HEALTHY" ? "text-zinc-200" : "text-amber-400 font-bold"}>
+                  {w.balance.split(" ")[0]} {w.symbol}
+                </span>
+              </div>
+            ))}
+          </div>
 
-        {/* 5. Database Health & Pruning Maintenance */}
-        <DatabaseHealthCard />
+          {lowGasCount > 0 ? (
+            <div className="text-[11px] text-amber-300 bg-amber-500/10 border border-amber-500/20 px-3 py-1.5 rounded-xl flex items-center gap-2">
+              <AlertTriangle className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+              <span>{lowGasCount} network requires gas top-up before sweeping queues stall.</span>
+            </div>
+          ) : (
+            <div className="text-[11px] text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1.5 rounded-xl flex items-center gap-2">
+              <CheckCircle2 className="w-3.5 h-3.5" />
+              <span>All hot wallet gas reserves above critical thresholds.</span>
+            </div>
+          )}
+        </div>
 
-        {/* 6. Multi-Chain Watcher Indexers */}
-        <WatcherHealthCard watchers={mockWatchers} />
+        {/* Watcher Node Sync Glance */}
+        <div className="p-5 rounded-2xl bg-zinc-900/60 border border-zinc-800 space-y-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Activity className="w-4 h-4 text-cyan-400" />
+              <h3 className="text-sm font-semibold text-white">Multi-Chain Watchers</h3>
+            </div>
+            <Link
+              href="/watchers"
+              className="text-xs text-cyan-400 hover:text-cyan-300 font-medium inline-flex items-center gap-1"
+            >
+              <span>Inspect</span>
+              <ArrowUpRight className="w-3.5 h-3.5" />
+            </Link>
+          </div>
 
-        {/* 7. Merchant Control Table */}
-        <MerchantControlTable initialMerchants={mockMerchantsList} />
-      </main>
+          <div className="grid grid-cols-2 gap-2 text-xs font-mono">
+            {watchers.map((w) => (
+              <div
+                key={w.network}
+                className="p-2.5 rounded-xl bg-zinc-950/60 border border-zinc-800/80 flex items-center justify-between"
+              >
+                <div className="flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                  <span className="font-sans font-medium text-zinc-300">{w.network}</span>
+                </div>
+                <span className="text-cyan-400">{w.latency_ms}ms</span>
+              </div>
+            ))}
+          </div>
+
+          <div className="text-[11px] text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1.5 rounded-xl flex items-center gap-2">
+            <CheckCircle2 className="w-3.5 h-3.5" />
+            <span>{activeWatchersCount}/4 indexers active • Head block latency &lt; 250ms</span>
+          </div>
+        </div>
+      </div>
+
+      {/* 3. Deep Ops Quick Links */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <Link
+          href="/database"
+          className="p-4 rounded-2xl bg-zinc-900/40 border border-zinc-800/80 hover:border-zinc-700 transition-all space-y-1 group"
+        >
+          <div className="flex items-center justify-between">
+            <Database className="w-4 h-4 text-cyan-400" />
+            <ArrowUpRight className="w-3.5 h-3.5 text-zinc-500 group-hover:text-cyan-400 transition-colors" />
+          </div>
+          <div className="text-xs font-bold text-white pt-1">Database Engine</div>
+          <p className="text-[11px] text-zinc-400">Connection pools, row count audits, and invoice pruning.</p>
+        </Link>
+
+        <Link
+          href="/finance"
+          className="p-4 rounded-2xl bg-zinc-900/40 border border-zinc-800/80 hover:border-zinc-700 transition-all space-y-1 group"
+        >
+          <div className="flex items-center justify-between">
+            <TrendingUp className="w-4 h-4 text-emerald-400" />
+            <ArrowUpRight className="w-3.5 h-3.5 text-zinc-500 group-hover:text-emerald-400 transition-colors" />
+          </div>
+          <div className="text-xs font-bold text-white pt-1">Financial Revenue</div>
+          <p className="text-[11px] text-zinc-400">Cumulative 0.4% platform commission ledger and gas expenses.</p>
+        </Link>
+
+        <Link
+          href="/settings"
+          className="p-4 rounded-2xl bg-zinc-900/40 border border-zinc-800/80 hover:border-zinc-700 transition-all space-y-1 group"
+        >
+          <div className="flex items-center justify-between">
+            <Shield className="w-4 h-4 text-amber-400" />
+            <ArrowUpRight className="w-3.5 h-3.5 text-zinc-500 group-hover:text-amber-400 transition-colors" />
+          </div>
+          <div className="text-xs font-bold text-white pt-1">Platform Parameters</div>
+          <p className="text-[11px] text-zinc-400">Default fee percentage, RPC endpoints, and maintenance mode.</p>
+        </Link>
+      </div>
     </div>
   );
 }
-

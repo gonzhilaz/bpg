@@ -77,3 +77,4 @@ func TestAuthService_RegisterAndLogin(t *testing.T) {
 		t.Fatal("expected new distinct raw API key")
 	}
 }
+

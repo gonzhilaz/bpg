@@ -198,3 +198,4 @@ if (fs.existsSync(pdfPath)) {
 } else {
   console.error('PDF generation failed');
 }
+

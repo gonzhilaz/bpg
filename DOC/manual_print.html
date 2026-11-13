@@ -224,30 +224,49 @@ Dengan arsitektur <strong>Non-Custodial Instant Forwarding</strong>, sistem Capt
 <p>   <em> Segera klik tombol salin (</em>copy*) dan simpan di password manager atau file konfigurasi `.env` server toko Anda.</p>
 <p>   * Di dalam database Captain, API Key disimpan dalam bentuk hash <strong>SHA-256</strong>, sehingga kunci asli tidak dapat dibaca oleh siapa pun jika database diretas.</p>
 
-<h3 class="sub-title">2.2 Autentikasi & Navigasi Dashboard</h3>
+<h3 class="sub-title">2.2 Autentikasi & Arsitektur Multi-Route Sidebar</h3>
 <p>Kunjungi halaman login di `/login`:</p>
 
 <div class="img-box"><img src="images/02_merchant_login.png" alt="Login Merchant" /><p class="caption">Login Merchant</p></div>
 <p>
 1. Masukkan email bisnis dan password yang telah didaftarkan.</p>
-<p>2. Setelah berhasil masuk, Anda akan diarahkan ke halaman utama <strong>Merchant Portal</strong>.</p>
+<p>2. Setelah berhasil masuk, Anda akan diarahkan ke <strong>Merchant Portal</strong> yang dibangun dengan arsitektur enterprise modern berbasis <strong>Persistent Sidebar</strong> dan <strong>Multi-Route Navigation</strong>:</p>
 
-<div class="img-box"><img src="images/01_merchant_dashboard.png" alt="Dashboard Merchant" /><p class="caption">Dashboard Merchant</p></div>
+<div class="img-box"><img src="images/01_merchant_overview.png" alt="Merchant Overview" /><p class="caption">Merchant Overview</p></div>
+<p>
+Merchant Portal dipecah menjadi beberapa rute terdedikasi:</p>
+<ul><li><strong>`/` (Overview & KPI)</strong>: Menampilkan metrik volume kotor, total settled, pesanan aktif, ringkasan saldo gas, dan 5 invoice terbaru.</li></ul>
+<ul><li><strong>`/invoices` (Invoices & Orders)</strong>: Tabel pencarian tagihan lengkap dengan live filter pencarian, filter jaringan blockchain, dan status order.</li></ul>
+<ul><li><strong>`/payouts` (Payouts & Settlements)</strong>: Riwayat transfer non-custodial ke cold wallet merchant dilengkapi tautan langsung ke explorer blockchain (BscScan, Tronscan, Polygonscan, Solscan).</li></ul>
+<ul><li><strong>`/wallets` (Wallets & Gas Policy)</strong>: Konfigurasi alamat cold wallet tujuan settlement, toggle auto-payout, dan pemilih kebijakan penanggung gas (Fee Payer).</li></ul>
+<ul><li><strong>`/api-keys` (API Credentials)</strong>: Kredensial API Key publik, Secret Key HMAC-SHA256, modal Reveal Once, dan cuplikan kode integrasi cURL / Node.js.</li></ul>
+<ul><li><strong>`/webhooks` (Webhook Logs)</strong>: Konfigurasi callback URL, log pengiriman notifikasi HTTP POST, inspeksi status code (200 OK), dan tombol Test Ping.</li></ul>
+<ul><li><strong>`/reports` (Financial Ledger)</strong>: Buku besar akuntansi pembukuan, akumulasi pendapatan bruto, potongan fee gateway (0.4%), biaya gas, dan tombol ekspor CSV.</li></ul>
 
-<h3 class="sub-title">2.3 Konfigurasi Cold Wallet Payout & Auto-Forwarding</h3>
-<p>Pada kartu <strong>Payout Wallets</strong>:</p>
-<p>1. Masukkan alamat cold wallet penerima untuk masing-masing jaringan:</p>
+<h3 class="sub-title">2.3 Manajemen Tagihan Pelanggan (`/invoices`)</h3>
+<p>Pada halaman <strong>Invoices & Orders</strong>:</p>
+
+<div class="img-box"><img src="images/01_merchant_invoices.png" alt="Merchant Invoices Table" /><p class="caption">Merchant Invoices Table</p></div>
+<p>
+1. <strong>Pencarian Real-Time</strong>: Masukkan nomor Order ID, Invoice ID, atau Deposit Address pada kolom pencarian untuk melacak transaksi secara instan.</p>
+<p>2. <strong>Filter Jaringan & Status</strong>: Gunakan chip navigasi untuk memfilter berdasarkan rantai blockchain (BSC, Polygon, TRON, Solana) dan status (`PAID`, `DETECTED`, `PENDING`, `UNDERPAID`).</p>
+<p>3. <strong>Tri-State Resilience</strong>: Jika tidak ada data yang cocok, sistem menyajikan <em>Empty State</em> informatif lengkap dengan tombol <strong>Reset All Filters</strong>.</p>
+
+<h3 class="sub-title">2.4 Konfigurasi Cold Wallet Payout & Gas Policy (`/wallets`)</h3>
+<p>Pada halaman <strong>Wallets & Gas Policy</strong>:</p>
+
+<div class="img-box"><img src="images/01_merchant_wallets.png" alt="Merchant Wallets & Gas Policy" /><p class="caption">Merchant Wallets & Gas Policy</p></div>
+<p>
+1. Masukkan alamat cold wallet penerima untuk masing-masing jaringan:</p>
 <p>   * <strong>TRON Address</strong>: Alamat Base58 berawalan huruf `T` (misal dompet TronLink, Ledger, atau Binance).</p>
 <p>   * <strong>BSC Address</strong>: Alamat 0x EVM (Trust Wallet, MetaMask, Safe).</p>
 <p>   * <strong>Polygon Address</strong>: Alamat 0x EVM.</p>
 <p>   * <strong>Solana Address</strong>: Alamat Base58 Solana (Phantom, Solflare).</p>
 <p>2. Pastikan centang toggle <strong>Auto-Payout</strong> aktif agar dana otomatis diteruskan begitu transaksi terdeteksi.</p>
-<p>3. Klik tombol <strong>Save Payout Settings</strong>.</p>
-
-<h3 class="sub-title">2.4 Pengaturan Fee Payer (Customer Surcharge vs. Merchant Absorbed)</h3>
-<p>Di bagian atas kartu Payout Wallets, terdapat pemilih opsi <strong>Fee Payer</strong>:</p>
-<ul><li><strong>Opsi Customer (Direkomendasikan)</strong>: Biaya gas jaringan ditambahkan ke total invoice tagihan pembeli. Pembeli membayar produk + gas surcharge, merchant menerima nominal bersih 100%.</li></ul>
-<ul><li><strong>Opsi Merchant</strong>: Pembeli membayar nominal pas harga produk, biaya gas penyapuan dipotong dari saldo yang masuk ke cold wallet merchant.</li></ul>
+<p>3. <strong>Pengaturan Fee Payer (Customer Surcharge vs. Merchant Absorbed)</strong>:</p>
+<p>   * <strong>Opsi Customer (Direkomendasikan)</strong>: Biaya gas jaringan ditambahkan ke total invoice tagihan pembeli. Pembeli membayar produk + gas surcharge, merchant menerima nominal bersih 100%.</p>
+<p>   * <strong>Opsi Merchant</strong>: Pembeli membayar nominal pas harga produk, biaya gas penyapuan dipotong dari saldo yang masuk ke cold wallet merchant.</p>
+<p>4. <strong>Live Coin & Gas Matrix</strong>: Pantau harga real-time koin native (BNB, POL, TRX, SOL) serta estimasi biaya transaksi sweeping terkini.</p>
 
 <h3 class="sub-title">2.5 Pemantauan Laporan Keuangan (Financial Ledger) & Ekspor CSV</h3>
 <p>Kartu <strong>Financial Ledger</strong> menyediakan data audit pembukuan yang transparan:</p>
@@ -407,23 +426,38 @@ function verifyWebhook(req, secretKey) {</p>
 
 <h2 class="section-title">BAB 5: PANDUAN DEVOPS & SUPER ADMIN PORTAL</h2>
 
-<h3 class="sub-title">5.1 Dashboard Monitoring Operasional Platform</h3>
+<h3 class="sub-title">5.1 Arsitektur Multi-Route Super Admin</h3>
 <p>Kunjungi Super Admin Portal di [https://bpg-admin.vercel.app](https://bpg-admin.vercel.app):</p>
 
-<div class="img-box"><img src="images/04_admin_portal.png" alt="Super Admin Portal" /><p class="caption">Super Admin Portal</p></div>
+<div class="img-box"><img src="images/04_admin_overview.png" alt="Super Admin Overview" /><p class="caption">Super Admin Overview</p></div>
 <p>
-Portal ini diperuntukkan khusus bagi DevOps dan Pemilik Platform (<em>Platform Owner</em>) untuk mengawasi seluruh infrastruktur gateway secara real-time.</p>
+Portal ini dirancang untuk DevOps dan Operator Gateway dengan arsitektur <strong>Persistent Sidebar</strong> dan rute khusus:</p>
+<ul><li><strong>`/` (System Operations)</strong>: Ringkasan metrik kesehatan sistem, volume platform 24 jam, status gas agregat, dan saklar darurat Circuit Breaker.</li></ul>
+<p><em> <strong>`/merchants` (Merchant Governance)</strong>: Direktori pendaftaran merchant, audit volume transaksi, dan aksi penangguhan (</em>Suspend / Activate*).</p>
+<ul><li><strong>`/gas-liquidity` (Gas Liquidity & Sweeper Engine)</strong>: Pemantauan saldo gas hot wallet 4 jaringan, mitigasi low gas, dan mesin pemicu penyapuan manual.</li></ul>
+<p><em> <strong>`/watchers` (Multi-Chain Watchers)</strong>: Monitoring latensi RPC node, tinggi blok (</em>block height*), dan status pemindaian blok tanpa smart contract.</p>
+<p><em> <strong>`/database` (Database Engine & Storage)</strong>: Pemantauan koneksi pool PostgreSQL/SQLite, statistik baris data, dan tombol pembersihan (</em>prune*) invoice kedaluwarsa.</p>
+<ul><li><strong>`/finance` (Financial Revenue Ledger)</strong>: Audit pendapatan biaya platform 0.4%, subsidi gas, margin bersih gateway, dan ekspor CSV.</li></ul>
+<p><em> <strong>`/settings` (Platform Settings)</strong>: Pengaturan persentase komisi, buffer gas transaksi, dan mode pemeliharaan (</em>maintenance*).</p>
 
-<h3 class="sub-title">5.2 Manajemen Cadangan Gas Hot Wallet & Alert Otomatis</h3>
-<p>Pada kartu <strong>Hot Wallet Gas Reserves</strong>:</p>
-<ul><li>Pantau saldo koin native operasional: <strong>TRX & Energy Pool (TRON)</strong>, <strong>BNB (BSC)</strong>, <strong>POL (Polygon)</strong>, dan <strong>SOL (Solana)</strong>.</li></ul>
-<p><em> <strong>Low Gas Alert</strong>: Jika saldo native menipis hingga batas kritis, sistem akan memunculkan lencana kuning `LOW` sebagai peringatan untuk segera mengisi ulang (</em>top up*) gas agar penyapuan otomatis tidak terhambat.</p>
+<h3 class="sub-title">5.2 Tata Kelola Akun Merchant (`/merchants`)</h3>
+<p>Pada halaman <strong>Merchant Governance</strong>:</p>
 
-<h3 class="sub-title">5.3 Prosedur Penyapuan Dana Manual (Manual Sweeper)</h3>
-<p>Jika terjadi kondisi di mana saldo gas hot wallet sempat habis dan ada deposit pembayaran yang belum tersapu:</p>
-<p>1. Isi ulang saldo gas native pada Master Hot Wallet yang bersangkutan.</p>
-<p>2. Buka <strong>Super Admin Portal</strong> atau panggil endpoint `POST /api/v1/admin/sweeps/manual` dengan membawa `invoice_id`.</p>
-<p>3. Mesin penyapu akan langsung mengeksekusi transfer on-chain memindahkan dana dari alamat deposit tagihan ke cold wallet merchant penerima.</p>
+<div class="img-box"><img src="images/04_admin_merchants.png" alt="Merchant Directory Governance" /><p class="caption">Merchant Directory Governance</p></div>
+<p>
+1. <strong>Pencarian & Audit</strong>: Telusuri merchant berdasarkan nama bisnis atau awalan API key.</p>
+<p>2. <strong>Filter Status</strong>: Filter daftar berdasarkan merchant `ACTIVE` atau `SUSPENDED`.</p>
+<p>3. <strong>Aksi Kontrol</strong>: Klik tombol <strong>Suspend</strong> untuk memutus otorisasi API key merchant bermasalah seketika, atau <strong>Activate</strong> untuk memulihkan akses.</p>
+<p>4. <strong>Pendaftaran Manual</strong>: Tombol <strong>Add Merchant</strong> memungkinkan DevOps mendaftarkan akun merchant baru secara langsung dari konsol admin.</p>
+
+<h3 class="sub-title">5.3 Manajemen Cadangan Gas Hot Wallet & Sweeper Engine (`/gas-liquidity`)</h3>
+<p>Pada halaman <strong>Gas Liquidity & Sweeper Engine</strong>:</p>
+
+<div class="img-box"><img src="images/04_admin_gas.png" alt="Gas Liquidity & Sweeper Engine" /><p class="caption">Gas Liquidity & Sweeper Engine</p></div>
+
+<ul><li><strong>Hot Wallet Balances</strong>: Pantau saldo koin native operasional: <strong>TRX & Energy Pool (TRON)</strong>, <strong>BNB (BSC)</strong>, <strong>POL (Polygon)</strong>, dan <strong>SOL (Solana)</strong>.</li></ul>
+<ul><li><strong>Low Gas Alert</strong>: Jika saldo native menipis di bawah ambang batas aman, sistem menampilkan peringatan kuning `Low Gas` di sidebar dan topbar.</li></ul>
+<ul><li><strong>Manual Sweeper Trigger</strong>: Jika ada tagihan yang belum tersapu akibat gangguan jaringan, pilih jaringan pada dropdown dan klik tombol <strong>Trigger Sweep</strong> untuk menyapu transaksi on-chain seketika.</li></ul>
 
 <h3 class="sub-title">5.4 Pemeliharaan Database (Database Engine & Pruning)</h3>
 <p>Pada kartu <strong>Database Engine</strong>:</p>
@@ -458,6 +492,7 @@ Portal ini diperuntukkan khusus bagi DevOps dan Pemilik Platform (<em>Platform O
 
 <hr class="divider" />
 <p><em>Dokumen manual ini dihasilkan secara otomatis dari spesifikasi arsitektur resmi Captain Crypto Payment Gateway v1.2.</em></p>
+
 
 </body>
 </html>

@@ -187,3 +187,4 @@ func (s *authService) RegenerateAPIKey(ctx context.Context, merchantID uuid.UUID
 		RawSecretKey: secretKey,
 	}, nil
 }
+

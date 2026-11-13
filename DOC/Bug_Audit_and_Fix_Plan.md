@@ -23,6 +23,7 @@
 | **BUG-004** | Sandbox Simulator | Halaman `/sandbox` melempar warning pada `Math.random()` saat kompilasi static SSG. | 🟢 MINOR | ✅ Fixed | Diubah menggunakan generator ID default deterministik `ORD-98210`. |
 | **BUG-005** | Backend Tests | `server_test.go` mengalami *test race condition* di mana goroutine auto-payout masih menulis ke database saat assertion dijalankan. | 🔴 CRITICAL | ✅ Fixed | Ditambahkan retry loop asynchronous hingga 500ms pada `server_test.go` sehingga seluruh tes unit lulus 100%. |
 | **BUG-006** | Keamanan API Key | API Key merchant awalnya disimpan dalam bentuk teks polos (*plaintext*) di database. | 🔴 CRITICAL | ✅ Fixed | Diperbarui menggunakan protokol **SHA-256 Hashing At-Rest** dan **Reveal Once** saat registrasi/regenerasi. |
+| **BUG-007** | Frontend UX & Arch | Frontend Merchant Portal dan Super Admin awalnya merender seluruh modul secara vertikal dalam satu halaman tunggal (`src/app/page.tsx`), melanggar standar arsitektur Enterprise Dashboard. | 🔴 CRITICAL | ✅ Fixed | Dilakukan perombakan penuh menjadi arsitektur **Persistent Sidebar Navigation** dan **Multi-Route App Router**: Merchant Portal dipecah menjadi 7 rute terdedikasi (`/`, `/invoices`, `/payouts`, `/wallets`, `/api-keys`, `/webhooks`, `/reports`), dan Super Admin dipecah menjadi 7 rute (`/`, `/merchants`, `/gas-liquidity`, `/watchers`, `/database`, `/finance`, `/settings`). Seluruh file dipastikan <= 400 baris, zero raw emojis (100% Lucide SVG), dan responsif dengan mobile slide-over drawer. |
 
 ---
 
@@ -42,3 +43,4 @@
 
 ---
 *Dokumen ini merupakan catatan teknis internal engineering dan dipisahkan murni dari buku panduan pengguna akhir.*
+
