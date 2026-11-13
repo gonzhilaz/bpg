@@ -27,8 +27,8 @@ export function IconButton({
 }: IconButtonProps) {
   const [showTooltip, setShowTooltip] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
-  const [positionClasses, setPositionClasses] = useState("bottom-full left-1/2 -translate-x-1/2 mb-2");
-  const [arrowClasses, setArrowClasses] = useState("top-full left-1/2 -translate-x-1/2 border-t-zinc-800");
+  const [positionClasses, setPositionClasses] = useState("bottom-full right-0 translate-x-0 mb-2");
+  const [arrowClasses, setArrowClasses] = useState("top-full right-2 translate-x-0 border-t-zinc-800");
 
   const sizeClasses = {
     xs: "p-1 rounded-lg text-xs",
@@ -60,9 +60,9 @@ export function IconButton({
     const rect = containerRef.current.getBoundingClientRect();
     const winWidth = window.innerWidth;
 
-    const isNearRight = rect.right > winWidth - 130;
-    const isNearLeft = rect.left < 90;
-    const isNearTop = rect.top < 50;
+    const isNearRight = rect.right > winWidth - 220;
+    const isNearLeft = rect.left < 140;
+    const isNearTop = rect.top < 60;
 
     let vClass = isNearTop || tooltipPlacement === "bottom" ? "top-full mt-2" : "bottom-full mb-2";
     let hClass = "left-1/2 -translate-x-1/2";

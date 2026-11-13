@@ -13,12 +13,12 @@ export default function DashboardLayout({
   return (
     <MerchantAuthGuard>
       <EnvironmentProvider>
-        <div className="min-h-screen bg-[#0B0E14] text-zinc-100 flex font-sans">
+        <div className="min-h-screen bg-[#0B0E14] text-zinc-100 flex font-sans overflow-x-hidden max-w-full">
           {/* Sidebar Nav */}
           <Sidebar />
 
           {/* Main Content Area */}
-          <div className="flex-1 flex flex-col min-w-0">
+          <div className="flex-1 flex flex-col min-w-0 overflow-x-hidden max-w-full">
             <SandboxBanner />
             <Header />
             <main className="flex-1 p-3 md:p-6 max-w-[1600px] w-full mx-auto space-y-6">

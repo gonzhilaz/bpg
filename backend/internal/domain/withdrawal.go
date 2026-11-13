@@ -49,3 +49,4 @@ func (w *WithdrawalRequest) BeforeCreate(tx *gorm.DB) error {
 	}
 	return nil
 }
+

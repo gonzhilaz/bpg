@@ -76,6 +76,7 @@ export default function MerchantsPage() {
           <IconButton
             icon={Plus}
             tooltip="Add New Merchant"
+            tooltipPlacement="left"
             onClick={() => setShowAddModal(true)}
             variant="primary"
             size="md"

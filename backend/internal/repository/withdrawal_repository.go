@@ -129,3 +129,4 @@ func (r *withdrawalRepository) FinalizeWithdrawalDeduction(ctx context.Context, 
 		return tx.Save(&m).Error
 	})
 }
+

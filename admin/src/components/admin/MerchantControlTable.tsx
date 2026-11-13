@@ -125,6 +125,7 @@ export function MerchantControlTable({ initialMerchants }: Props) {
                     <IconButton
                       icon={Eye}
                       tooltip="View Details"
+                      tooltipPlacement="left"
                       onClick={() => setSelectedMerchant(m)}
                       variant="ghost"
                       size="xs"
@@ -134,6 +135,7 @@ export function MerchantControlTable({ initialMerchants }: Props) {
                     <IconButton
                       icon={Pencil}
                       tooltip="Edit Merchant"
+                      tooltipPlacement="left"
                       onClick={() => setEditingMerchant(m)}
                       size="xs"
                     />
@@ -142,6 +144,7 @@ export function MerchantControlTable({ initialMerchants }: Props) {
                     <IconButton
                       icon={Key}
                       tooltip="Rotate API Key"
+                      tooltipPlacement="left"
                       onClick={() => handleRotateKey(m)}
                       size="xs"
                     />
@@ -151,6 +154,7 @@ export function MerchantControlTable({ initialMerchants }: Props) {
                       <IconButton
                         icon={Ban}
                         tooltip="Suspend Merchant"
+                        tooltipPlacement="left"
                         onClick={() => handleToggleStatus(m.id)}
                         variant="danger"
                         size="xs"
@@ -159,6 +163,7 @@ export function MerchantControlTable({ initialMerchants }: Props) {
                       <IconButton
                         icon={CheckCircle2}
                         tooltip="Activate Merchant"
+                        tooltipPlacement="left"
                         onClick={() => handleToggleStatus(m.id)}
                         size="xs"
                         className="text-emerald-400 hover:text-emerald-300"
@@ -169,6 +174,7 @@ export function MerchantControlTable({ initialMerchants }: Props) {
                     <IconButton
                       icon={Trash2}
                       tooltip="Delete Merchant"
+                      tooltipPlacement="left"
                       onClick={() => setDeletingId(m.id)}
                       variant="danger"
                       size="xs"

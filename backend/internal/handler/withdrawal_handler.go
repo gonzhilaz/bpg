@@ -157,3 +157,4 @@ func (h *WithdrawalHandler) AdminRejectWithdrawal(c *gin.Context) {
 
 	response.Success(c, http.StatusOK, "Withdrawal rejected and balance refunded", record)
 }
+

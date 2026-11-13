@@ -194,3 +194,4 @@ func (s *withdrawalService) GetMerchantEscrowSummary(ctx context.Context, mercha
 		SettlementMode:      mode,
 	}, nil
 }
+

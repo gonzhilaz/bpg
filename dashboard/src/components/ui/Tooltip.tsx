@@ -14,16 +14,16 @@ interface TooltipProps {
 export function Tooltip({ content, placement = "auto", className = "" }: TooltipProps) {
   const [isVisible, setIsVisible] = useState(false);
   const containerRef = useRef<HTMLSpanElement>(null);
-  const [positionClasses, setPositionClasses] = useState("bottom-full left-1/2 -translate-x-1/2 mb-2");
-  const [arrowClasses, setArrowClasses] = useState("top-full left-1/2 -translate-x-1/2 border-t-zinc-800");
+  const [positionClasses, setPositionClasses] = useState("bottom-full right-0 translate-x-0 mb-2");
+  const [arrowClasses, setArrowClasses] = useState("top-full right-2 translate-x-0 border-t-zinc-800");
 
   const calculatePosition = () => {
     if (!containerRef.current || typeof window === "undefined") return;
     const rect = containerRef.current.getBoundingClientRect();
     const winWidth = window.innerWidth;
 
-    const isNearRight = rect.right > winWidth - 180;
-    const isNearLeft = rect.left < 140;
+    const isNearRight = rect.right > winWidth - 240;
+    const isNearLeft = rect.left < 160;
     const isNearTop = rect.top < 70;
 
     let vClass = isNearTop || placement === "bottom" ? "top-full mt-2" : "bottom-full mb-2";

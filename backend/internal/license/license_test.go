@@ -50,3 +50,4 @@ func TestVerifyToken_TamperedPayload(t *testing.T) {
 		t.Fatal("expected tampered token to fail verification, but it passed")
 	}
 }
+

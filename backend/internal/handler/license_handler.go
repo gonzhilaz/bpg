@@ -44,3 +44,4 @@ func (h *LicenseHandler) Activate(c *gin.Context) {
 
 	response.Success(c, http.StatusOK, "13C Gateway successfully licensed and activated!", mgr.GetStatus())
 }
+
