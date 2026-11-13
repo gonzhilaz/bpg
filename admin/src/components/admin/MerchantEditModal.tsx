@@ -123,3 +123,4 @@ export function MerchantEditModal({ merchant, onSave, onClose }: Props) {
     </div>
   );
 }
+

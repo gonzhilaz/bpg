@@ -1,11 +1,14 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { LucideIcon } from "lucide-react";
+
+export type TooltipPlacement = "auto" | "top" | "bottom" | "left" | "right";
 
 interface IconButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   icon: LucideIcon;
   tooltip?: string;
+  tooltipPlacement?: TooltipPlacement;
   variant?: "default" | "primary" | "danger" | "ghost" | "cyan";
   size?: "xs" | "sm" | "md";
   loading?: boolean;
@@ -14,6 +17,7 @@ interface IconButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> 
 export function IconButton({
   icon: Icon,
   tooltip,
+  tooltipPlacement = "auto",
   variant = "default",
   size = "sm",
   loading = false,
@@ -22,6 +26,9 @@ export function IconButton({
   ...props
 }: IconButtonProps) {
   const [showTooltip, setShowTooltip] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [positionClasses, setPositionClasses] = useState("bottom-full left-1/2 -translate-x-1/2 mb-2");
+  const [arrowClasses, setArrowClasses] = useState("top-full left-1/2 -translate-x-1/2 border-t-zinc-800");
 
   const sizeClasses = {
     xs: "p-1 rounded-lg text-xs",
@@ -48,14 +55,45 @@ export function IconButton({
       "bg-transparent hover:bg-zinc-800/60 text-zinc-400 hover:text-zinc-200 active:scale-95",
   };
 
+  const calculatePosition = () => {
+    if (!containerRef.current || typeof window === "undefined") return;
+    const rect = containerRef.current.getBoundingClientRect();
+    const winWidth = window.innerWidth;
+
+    const isNearRight = rect.right > winWidth - 130;
+    const isNearLeft = rect.left < 90;
+    const isNearTop = rect.top < 50;
+
+    let vClass = isNearTop || tooltipPlacement === "bottom" ? "top-full mt-2" : "bottom-full mb-2";
+    let hClass = "left-1/2 -translate-x-1/2";
+    let arrV = isNearTop || tooltipPlacement === "bottom" ? "bottom-full border-b-zinc-800" : "top-full border-t-zinc-800";
+    let arrH = "left-1/2 -translate-x-1/2";
+
+    if (isNearRight || tooltipPlacement === "left") {
+      hClass = "right-0 translate-x-0";
+      arrH = "right-2 translate-x-0";
+    } else if (isNearLeft || tooltipPlacement === "right") {
+      hClass = "left-0 translate-x-0";
+      arrH = "left-2 translate-x-0";
+    }
+
+    setPositionClasses(`${vClass} ${hClass}`);
+    setArrowClasses(`${arrV} ${arrH}`);
+  };
+
+  const handleMouseEnter = () => {
+    calculatePosition();
+    setShowTooltip(true);
+  };
+
   return (
-    <div className="relative inline-flex items-center">
+    <div ref={containerRef} className="relative inline-flex items-center">
       <button
         type="button"
         disabled={disabled || loading}
-        onMouseEnter={() => setShowTooltip(true)}
+        onMouseEnter={handleMouseEnter}
         onMouseLeave={() => setShowTooltip(false)}
-        onFocus={() => setShowTooltip(true)}
+        onFocus={handleMouseEnter}
         onBlur={() => setShowTooltip(false)}
         className={`inline-flex items-center justify-center transition-all disabled:opacity-50 disabled:pointer-events-none ${sizeClasses[size]} ${variantClasses[variant]} ${className}`}
         aria-label={tooltip || props["aria-label"]}
@@ -67,12 +105,14 @@ export function IconButton({
       {tooltip && showTooltip && (
         <span
           role="tooltip"
-          className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-50 px-2 py-1 text-[11px] font-medium text-white bg-zinc-900 border border-zinc-700 rounded-lg shadow-xl pointer-events-none whitespace-nowrap animate-in fade-in duration-100"
+          className={`absolute z-50 px-2.5 py-1 text-[11px] font-semibold text-zinc-100 bg-zinc-950/95 border border-zinc-700/80 rounded-lg shadow-2xl pointer-events-none whitespace-nowrap max-w-[calc(100vw-24px)] backdrop-blur-md animate-in fade-in zoom-in-95 duration-100 ${positionClasses}`}
         >
           {tooltip}
+          <span
+            className={`absolute w-0 h-0 border-4 border-transparent pointer-events-none ${arrowClasses}`}
+          />
         </span>
       )}
     </div>
   );
 }
-

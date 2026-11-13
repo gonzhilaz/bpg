@@ -112,3 +112,4 @@ export function MerchantDetailModal({ merchant, onClose }: Props) {
     </div>
   );
 }
+

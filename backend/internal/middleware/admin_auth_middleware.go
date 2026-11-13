@@ -41,3 +41,4 @@ func AdminAuth(masterSecretKey string) gin.HandlerFunc {
 		c.Next()
 	}
 }
+
