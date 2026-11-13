@@ -60,6 +60,9 @@ func (s *rateService) ConvertToCrypto(ctx context.Context, amountFiat decimal.De
 	// Example IDR to USDT default rate estimate if no feed (e.g. 1 USD = 16,000 IDR)
 	if (crypto == "USDT" || crypto == "USDC") && fiat == "IDR" {
 		rate := s.getRateWithFallback("USDTIDR", decimal.NewFromInt(16200))
+		if rate.IsZero() {
+			rate = decimal.NewFromInt(16200)
+		}
 		cryptoAmount := amountFiat.Div(rate).Round(4)
 		return cryptoAmount, nil
 	}

@@ -29,7 +29,7 @@ export default function SandboxPage() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "X-API-KEY": "cap_demo_api_key_12345678",
+          "X-API-KEY": "13c_demo_api_key_12345678",
         },
         body: JSON.stringify({
           order_id: orderId,

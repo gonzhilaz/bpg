@@ -78,15 +78,15 @@ func (d *webhookDispatcher) DispatchInvoiceEvent(ctx context.Context, invoice *d
 	signature := hex.EncodeToString(mac.Sum(nil))
 
 	// Deliver asynchronously with retries
-	go d.deliverWithRetry(invoice.CallbackURL, bodyBytes, signature, payload.Timestamp)
+	go d.deliverWithRetry(context.Background(), invoice.CallbackURL, bodyBytes, signature, payload.Timestamp)
 }
 
-func (d *webhookDispatcher) deliverWithRetry(targetURL string, body []byte, signature string, ts int64) {
+func (d *webhookDispatcher) deliverWithRetry(ctx context.Context, targetURL string, body []byte, signature string, ts int64) {
 	maxRetries := 3
 	backoff := 2 * time.Second
 
 	for attempt := 1; attempt <= maxRetries; attempt++ {
-		req, err := http.NewRequest(http.MethodPost, targetURL, bytes.NewReader(body))
+		req, err := http.NewRequestWithContext(ctx, http.MethodPost, targetURL, bytes.NewReader(body))
 		if err != nil {
 			log.Printf("[WEBHOOK ERROR] Invalid target URL %s: %v", targetURL, err)
 			return
@@ -110,7 +110,12 @@ func (d *webhookDispatcher) deliverWithRetry(targetURL string, body []byte, sign
 
 		log.Printf("[WEBHOOK RETRY] Delivery to %s failed (attempt %d/%d), retrying in %v...",
 			targetURL, attempt, maxRetries, backoff)
-		time.Sleep(backoff)
+		select {
+		case <-ctx.Done():
+			log.Printf("[WEBHOOK ABORT] Context cancelled during retry backoff for %s", targetURL)
+			return
+		case <-time.After(backoff):
+		}
 		backoff *= 2
 	}
 
