@@ -14,11 +14,12 @@ import (
 
 // WatcherManager orchestrates multi-chain indexers concurrently
 type WatcherManager struct {
-	watchers []NetworkWatcher
-	invRepo  repository.InvoiceRepository
-	interval time.Duration
-	cancel   context.CancelFunc
-	wg       sync.WaitGroup
+	watchers    []NetworkWatcher
+	invRepo     repository.InvoiceRepository
+	interval    time.Duration
+	gracePeriod time.Duration
+	cancel      context.CancelFunc
+	wg          sync.WaitGroup
 }
 
 // NewWatcherManager initializes all 4 network indexers
@@ -31,6 +32,8 @@ func NewWatcherManager(
 	polyRPC := cfg.PolygonRPCURL
 	tronGrid := cfg.TronGridAPIURL
 	solRPC := cfg.SolanaRPCURL
+
+	gracePeriod := time.Duration(cfg.InvoiceGracePeriodMin) * time.Minute
 
 	// Dynamic testnet / sandbox RPC switching
 	if cfg.AppEnv == "sandbox" || cfg.AppEnv == "testnet" || cfg.AppEnv == "development" {
@@ -50,19 +53,20 @@ func NewWatcherManager(
 
 	watchers := []NetworkWatcher{
 		// BSC EVM Indexer (USDT 18 Decimals)
-		NewEVMWatcher(domain.NetworkBSC, bscRPC, BSC_USDT_CONTRACT, 18, invRepo, invoiceSvc),
+		NewEVMWatcher(domain.NetworkBSC, bscRPC, BSC_USDT_CONTRACT, 18, invRepo, invoiceSvc, gracePeriod),
 		// Polygon EVM Indexer (USDT 6 Decimals)
-		NewEVMWatcher(domain.NetworkPolygon, polyRPC, POLYGON_USDT_CONTRACT, 6, invRepo, invoiceSvc),
+		NewEVMWatcher(domain.NetworkPolygon, polyRPC, POLYGON_USDT_CONTRACT, 6, invRepo, invoiceSvc, gracePeriod),
 		// TRON Indexer (USDT TRC-20 6 Decimals)
-		NewTronWatcher(tronGrid, cfg.TronAPIKey, invRepo, invoiceSvc),
+		NewTronWatcher(tronGrid, cfg.TronAPIKey, invRepo, invoiceSvc, gracePeriod),
 		// Solana Indexer (USDT/USDC SPL 6 Decimals)
-		NewSolanaWatcher(solRPC, invRepo, invoiceSvc),
+		NewSolanaWatcher(solRPC, invRepo, invoiceSvc, gracePeriod),
 	}
 
 	return &WatcherManager{
-		watchers: watchers,
-		invRepo:  invRepo,
-		interval: 5 * time.Second, // Scan every 5 seconds
+		watchers:    watchers,
+		invRepo:     invRepo,
+		interval:    5 * time.Second, // Scan every 5 seconds
+		gracePeriod: gracePeriod,
 	}
 }
 
@@ -112,9 +116,10 @@ func (m *WatcherManager) runExpiryCleaner(ctx context.Context) {
 		case <-ctx.Done():
 			return
 		case <-ticker.C:
-			affected, err := m.invRepo.ExpireOverdueInvoices(ctx, time.Now())
+			cutoff := time.Now().Add(-m.gracePeriod)
+			affected, err := m.invRepo.ExpireOverdueInvoices(ctx, cutoff)
 			if err == nil && affected > 0 {
-				log.Printf("[WATCHER] Expired %d overdue invoices", affected)
+				log.Printf("[WATCHER] Expired %d overdue invoices (past grace period %v)", affected, m.gracePeriod)
 			}
 		}
 	}

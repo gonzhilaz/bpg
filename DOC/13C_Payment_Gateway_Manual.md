@@ -347,11 +347,11 @@ Pada modul **Database Engine & Storage Maintenance**:
 * **Disaster Recovery & Compressed Snapshots (`pg_dump`)**: Pembuatan *snapshot point-in-time* instan terkompresi dengan validasi *checksum* kriptografis SHA-256 dan opsi unduhan langsung.
 * **Audit Migrasi SQL**: Riwayat eksekusi skrip migrasi skema lengkap dengan durasi eksekusi dalam milidetik dan status integritas skema.
 
-### 5.5 Emergency Circuit Breaker
-Pada kartu **Platform Overview**:
-* Terdapat sakelar darurat **Circuit Breaker Active**.
-* Jika terjadi anomali pada blockchain (misal hard fork, reorg ekstrim, atau eksploitasi RPC node eksternal), admin dapat mengaktifkan Circuit Breaker dalam 1 klik.
-* Saat aktif, seluruh eksekusi payout sweeping otomatis akan dibekukan sementara di memori hingga situasi jaringan dinyatakan aman.
+### 5.5 Emergency Circuit Breaker & Platform Settings
+Pada kartu **Platform Overview** dan halaman **Platform Settings** (`/settings`):
+* **Circuit Breaker**: Sakelar darurat untuk membekukan proses sweeping otomatis jika terjadi gangguan eksternal.
+* **Underpaid Tolerance Margin (0.00% - 100.00%)**: Ambang batas toleransi pembayaran kurang. Secara default bernilai ketat `0.00%` (exact match). Jika developer/merchant mengonfigurasi toleransi (misalnya 1.00%), transaksi dengan setoran $\ge 99\%$ nilai tagihan akan langsung dianggap lunas (`PAID`).
+* **Watcher Grace Period (Menit)**: Jendela waktu kompensasi setelah invoice kedaluwarsa (default `15` menit). Transaksi blockchain yang baru terkonfirmasi dalam jendela ini tetap dideteksi oleh watcher dan tidak hangus.
 
 ### 5.6 Deployment Mandiri di Server VPS Menggunakan Docker Compose
 Untuk mengoperasikan backend Go dan database PostgreSQL di server VPS privat:

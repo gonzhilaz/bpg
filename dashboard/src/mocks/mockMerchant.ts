@@ -46,6 +46,7 @@ export const mockLiveProfile: MerchantProfile = {
   payout_address_solana: "7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU",
   auto_payout_enabled: true,
   fee_payer: "customer",
+  underpaid_tolerance: 0.0,
   webhook_url: "https://myshop.com/api/webhooks/crypto",
 };
 
@@ -60,6 +61,7 @@ export const mockSandboxProfile: MerchantProfile = {
   payout_address_solana: "7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU",
   auto_payout_enabled: true,
   fee_payer: "customer",
+  underpaid_tolerance: 0.0,
   webhook_url: "https://myshop.com/api/webhooks/crypto",
 };
 

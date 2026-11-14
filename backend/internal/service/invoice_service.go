@@ -27,6 +27,7 @@ type CreateInvoiceRequest struct {
 	FeePayer          string          `json:"fee_payer"`                        // "customer" or "merchant"
 	CallbackURL       string          `json:"callback_url"`
 	CustomExpiryMin   int             `json:"custom_expiry_min"`
+	UnderpaidTolerance *decimal.Decimal `json:"underpaid_tolerance"` // Optional margin (0.0 to 100.0)
 }
 
 // InvoiceResponse represents client-facing invoice details
@@ -42,6 +43,7 @@ type InvoiceResponse struct {
 	BaseAmount       decimal.Decimal      `json:"base_amount"`
 	NetworkFee       decimal.Decimal      `json:"network_fee"`
 	DepositAddress   string               `json:"deposit_address"`
+	UnderpaidTolerance decimal.Decimal    `json:"underpaid_tolerance"`
 	Status           domain.InvoiceStatus `json:"status"`
 	ReceivedAmount   decimal.Decimal      `json:"received_amount"`
 	RemainingAmount  decimal.Decimal      `json:"remaining_amount"`
@@ -56,17 +58,21 @@ type InvoiceService interface {
 	GetInvoice(ctx context.Context, id uuid.UUID) (*InvoiceResponse, error)
 	RecordPayment(ctx context.Context, depositAddress string, amount decimal.Decimal, txHash string, network domain.Network, blockNumber uint64) (*domain.Invoice, error)
 	SetWithdrawalRepo(repo repository.WithdrawalRepository)
+	SetUnderpaidTolerance(tolerance decimal.Decimal)
+	SetGracePeriod(gracePeriod time.Duration)
 }
 
 type invoiceService struct {
-	invRepo        repository.InvoiceRepository
-	txRepo         repository.TransactionRepository
-	withdrawalRepo repository.WithdrawalRepository
-	rateSvc        RateService
-	payoutSvc      payout.PayoutService
-	dispatcher     webhook.Dispatcher
-	secretKey      string
-	expiryMin      int
+	invRepo                 repository.InvoiceRepository
+	txRepo                  repository.TransactionRepository
+	withdrawalRepo          repository.WithdrawalRepository
+	rateSvc                 RateService
+	payoutSvc               payout.PayoutService
+	dispatcher              webhook.Dispatcher
+	secretKey               string
+	expiryMin               int
+	underpaidTolerance      decimal.Decimal
+	gracePeriod             time.Duration
 }
 
 // NewInvoiceService creates a new invoice service with payout and webhook integration
@@ -80,18 +86,36 @@ func NewInvoiceService(
 	expiryMin int,
 ) InvoiceService {
 	return &invoiceService{
-		invRepo:    invRepo,
-		txRepo:     txRepo,
-		rateSvc:    rateSvc,
-		payoutSvc:  payoutSvc,
-		dispatcher: dispatcher,
-		secretKey:  secretKey,
-		expiryMin:  expiryMin,
+		invRepo:            invRepo,
+		txRepo:             txRepo,
+		rateSvc:            rateSvc,
+		payoutSvc:          payoutSvc,
+		dispatcher:         dispatcher,
+		secretKey:          secretKey,
+		expiryMin:          expiryMin,
+		underpaidTolerance: decimal.Zero, // Default: strictly 0% tolerance
+		gracePeriod:        15 * time.Minute,
 	}
 }
 
 func (s *invoiceService) SetWithdrawalRepo(repo repository.WithdrawalRepository) {
 	s.withdrawalRepo = repo
+}
+
+func (s *invoiceService) SetUnderpaidTolerance(tolerance decimal.Decimal) {
+	if tolerance.IsNegative() {
+		tolerance = decimal.Zero
+	} else if tolerance.GreaterThan(decimal.NewFromInt(100)) {
+		tolerance = decimal.NewFromInt(100)
+	}
+	s.underpaidTolerance = tolerance
+}
+
+func (s *invoiceService) SetGracePeriod(gracePeriod time.Duration) {
+	if gracePeriod < 0 {
+		gracePeriod = 0
+	}
+	s.gracePeriod = gracePeriod
 }
 
 func (s *invoiceService) CreateInvoice(ctx context.Context, merchant *domain.Merchant, req *CreateInvoiceRequest) (*InvoiceResponse, error) {
@@ -158,24 +182,37 @@ func (s *invoiceService) CreateInvoice(ctx context.Context, merchant *domain.Mer
 		callbackURL = merchant.WebhookURL
 	}
 
+	// Resolve Underpaid Tolerance Margin (default 0.0%, strictly clamped 0.0 - 100.0)
+	tolerance := s.underpaidTolerance
+	if merchant.UnderpaidTolerance.GreaterThan(decimal.Zero) {
+		tolerance = merchant.UnderpaidTolerance
+	}
+	if req.UnderpaidTolerance != nil {
+		if req.UnderpaidTolerance.IsNegative() || req.UnderpaidTolerance.GreaterThan(decimal.NewFromInt(100)) {
+			return nil, errors.New("underpaid_tolerance must be between 0.0 and 100.0 percent")
+		}
+		tolerance = *req.UnderpaidTolerance
+	}
+
 	invoice := &domain.Invoice{
-		MerchantID:        merchant.ID,
-		OrderID:           req.OrderID,
-		AmountRequested:   req.Amount,
-		CurrencyRequested: req.Currency,
-		PayCurrency:       req.PayCurrency,
-		PayNetwork:        req.PayNetwork,
-		PayAmount:         payAmount,
-		FeePayer:          feePayer,
-		BaseAmount:        baseAmount,
-		NetworkFee:        networkFee,
-		DepositAddress:    wallet.Address,
-		EncryptedPrivKey:  wallet.EncryptedPrivKey,
-		Status:            domain.StatusPending,
-		ReceivedAmount:    decimal.Zero,
-		CallbackURL:       callbackURL,
-		PayoutAddress:     payoutAddress,
-		ExpiresAt:         expiresAt,
+		MerchantID:         merchant.ID,
+		OrderID:            req.OrderID,
+		AmountRequested:    req.Amount,
+		CurrencyRequested:  req.Currency,
+		PayCurrency:        req.PayCurrency,
+		PayNetwork:         req.PayNetwork,
+		PayAmount:          payAmount,
+		FeePayer:           feePayer,
+		BaseAmount:         baseAmount,
+		NetworkFee:         networkFee,
+		DepositAddress:     wallet.Address,
+		EncryptedPrivKey:   wallet.EncryptedPrivKey,
+		UnderpaidTolerance: tolerance,
+		Status:             domain.StatusPending,
+		ReceivedAmount:     decimal.Zero,
+		CallbackURL:        callbackURL,
+		PayoutAddress:      payoutAddress,
+		ExpiresAt:          expiresAt,
 	}
 
 	if err := s.invRepo.Create(ctx, invoice); err != nil {
@@ -194,7 +231,9 @@ func (s *invoiceService) GetInvoice(ctx context.Context, id uuid.UUID) (*Invoice
 		return nil, errors.New("invoice not found")
 	}
 
-	if invoice.Status == domain.StatusPending && time.Now().After(invoice.ExpiresAt) {
+	// Only expire if both normal countdown and grace period have fully elapsed
+	effectiveExpiry := invoice.ExpiresAt.Add(s.gracePeriod)
+	if invoice.Status == domain.StatusPending && time.Now().After(effectiveExpiry) {
 		invoice.Status = domain.StatusExpired
 		_ = s.invRepo.Update(ctx, invoice)
 	}
@@ -230,9 +269,23 @@ func (s *invoiceService) RecordPayment(ctx context.Context, depositAddress strin
 
 	invoice.ReceivedAmount = invoice.ReceivedAmount.Add(amount)
 
+	// Calculate Minimum Required Amount using Underpaid Tolerance (0.0% to 100.0%)
+	tolerance := invoice.UnderpaidTolerance
+	if tolerance.IsNegative() {
+		tolerance = decimal.Zero
+	} else if tolerance.GreaterThan(decimal.NewFromInt(100)) {
+		tolerance = decimal.NewFromInt(100)
+	}
+
+	minRequired := invoice.PayAmount
+	if tolerance.GreaterThan(decimal.Zero) {
+		factor := decimal.NewFromInt(1).Sub(tolerance.Div(decimal.NewFromInt(100)))
+		minRequired = invoice.PayAmount.Mul(factor)
+	}
+
 	now := time.Now()
 	var eventName string
-	if invoice.ReceivedAmount.GreaterThanOrEqual(invoice.PayAmount) {
+	if invoice.ReceivedAmount.GreaterThanOrEqual(minRequired) {
 		invoice.Status = domain.StatusPaid
 		invoice.PaidAt = &now
 		eventName = "invoice.paid"
@@ -291,10 +344,11 @@ func (s *invoiceService) toInvoiceResponse(inv *domain.Invoice) *InvoiceResponse
 		PayNetwork:       inv.PayNetwork,
 		PayAmount:        inv.PayAmount,
 		FeePayer:         inv.FeePayer,
-		BaseAmount:       inv.BaseAmount,
-		NetworkFee:       inv.NetworkFee,
-		DepositAddress:   inv.DepositAddress,
-		Status:           inv.Status,
+		BaseAmount:         inv.BaseAmount,
+		NetworkFee:         inv.NetworkFee,
+		DepositAddress:     inv.DepositAddress,
+		UnderpaidTolerance: inv.UnderpaidTolerance,
+		Status:             inv.Status,
 		ReceivedAmount:   inv.ReceivedAmount,
 		RemainingAmount:  remaining,
 		ExpiresAt:        inv.ExpiresAt,

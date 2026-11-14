@@ -17,6 +17,7 @@ type InvoiceRepository interface {
 	GetByID(ctx context.Context, id uuid.UUID) (*domain.Invoice, error)
 	GetByDepositAddress(ctx context.Context, address string) (*domain.Invoice, error)
 	GetActivePendingInvoices(ctx context.Context, network domain.Network) ([]domain.Invoice, error)
+	GetActiveInvoicesWithGrace(ctx context.Context, network domain.Network, gracePeriod time.Duration) ([]domain.Invoice, error)
 	Update(ctx context.Context, invoice *domain.Invoice) error
 	ExpireOverdueInvoices(ctx context.Context, now time.Time) (int64, error)
 }
@@ -59,10 +60,15 @@ func (r *invoiceRepository) GetByDepositAddress(ctx context.Context, address str
 }
 
 func (r *invoiceRepository) GetActivePendingInvoices(ctx context.Context, network domain.Network) ([]domain.Invoice, error) {
+	return r.GetActiveInvoicesWithGrace(ctx, network, 0)
+}
+
+func (r *invoiceRepository) GetActiveInvoicesWithGrace(ctx context.Context, network domain.Network, gracePeriod time.Duration) ([]domain.Invoice, error) {
 	var invoices []domain.Invoice
+	cutoff := time.Now().Add(-gracePeriod)
 	err := r.db.WithContext(ctx).
 		Where("pay_network = ? AND status IN (?, ?)", network, domain.StatusPending, domain.StatusDetected).
-		Where("expires_at > ?", time.Now()).
+		Where("expires_at > ?", cutoff).
 		Find(&invoices).Error
 	return invoices, err
 }

@@ -12,6 +12,7 @@ export interface MerchantProfile {
   payout_address_solana: string;
   auto_payout_enabled: boolean;
   fee_payer: "customer" | "merchant";
+  underpaid_tolerance?: number;
   webhook_url: string;
 }
 

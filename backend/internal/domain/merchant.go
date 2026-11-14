@@ -27,6 +27,7 @@ type Merchant struct {
 	AutoPayoutEnabled    bool            `gorm:"default:true" json:"auto_payout_enabled"`
 	FeePayer             string          `gorm:"type:varchar(20);default:'customer'" json:"fee_payer"`
 	SettlementMode       string          `gorm:"type:varchar(30);default:'ESCROW_BALANCE'" json:"settlement_mode"` // "ESCROW_BALANCE" or "INSTANT_FORWARD"
+	UnderpaidTolerance   decimal.Decimal `gorm:"type:numeric(5,2);default:0.0" json:"underpaid_tolerance"`
 	BalanceUSD           decimal.Decimal `gorm:"type:numeric(28,8);default:0" json:"balance_usd"`
 	LockedBalanceUSD     decimal.Decimal `gorm:"type:numeric(28,8);default:0" json:"locked_balance_usd"`
 	WebhookURL           string          `gorm:"type:text" json:"webhook_url"`

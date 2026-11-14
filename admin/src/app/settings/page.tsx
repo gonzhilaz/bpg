@@ -11,10 +11,23 @@ export default function SettingsPage() {
   const [feePercent, setFeePercent] = useState("0.40");
   const [minPayout, setMinPayout] = useState("10.00");
   const [invoiceTtl, setInvoiceTtl] = useState("30");
+  const [underpaidTolerance, setUnderpaidTolerance] = useState("0.00");
+  const [gracePeriod, setGracePeriod] = useState("15");
   const [gasBuffer, setGasBuffer] = useState("15");
   const [maintenance, setMaintenance] = useState(false);
   const [webhookRetries, setWebhookRetries] = useState("5");
   const [saved, setSaved] = useState(false);
+
+  const handleToleranceChange = (val: string) => {
+    const num = parseFloat(val);
+    if (isNaN(num)) {
+      setUnderpaidTolerance(val);
+      return;
+    }
+    if (num < 0) setUnderpaidTolerance("0.00");
+    else if (num > 100) setUnderpaidTolerance("100.00");
+    else setUnderpaidTolerance(val);
+  };
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
@@ -107,6 +120,56 @@ export default function SettingsPage() {
                     type="text"
                     value={invoiceTtl}
                     onChange={(e) => setInvoiceTtl(e.target.value)}
+                    className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-1.5 text-xs text-white font-mono focus:outline-none focus:border-cyan-500/50"
+                  />
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 font-mono text-[11px]">min</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Tolerance & Grace Period */}
+          <div className="bg-zinc-900/80 border border-zinc-800 rounded-2xl p-4 shadow-sm space-y-3">
+            <div className="flex items-center justify-between border-b border-zinc-800/60 pb-2">
+              <div className="flex items-center gap-2">
+                <Clock className="w-4 h-4 text-cyan-400" />
+                <h2 className="text-xs font-bold text-white uppercase tracking-wider">Settlement & Watcher</h2>
+              </div>
+              <Tooltip content="Configurable blockchain watcher grace window and invoice underpaid margin." />
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+              <div className="space-y-1">
+                <div className="flex items-center justify-between">
+                  <label className="text-[11px] text-zinc-400 font-medium">Underpaid Margin</label>
+                  <Tooltip content="Allowable underpayment margin (0.00% - 100.00%). Default 0.00% requires 100% exact payment match." />
+                </div>
+                <div className="relative">
+                  <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    step="0.01"
+                    value={underpaidTolerance}
+                    onChange={(e) => handleToleranceChange(e.target.value)}
+                    className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-1.5 text-xs text-white font-mono focus:outline-none focus:border-cyan-500/50"
+                  />
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 font-mono text-[11px]">%</span>
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <div className="flex items-center justify-between">
+                  <label className="text-[11px] text-zinc-400 font-medium">Grace Period</label>
+                  <Tooltip content="Buffer duration in minutes after invoice expiration during which blockchain deposits are still captured and credited." />
+                </div>
+                <div className="relative">
+                  <input
+                    type="number"
+                    min="0"
+                    max="1440"
+                    value={gracePeriod}
+                    onChange={(e) => setGracePeriod(e.target.value)}
                     className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-1.5 text-xs text-white font-mono focus:outline-none focus:border-cyan-500/50"
                   />
                   <span className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 font-mono text-[11px]">min</span>

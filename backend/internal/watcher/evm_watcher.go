@@ -29,6 +29,7 @@ type EVMWatcher struct {
 	invoiceSvc       service.InvoiceService
 	httpClient       *http.Client
 	lastScannedBlock uint64
+	gracePeriod      time.Duration
 }
 
 // NewEVMWatcher creates a new EVM indexer for BSC or Polygon
@@ -39,7 +40,13 @@ func NewEVMWatcher(
 	decimals int32,
 	invRepo repository.InvoiceRepository,
 	invoiceSvc service.InvoiceService,
+	gracePeriod ...time.Duration,
 ) *EVMWatcher {
+	grace := 15 * time.Minute
+	if len(gracePeriod) > 0 && gracePeriod[0] >= 0 {
+		grace = gracePeriod[0]
+	}
+
 	return &EVMWatcher{
 		network:         network,
 		rpcURL:          rpcURL,
@@ -47,6 +54,7 @@ func NewEVMWatcher(
 		decimals:        decimals,
 		invRepo:         invRepo,
 		invoiceSvc:      invoiceSvc,
+		gracePeriod:     grace,
 		httpClient: &http.Client{
 			Timeout: 10 * time.Second,
 		},
@@ -82,7 +90,7 @@ type logEntry struct {
 
 // ScanBlocks fetches recent logs and processes deposits for active invoices
 func (w *EVMWatcher) ScanBlocks(ctx context.Context) error {
-	activeInvoices, err := w.invRepo.GetActivePendingInvoices(ctx, w.network)
+	activeInvoices, err := w.invRepo.GetActiveInvoicesWithGrace(ctx, w.network, w.gracePeriod)
 	if err != nil {
 		return fmt.Errorf("[%s] failed to get active invoices: %w", w.network, err)
 	}

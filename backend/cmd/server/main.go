@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/shopspring/decimal"
 	"gorm.io/gorm"
 
 	"13c-gateway/configs"
@@ -73,6 +74,8 @@ func main() {
 		cfg.InvoiceExpiryMin,
 	)
 	invoiceSvc.SetWithdrawalRepo(withdrawalRepo)
+	invoiceSvc.SetUnderpaidTolerance(decimal.NewFromFloat(cfg.UnderpaidTolerancePercent))
+	invoiceSvc.SetGracePeriod(time.Duration(cfg.InvoiceGracePeriodMin) * time.Minute)
 
 	// Initialize Multi-Chain Background Watchers (BSC, Polygon, TRON, Solana)
 	watcherManager := watcher.NewWatcherManager(cfg, invoiceRepo, invoiceSvc)

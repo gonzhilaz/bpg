@@ -18,11 +18,12 @@ import (
 
 // SolanaWatcher monitors Solana SPL token transfers to active deposit addresses
 type SolanaWatcher struct {
-	rpcURL     string
-	invRepo    repository.InvoiceRepository
-	invoiceSvc service.InvoiceService
-	httpClient *http.Client
-	seenSigs   map[string]bool
+	rpcURL      string
+	invRepo     repository.InvoiceRepository
+	invoiceSvc  service.InvoiceService
+	httpClient  *http.Client
+	seenSigs    map[string]bool
+	gracePeriod time.Duration
 }
 
 // NewSolanaWatcher creates a new Solana network indexer
@@ -30,11 +31,18 @@ func NewSolanaWatcher(
 	rpcURL string,
 	invRepo repository.InvoiceRepository,
 	invoiceSvc service.InvoiceService,
+	gracePeriod ...time.Duration,
 ) *SolanaWatcher {
+	grace := 15 * time.Minute
+	if len(gracePeriod) > 0 && gracePeriod[0] >= 0 {
+		grace = gracePeriod[0]
+	}
+
 	return &SolanaWatcher{
-		rpcURL:     rpcURL,
-		invRepo:    invRepo,
-		invoiceSvc: invoiceSvc,
+		rpcURL:      rpcURL,
+		invRepo:     invRepo,
+		invoiceSvc:  invoiceSvc,
+		gracePeriod: grace,
 		httpClient: &http.Client{
 			Timeout: 10 * time.Second,
 		},
@@ -74,7 +82,7 @@ type solParsedTx struct {
 
 // ScanBlocks polls recent signatures for all active Solana deposit addresses
 func (w *SolanaWatcher) ScanBlocks(ctx context.Context) error {
-	activeInvoices, err := w.invRepo.GetActivePendingInvoices(ctx, domain.NetworkSolana)
+	activeInvoices, err := w.invRepo.GetActiveInvoicesWithGrace(ctx, domain.NetworkSolana, w.gracePeriod)
 	if err != nil {
 		return fmt.Errorf("[SOLANA] failed to get active invoices: %w", err)
 	}

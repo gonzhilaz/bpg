@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Wallet, ShieldCheck, Check, UserCheck, Building2, Flame } from "lucide-react";
+import { Wallet, ShieldCheck, Check, UserCheck, Building2, Flame, Percent } from "lucide-react";
 import { Tooltip } from "../ui/Tooltip";
 import { MerchantProfile, NetworkGasRate } from "../../types/merchant";
 import { mockNetworkGasRates } from "../../mocks/mockMerchant";
@@ -18,6 +18,9 @@ export function PayoutSettingsCard({ profile, gasRates = mockNetworkGasRates }: 
   const [solanaAddr, setSolanaAddr] = useState(profile.payout_address_solana);
   const [autoPayout, setAutoPayout] = useState(profile.auto_payout_enabled);
   const [feePayer, setFeePayer] = useState<"customer" | "merchant">(profile.fee_payer || "customer");
+  const [tolerance, setTolerance] = useState(
+    profile.underpaid_tolerance !== undefined ? profile.underpaid_tolerance.toFixed(2) : "0.00"
+  );
   const [saved, setSaved] = useState(false);
 
   const getRate = (net: string) => gasRates.find((r) => r.network === net);
@@ -87,6 +90,34 @@ export function PayoutSettingsCard({ profile, gasRates = mockNetworkGasRates }: 
             <Building2 className="w-3 h-3" />
             <span>Merchant</span>
           </button>
+        </div>
+      </div>
+
+      {/* Underpaid Margin Control */}
+      <div className="bg-zinc-950/60 border border-zinc-800/80 rounded-xl p-2.5 flex items-center justify-between gap-2">
+        <div className="flex items-center gap-1.5 text-xs text-zinc-300">
+          <Percent className="w-3.5 h-3.5 text-cyan-400" />
+          <span className="font-medium">Underpaid Margin</span>
+          <Tooltip content="Allowable underpayment threshold (0.00% - 100.00%). Invoices within this margin are automatically marked as PAID. Default is 0.00% for strict exact match." />
+        </div>
+
+        <div className="relative w-28">
+          <input
+            type="number"
+            min="0"
+            max="100"
+            step="0.01"
+            value={tolerance}
+            onChange={(e) => {
+              const val = parseFloat(e.target.value);
+              if (isNaN(val)) setTolerance(e.target.value);
+              else if (val < 0) setTolerance("0.00");
+              else if (val > 100) setTolerance("100.00");
+              else setTolerance(e.target.value);
+            }}
+            className="w-full bg-zinc-900 border border-zinc-800 rounded-lg pr-7 pl-2.5 py-1 text-right text-xs text-white font-mono focus:outline-none focus:border-cyan-500/50"
+          />
+          <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-zinc-500 font-mono text-[11px]">%</span>
         </div>
       </div>
 

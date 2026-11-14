@@ -47,6 +47,7 @@ type Invoice struct {
 	NetworkFee       decimal.Decimal `gorm:"type:numeric(28,8);default:0" json:"network_fee"`
 	DepositAddress   string          `gorm:"type:varchar(128);index;not null" json:"deposit_address"`
 	EncryptedPrivKey string          `gorm:"type:text;not null" json:"-"`
+	UnderpaidTolerance decimal.Decimal `gorm:"type:numeric(5,2);default:0.0" json:"underpaid_tolerance"`
 	Status           InvoiceStatus   `gorm:"type:varchar(20);index;default:'PENDING'" json:"status"`
 	ReceivedAmount   decimal.Decimal `gorm:"type:numeric(28,8);default:0" json:"received_amount"`
 	CallbackURL      string          `gorm:"type:text" json:"callback_url"`

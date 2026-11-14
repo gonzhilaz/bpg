@@ -17,12 +17,13 @@ import (
 
 // TronWatcher polls TronGrid for TRC-20 USDT Transfer events
 type TronWatcher struct {
-	gridURL    string
-	apiKey     string
-	invRepo    repository.InvoiceRepository
-	invoiceSvc service.InvoiceService
-	httpClient *http.Client
-	lastSeenTs int64
+	gridURL     string
+	apiKey      string
+	invRepo     repository.InvoiceRepository
+	invoiceSvc  service.InvoiceService
+	httpClient  *http.Client
+	lastSeenTs  int64
+	gracePeriod time.Duration
 }
 
 // NewTronWatcher creates a new TRON network indexer
@@ -31,12 +32,19 @@ func NewTronWatcher(
 	apiKey string,
 	invRepo repository.InvoiceRepository,
 	invoiceSvc service.InvoiceService,
+	gracePeriod ...time.Duration,
 ) *TronWatcher {
+	grace := 15 * time.Minute
+	if len(gracePeriod) > 0 && gracePeriod[0] >= 0 {
+		grace = gracePeriod[0]
+	}
+
 	return &TronWatcher{
-		gridURL:    gridURL,
-		apiKey:     apiKey,
-		invRepo:    invRepo,
-		invoiceSvc: invoiceSvc,
+		gridURL:     gridURL,
+		apiKey:      apiKey,
+		invRepo:     invRepo,
+		invoiceSvc:  invoiceSvc,
+		gracePeriod: grace,
 		httpClient: &http.Client{
 			Timeout: 10 * time.Second,
 		},
@@ -66,7 +74,7 @@ type tronEventResponse struct {
 
 // ScanBlocks fetches recent confirmed TRC-20 Transfer events from TronGrid
 func (w *TronWatcher) ScanBlocks(ctx context.Context) error {
-	activeInvoices, err := w.invRepo.GetActivePendingInvoices(ctx, domain.NetworkTron)
+	activeInvoices, err := w.invRepo.GetActiveInvoicesWithGrace(ctx, domain.NetworkTron, w.gracePeriod)
 	if err != nil {
 		return fmt.Errorf("[TRON] failed to get active invoices: %w", err)
 	}

@@ -483,11 +483,11 @@ Portal ini dirancang untuk DevOps dan Operator Gateway dengan arsitektur <strong
 <p><em> <strong>Disaster Recovery & Compressed Snapshots (`pg_dump`)</strong>: Pembuatan </em>snapshot point-in-time<em> instan terkompresi dengan validasi </em>checksum* kriptografis SHA-256 dan opsi unduhan langsung.</p>
 <ul><li><strong>Audit Migrasi SQL</strong>: Riwayat eksekusi skrip migrasi skema lengkap dengan durasi eksekusi dalam milidetik dan status integritas skema.</li></ul>
 
-<h3 class="sub-title">5.5 Emergency Circuit Breaker</h3>
-<p>Pada kartu <strong>Platform Overview</strong>:</p>
-<ul><li>Terdapat sakelar darurat <strong>Circuit Breaker Active</strong>.</li></ul>
-<ul><li>Jika terjadi anomali pada blockchain (misal hard fork, reorg ekstrim, atau eksploitasi RPC node eksternal), admin dapat mengaktifkan Circuit Breaker dalam 1 klik.</li></ul>
-<ul><li>Saat aktif, seluruh eksekusi payout sweeping otomatis akan dibekukan sementara di memori hingga situasi jaringan dinyatakan aman.</li></ul>
+<h3 class="sub-title">5.5 Emergency Circuit Breaker & Platform Settings</h3>
+<p>Pada kartu <strong>Platform Overview</strong> dan halaman <strong>Platform Settings</strong> (`/settings`):</p>
+<ul><li><strong>Circuit Breaker</strong>: Sakelar darurat untuk membekukan proses sweeping otomatis jika terjadi gangguan eksternal.</li></ul>
+<ul><li><strong>Underpaid Tolerance Margin (0.00% - 100.00%)</strong>: Ambang batas toleransi pembayaran kurang. Secara default bernilai ketat `0.00%` (exact match). Jika developer/merchant mengonfigurasi toleransi (misalnya 1.00%), transaksi dengan setoran $\ge 99\%$ nilai tagihan akan langsung dianggap lunas (`PAID`).</li></ul>
+<ul><li><strong>Watcher Grace Period (Menit)</strong>: Jendela waktu kompensasi setelah invoice kedaluwarsa (default `15` menit). Transaksi blockchain yang baru terkonfirmasi dalam jendela ini tetap dideteksi oleh watcher dan tidak hangus.</li></ul>
 
 <h3 class="sub-title">5.6 Deployment Mandiri di Server VPS Menggunakan Docker Compose</h3>
 <p>Untuk mengoperasikan backend Go dan database PostgreSQL di server VPS privat:</p>
