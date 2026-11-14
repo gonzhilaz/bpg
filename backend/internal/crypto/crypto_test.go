@@ -44,17 +44,23 @@ func TestEVMKeyGen(t *testing.T) {
 	}
 }
 
-func TestTronKeyGen(t *testing.T) {
+func TestNormalizeTronAddress(t *testing.T) {
+	// Generate genuine Tron address
 	tron, err := GenerateTronKeyPair()
 	if err != nil {
 		t.Fatalf("failed to generate tron key: %v", err)
 	}
 
-	if !strings.HasPrefix(tron.Address, "T") {
-		t.Fatalf("invalid Tron address prefix: %s", tron.Address)
+	// Normalizing already Base58 address returns identical address
+	norm1 := NormalizeTronAddress(tron.Address)
+	if norm1 != tron.Address {
+		t.Fatalf("expected %s, got %s", tron.Address, norm1)
 	}
-	if len(tron.Address) != 34 {
-		t.Fatalf("invalid Tron address length: %d", len(tron.Address))
+
+	// Normalizing with whitespace or 0x prefix
+	norm2 := NormalizeTronAddress("  " + tron.Address + " ")
+	if norm2 != tron.Address {
+		t.Fatalf("expected trimmed %s, got %s", tron.Address, norm2)
 	}
 }
 

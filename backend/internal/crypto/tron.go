@@ -4,6 +4,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
+	"strings"
 
 	"github.com/decred/dcrd/dcrec/secp256k1/v4"
 	"github.com/mr-tron/base58"
@@ -54,3 +55,24 @@ func GenerateTronKeyPair() (*TronKeyPair, error) {
 	}, nil
 }
 
+// NormalizeTronAddress converts either 42-char hex (e.g. 41...) or Base58 (T...) to canonical Base58Check format
+func NormalizeTronAddress(addr string) string {
+	addr = strings.TrimSpace(addr)
+	if strings.HasPrefix(addr, "0x") || strings.HasPrefix(addr, "0X") {
+		addr = addr[2:]
+	}
+
+	// 42 hex characters starting with 41
+	if len(addr) == 42 && (strings.HasPrefix(addr, "41") || strings.HasPrefix(addr, "41")) {
+		rawBytes, err := hex.DecodeString(addr)
+		if err == nil && len(rawBytes) == 21 {
+			firstHash := sha256.Sum256(rawBytes)
+			secondHash := sha256.Sum256(firstHash[:])
+			checksum := secondHash[:4]
+			full := append(rawBytes, checksum...)
+			return base58.Encode(full)
+		}
+	}
+
+	return addr
+}

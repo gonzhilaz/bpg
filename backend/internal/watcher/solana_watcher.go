@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"sync"
 	"time"
 
 	"github.com/shopspring/decimal"
@@ -18,6 +19,7 @@ import (
 
 // SolanaWatcher monitors Solana SPL token transfers to active deposit addresses
 type SolanaWatcher struct {
+	mu          sync.RWMutex
 	rpcURL      string
 	targetMint  string
 	invRepo     repository.InvoiceRepository
@@ -86,6 +88,22 @@ type solParsedTx struct {
 	Slot uint64 `json:"slot"`
 }
 
+func (w *SolanaWatcher) isSigSeen(sig string) bool {
+	w.mu.RLock()
+	defer w.mu.RUnlock()
+	return w.seenSigs[sig]
+}
+
+func (w *SolanaWatcher) markSigSeen(sig string) {
+	w.mu.Lock()
+	defer w.mu.Unlock()
+	// Cap size to 10,000 entries to prevent memory leak
+	if len(w.seenSigs) >= 10000 {
+		w.seenSigs = make(map[string]bool)
+	}
+	w.seenSigs[sig] = true
+}
+
 // ScanBlocks polls recent signatures for all active Solana deposit addresses
 func (w *SolanaWatcher) ScanBlocks(ctx context.Context) error {
 	activeInvoices, err := w.invRepo.GetActiveInvoicesWithGrace(ctx, domain.NetworkSolana, w.gracePeriod)
@@ -100,12 +118,12 @@ func (w *SolanaWatcher) ScanBlocks(ctx context.Context) error {
 		}
 
 		for _, sig := range sigs {
-			if sig.Err != nil || w.seenSigs[sig.Signature] {
+			if sig.Err != nil || w.isSigSeen(sig.Signature) {
 				continue
 			}
 
-			// Mark signature as seen
-			w.seenSigs[sig.Signature] = true
+			// Mark signature as seen (thread-safe with eviction cap)
+			w.markSigSeen(sig.Signature)
 
 			// Parse transaction balance delta
 			txInfo, err := w.getTransaction(ctx, sig.Signature)

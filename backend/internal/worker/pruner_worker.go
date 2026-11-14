@@ -93,7 +93,9 @@ func (w *prunerWorker) Start(ctx context.Context, interval time.Duration, retent
 			case <-ctx.Done():
 				return
 			case <-ticker.C:
-				_, err := w.PruneExpiredInvoices(context.Background(), retentionDays, false)
+				pCtx, pCancel := context.WithTimeout(ctx, 30*time.Second)
+				_, err := w.PruneExpiredInvoices(pCtx, retentionDays, false)
+				pCancel()
 				if err != nil {
 					log.Printf("[DB PRUNER ERROR] Periodic prune failed: %v", err)
 				}

@@ -10,6 +10,7 @@ import (
 
 	"github.com/shopspring/decimal"
 
+	"13c-gateway/internal/crypto"
 	"13c-gateway/internal/domain"
 	"13c-gateway/internal/repository"
 	"13c-gateway/internal/service"
@@ -126,7 +127,8 @@ func (w *TronWatcher) ScanBlocks(ctx context.Context) error {
 			maxTs = event.BlockTimestamp
 		}
 
-		if addressMap[event.Result.To] {
+		toNormalized := crypto.NormalizeTronAddress(event.Result.To)
+		if addressMap[toNormalized] || addressMap[event.Result.To] {
 			rawVal, err := decimal.NewFromString(event.Result.Value)
 			if err != nil {
 				continue
@@ -136,16 +138,18 @@ func (w *TronWatcher) ScanBlocks(ctx context.Context) error {
 			amountDec := rawVal.Div(decimal.NewFromInt(1_000_000))
 
 			log.Printf("[TRON] MATCHED DEPOSIT! Tx: %s, To: %s, Amount: %s",
-				event.TransactionID, event.Result.To, amountDec.String())
+				event.TransactionID, toNormalized, amountDec.String())
 
-			_, err = w.invoiceSvc.RecordPayment(ctx, event.Result.To, amountDec, event.TransactionID, domain.NetworkTron, event.BlockNumber)
+			_, err = w.invoiceSvc.RecordPayment(ctx, toNormalized, amountDec, event.TransactionID, domain.NetworkTron, event.BlockNumber)
 			if err != nil {
 				log.Printf("[TRON] Error recording payment: %v", err)
 			}
 		}
 	}
 
-	w.lastSeenTs = maxTs + 1
+	if len(eventResp.Data) > 0 {
+		w.lastSeenTs = maxTs + 1
+	}
 	return nil
 }
 
