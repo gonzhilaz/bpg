@@ -51,3 +51,36 @@ func TestVerifyToken_TamperedPayload(t *testing.T) {
 	}
 }
 
+func TestManager_OfflineGracePeriod(t *testing.T) {
+	mgr := &Manager{
+		status:          StatusActive,
+		lastVerified:    time.Now().Add(-73 * time.Hour), // Expired 73h ago
+		maxOfflineGrace: 72 * time.Hour,
+	}
+
+	operational, msg := mgr.IsOperational()
+	if operational {
+		t.Fatalf("expected operational to be false after 73h offline grace exceeded, got true")
+	}
+
+	if mgr.status != StatusRevoked {
+		t.Fatalf("expected status to be REVOKED, got %v", mgr.status)
+	}
+
+	if msg == "" {
+		t.Fatal("expected descriptive revocation message")
+	}
+
+	// Test within grace period
+	mgrValid := &Manager{
+		status:          StatusActive,
+		lastVerified:    time.Now().Add(-24 * time.Hour), // Only 24h ago, within 72h grace
+		maxOfflineGrace: 72 * time.Hour,
+	}
+
+	validOperational, _ := mgrValid.IsOperational()
+	if !validOperational {
+		t.Fatalf("expected operational to be true within 24h of 72h offline grace, got false")
+	}
+}
+

@@ -7,10 +7,13 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"strconv"
 	"time"
+
+	"github.com/google/uuid"
 
 	"13c-gateway/internal/domain"
 )
@@ -36,6 +39,7 @@ type ReplayResult struct {
 	Success      bool   `json:"success"`
 	ResponseBody string `json:"response_body"`
 	Signature    string `json:"signature"`
+	DeliveryID   string `json:"delivery_id"`
 }
 
 // Dispatcher defines interface for delivering webhooks
@@ -98,6 +102,7 @@ func (d *webhookDispatcher) DispatchInvoiceEvent(ctx context.Context, invoice *d
 func (d *webhookDispatcher) deliverWithRetry(ctx context.Context, targetURL string, body []byte, signature string, ts int64) {
 	maxRetries := 3
 	backoff := 2 * time.Second
+	deliveryID := fmt.Sprintf("del_%s", uuid.New().String()[:12])
 
 	for attempt := 1; attempt <= maxRetries; attempt++ {
 		req, err := http.NewRequestWithContext(ctx, http.MethodPost, targetURL, bytes.NewReader(body))
@@ -107,6 +112,9 @@ func (d *webhookDispatcher) deliverWithRetry(ctx context.Context, targetURL stri
 		}
 
 		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set("X-13C-Delivery-ID", deliveryID)
+		req.Header.Set("Idempotency-Key", deliveryID)
+		req.Header.Set("X-13C-Signature", signature)
 		req.Header.Set("X-Signature", signature)
 		req.Header.Set("X-Timestamp", strconv.FormatInt(ts, 10))
 		req.Header.Set("User-Agent", "13C-Crypto-Gateway/1.0")
@@ -114,7 +122,7 @@ func (d *webhookDispatcher) deliverWithRetry(ctx context.Context, targetURL stri
 		resp, err := d.client.Do(req)
 		if err == nil && resp.StatusCode >= 200 && resp.StatusCode < 300 {
 			resp.Body.Close()
-			log.Printf("[WEBHOOK SUCCESS] Delivered to %s (attempt %d)", targetURL, attempt)
+			log.Printf("[WEBHOOK SUCCESS] Delivered to %s (attempt %d, delivery_id: %s)", targetURL, attempt, deliveryID)
 			return
 		}
 
@@ -122,8 +130,8 @@ func (d *webhookDispatcher) deliverWithRetry(ctx context.Context, targetURL stri
 			resp.Body.Close()
 		}
 
-		log.Printf("[WEBHOOK RETRY] Delivery to %s failed (attempt %d/%d), retrying in %v...",
-			targetURL, attempt, maxRetries, backoff)
+		log.Printf("[WEBHOOK RETRY] Delivery to %s failed (attempt %d/%d, delivery_id: %s), retrying in %v...",
+			targetURL, attempt, maxRetries, deliveryID, backoff)
 		select {
 		case <-ctx.Done():
 			log.Printf("[WEBHOOK ABORT] Context cancelled during retry backoff for %s", targetURL)
@@ -133,7 +141,7 @@ func (d *webhookDispatcher) deliverWithRetry(ctx context.Context, targetURL stri
 		backoff *= 2
 	}
 
-	log.Printf("[WEBHOOK FAILED] Delivery permanently failed after %d attempts: %s", maxRetries, targetURL)
+	log.Printf("[WEBHOOK FAILED] Delivery permanently failed after %d attempts (delivery_id: %s): %s", maxRetries, deliveryID, targetURL)
 }
 
 // DispatchSync sends an immediate test or replay webhook and returns diagnostic telemetry
@@ -146,6 +154,7 @@ func (d *webhookDispatcher) DispatchSync(ctx context.Context, targetURL, secretK
 	mac := hmac.New(sha256.New, []byte(secretKey))
 	mac.Write(bodyBytes)
 	signature := hex.EncodeToString(mac.Sum(nil))
+	deliveryID := fmt.Sprintf("del_%s", uuid.New().String()[:12])
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, targetURL, bytes.NewReader(bodyBytes))
 	if err != nil {
@@ -153,6 +162,8 @@ func (d *webhookDispatcher) DispatchSync(ctx context.Context, targetURL, secretK
 	}
 
 	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("X-13C-Delivery-ID", deliveryID)
+	req.Header.Set("Idempotency-Key", deliveryID)
 	req.Header.Set("X-13C-Signature", signature)
 	req.Header.Set("X-Signature", signature)
 	req.Header.Set("X-Timestamp", strconv.FormatInt(payload.Timestamp, 10))
@@ -169,6 +180,7 @@ func (d *webhookDispatcher) DispatchSync(ctx context.Context, targetURL, secretK
 			Success:      false,
 			ResponseBody: err.Error(),
 			Signature:    signature,
+			DeliveryID:   deliveryID,
 		}, nil
 	}
 	defer resp.Body.Close()
@@ -186,5 +198,6 @@ func (d *webhookDispatcher) DispatchSync(ctx context.Context, targetURL, secretK
 		Success:      resp.StatusCode >= 200 && resp.StatusCode < 300,
 		ResponseBody: respStr,
 		Signature:    signature,
+		DeliveryID:   deliveryID,
 	}, nil
 }

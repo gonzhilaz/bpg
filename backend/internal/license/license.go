@@ -42,12 +42,13 @@ type LicensePayload struct {
 
 // Manager controls active license validation and remote kill-switch heartbeat
 type Manager struct {
-	mu           sync.RWMutex
-	status       LicenseStatus
-	payload      *LicensePayload
-	lastVerified time.Time
-	stopChan     chan struct{}
-	httpClient   *http.Client
+	mu              sync.RWMutex
+	status          LicenseStatus
+	payload         *LicensePayload
+	lastVerified    time.Time
+	maxOfflineGrace time.Duration
+	stopChan        chan struct{}
+	httpClient      *http.Client
 }
 
 var (
@@ -59,12 +60,20 @@ var (
 func GetManager() *Manager {
 	once.Do(func() {
 		globalManager = &Manager{
-			status:     StatusUnlicensed,
-			stopChan:   make(chan struct{}),
-			httpClient: &http.Client{Timeout: 8 * time.Second},
+			status:          StatusUnlicensed,
+			stopChan:        make(chan struct{}),
+			httpClient:      &http.Client{Timeout: 8 * time.Second},
+			maxOfflineGrace: 72 * time.Hour,
 		}
 	})
 	return globalManager
+}
+
+// SetMaxOfflineGrace configures the maximum permitted duration without a successful heartbeat
+func (m *Manager) SetMaxOfflineGrace(d time.Duration) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	m.maxOfflineGrace = d
 }
 
 // VerifyAndActivate validates offline Ed25519 signature and starts background heartbeat
@@ -144,7 +153,15 @@ func (m *Manager) checkRemoteHeartbeat() {
 
 	resp, err := m.httpClient.Post(heartbeatURL, "application/json", bytes.NewReader(reqBody))
 	if err != nil {
-		log.Printf("[LICENSE HEARTBEAT WARN] Remote license server check failed (grace period active): %v", err)
+		m.mu.Lock()
+		if !m.lastVerified.IsZero() && time.Since(m.lastVerified) > m.maxOfflineGrace {
+			m.status = StatusRevoked
+			log.Printf("[LICENSE REVOKED] Offline grace period of %v exceeded without heartbeat. System locked.", m.maxOfflineGrace)
+		} else {
+			log.Printf("[LICENSE HEARTBEAT WARN] Remote license server check failed (grace period active, %v remaining): %v",
+				m.maxOfflineGrace-time.Since(m.lastVerified), err)
+		}
+		m.mu.Unlock()
 		return
 	}
 	defer resp.Body.Close()
@@ -171,8 +188,14 @@ func (m *Manager) checkRemoteHeartbeat() {
 
 // IsOperational returns true if the system is legally licensed and not revoked
 func (m *Manager) IsOperational() (bool, string) {
-	m.mu.RLock()
-	defer m.mu.RUnlock()
+	m.mu.Lock()
+	defer m.mu.Unlock()
+
+	// Enforce 72-hour maximum offline grace period against firewall/DNS blackhole attacks
+	if m.status == StatusActive && !m.lastVerified.IsZero() && time.Since(m.lastVerified) > m.maxOfflineGrace {
+		m.status = StatusRevoked
+		log.Printf("[LICENSE REVOKED] Offline grace period of %v exceeded. Access revoked.", m.maxOfflineGrace)
+	}
 
 	if m.status == StatusActive {
 		return true, "System operational"
@@ -193,9 +216,20 @@ func (m *Manager) GetStatus() map[string]interface{} {
 	m.mu.RLock()
 	defer m.mu.RUnlock()
 
+	graceRemaining := "0s"
+	if !m.lastVerified.IsZero() {
+		rem := m.maxOfflineGrace - time.Since(m.lastVerified)
+		if rem < 0 {
+			rem = 0
+		}
+		graceRemaining = rem.Round(time.Second).String()
+	}
+
 	res := map[string]interface{}{
-		"status":        m.status,
-		"last_verified": m.lastVerified,
+		"status":            m.status,
+		"last_verified":     m.lastVerified,
+		"max_offline_grace": m.maxOfflineGrace.String(),
+		"grace_remaining":   graceRemaining,
 	}
 	if m.payload != nil {
 		res["licensee"] = m.payload.Licensee

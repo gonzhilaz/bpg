@@ -108,6 +108,10 @@ func main() {
 	r := gin.New()
 	r.Use(gin.Logger(), gin.Recovery(), middleware.CORSMiddleware(), middleware.LicenseEnforcement())
 
+	// Rate Limiting Middlewares (Anti-Brute Force & Anti-DDoS)
+	authRateLimiter := middleware.RateLimit(15, 15, time.Minute)
+	publicRateLimiter := middleware.RateLimit(60, 60, time.Minute)
+
 	// Public Health Endpoint
 	r.GET("/health", healthHandler.Check)
 
@@ -130,8 +134,8 @@ func main() {
 		// Authentication (Self-service merchant onboarding & login)
 		authRoutes := v1.Group("/auth")
 		{
-			authRoutes.POST("/register", authHandler.Register)
-			authRoutes.POST("/login", authHandler.Login)
+			authRoutes.POST("/register", authRateLimiter, authHandler.Register)
+			authRoutes.POST("/login", authRateLimiter, authHandler.Login)
 			authProtected := authRoutes.Group("/")
 			authProtected.Use(middleware.JWTAuth(cfg.JWTSecret, merchantRepo))
 			{
@@ -161,7 +165,7 @@ func main() {
 		v1.GET("/invoices/:id/events", invoiceHandler.StreamEvents)
 		v1.GET("/rates/gas", rateHandler.GetGasRates)
 		v1.GET("/pay/:slug", paymentLinkHandler.GetBySlug)
-		v1.POST("/pay/:slug/invoice", paymentLinkHandler.Pay)
+		v1.POST("/pay/:slug/invoice", publicRateLimiter, paymentLinkHandler.Pay)
 
 		// Sandbox Simulation Endpoint (for dev/testing)
 		v1.POST("/invoices/simulate-payment", invoiceHandler.SimulatePayment)
@@ -187,7 +191,7 @@ func main() {
 		authorized := v1.Group("/")
 		authorized.Use(middleware.APIKeyAuth(merchantRepo))
 		{
-			authorized.POST("/invoices", invoiceHandler.Create)
+			authorized.POST("/invoices", publicRateLimiter, invoiceHandler.Create)
 			authorized.GET("/escrow/summary", withdrawalHandler.GetEscrowSummary)
 			authorized.POST("/withdrawals", withdrawalHandler.RequestWithdrawal)
 			authorized.GET("/withdrawals", withdrawalHandler.ListMerchantWithdrawals)

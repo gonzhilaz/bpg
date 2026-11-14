@@ -48,9 +48,20 @@ func InitDatabase(cfg *Config) (*gorm.DB, error) {
 		return nil, fmt.Errorf("failed to get sql.DB: %w", err)
 	}
 
-	// Connection Pooling
-	sqlDB.SetMaxIdleConns(10)
-	sqlDB.SetMaxOpenConns(100)
+	// Connection Pooling & High-Concurrency Hardening
+	if cfg.DatabaseDriver == "sqlite" {
+		// Enable Write-Ahead Logging (WAL) and 5000ms busy timeout to prevent concurrent database lock failures
+		_ = db.Exec("PRAGMA journal_mode=WAL;").Error
+		_ = db.Exec("PRAGMA busy_timeout=5000;").Error
+		_ = db.Exec("PRAGMA synchronous=NORMAL;").Error
+
+		sqlDB.SetMaxIdleConns(5)
+		sqlDB.SetMaxOpenConns(25)
+	} else {
+		// PostgreSQL connection pooling for high-throughput production
+		sqlDB.SetMaxIdleConns(10)
+		sqlDB.SetMaxOpenConns(100)
+	}
 	sqlDB.SetConnMaxLifetime(time.Hour)
 
 	log.Printf("[INFO] Connected to %s database successfully", cfg.DatabaseDriver)

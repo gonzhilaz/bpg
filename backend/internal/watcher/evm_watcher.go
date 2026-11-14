@@ -29,6 +29,7 @@ type EVMWatcher struct {
 	invoiceSvc       service.InvoiceService
 	httpClient       *http.Client
 	lastScannedBlock uint64
+	requiredConfs    uint64
 	gracePeriod      time.Duration
 }
 
@@ -47,6 +48,12 @@ func NewEVMWatcher(
 		grace = gracePeriod[0]
 	}
 
+	// Dynamic confirmation depth to prevent blockchain reorganization / double-spend attacks
+	confs := uint64(3) // BSC: 3 blocks (~9 seconds)
+	if network == domain.NetworkPolygon {
+		confs = 15 // Polygon: 15 blocks (~30 seconds)
+	}
+
 	return &EVMWatcher{
 		network:         network,
 		rpcURL:          rpcURL,
@@ -54,11 +61,17 @@ func NewEVMWatcher(
 		decimals:        decimals,
 		invRepo:         invRepo,
 		invoiceSvc:      invoiceSvc,
+		requiredConfs:   confs,
 		gracePeriod:     grace,
 		httpClient: &http.Client{
 			Timeout: 10 * time.Second,
 		},
 	}
+}
+
+// SetRequiredConfirmations sets the confirmation lag depth for the watcher
+func (w *EVMWatcher) SetRequiredConfirmations(confs uint64) {
+	w.requiredConfs = confs
 }
 
 func (w *EVMWatcher) Network() domain.Network {
@@ -99,11 +112,19 @@ func (w *EVMWatcher) ScanBlocks(ctx context.Context) error {
 		return nil
 	}
 
-	// Build map of watched deposit addresses in lowercase
+	// Build map and slice of watched deposit addresses in lowercase
 	addressMap := make(map[string]bool)
+	var watchedAddrs []string
 	for _, inv := range activeInvoices {
 		cleanAddr := strings.ToLower(strings.TrimPrefix(inv.DepositAddress, "0x"))
-		addressMap[cleanAddr] = true
+		if cleanAddr != "" && !addressMap[cleanAddr] {
+			addressMap[cleanAddr] = true
+			watchedAddrs = append(watchedAddrs, cleanAddr)
+		}
+	}
+
+	if len(watchedAddrs) == 0 {
+		return nil
 	}
 
 	// 1. Get current block number
@@ -112,28 +133,34 @@ func (w *EVMWatcher) ScanBlocks(ctx context.Context) error {
 		return fmt.Errorf("[%s] getBlockNumber error: %w", w.network, err)
 	}
 
+	// Apply confirmation depth to protect against blockchain reorgs / double-spends
+	if currentBlock <= w.requiredConfs {
+		return nil
+	}
+	safeHead := currentBlock - w.requiredConfs
+
 	if w.lastScannedBlock == 0 {
-		// Start scanning from 10 blocks ago
-		if currentBlock > 10 {
-			w.lastScannedBlock = currentBlock - 10
+		// Start scanning from safeHead - 10 blocks
+		if safeHead > 10 {
+			w.lastScannedBlock = safeHead - 10
 		} else {
-			w.lastScannedBlock = currentBlock
+			w.lastScannedBlock = safeHead
 		}
 	}
 
-	if currentBlock <= w.lastScannedBlock {
+	if safeHead <= w.lastScannedBlock {
 		return nil
 	}
 
 	fromBlock := w.lastScannedBlock + 1
-	toBlock := currentBlock
+	toBlock := safeHead
 	// Limit block batch size to 20 to avoid RPC provider limits
 	if toBlock-fromBlock > 20 {
 		toBlock = fromBlock + 20
 	}
 
-	// 2. Query eth_getLogs for the USDT contract
-	logs, err := w.getLogs(ctx, fromBlock, toBlock)
+	// 2. Query eth_getLogs with targeted topic filter matching our deposit addresses
+	logs, err := w.getLogs(ctx, fromBlock, toBlock, watchedAddrs)
 	if err != nil {
 		return fmt.Errorf("[%s] getLogs error: %w", w.network, err)
 	}
@@ -208,12 +235,26 @@ func (w *EVMWatcher) getLatestBlockNumber(ctx context.Context) (uint64, error) {
 	return strconv.ParseUint(strings.TrimPrefix(hexBlock, "0x"), 16, 64)
 }
 
-func (w *EVMWatcher) getLogs(ctx context.Context, fromBlock, toBlock uint64) ([]logEntry, error) {
+func (w *EVMWatcher) getLogs(ctx context.Context, fromBlock, toBlock uint64, addresses []string) ([]logEntry, error) {
+	if len(addresses) == 0 {
+		return nil, nil
+	}
+
+	// Format deposit addresses into 32-byte zero-padded hex topics for topic[2] (ERC-20 transfer recipient)
+	var addressTopics []any
+	for _, addr := range addresses {
+		clean := strings.TrimPrefix(addr, "0x")
+		if len(clean) == 40 {
+			padded := fmt.Sprintf("0x000000000000000000000000%s", clean)
+			addressTopics = append(addressTopics, padded)
+		}
+	}
+
 	filter := map[string]any{
 		"fromBlock": fmt.Sprintf("0x%x", fromBlock),
 		"toBlock":   fmt.Sprintf("0x%x", toBlock),
 		"address":   w.contractAddress,
-		"topics":    []any{EVM_TRANSFER_TOPIC},
+		"topics":    []any{EVM_TRANSFER_TOPIC, nil, addressTopics},
 	}
 
 	reqBody, _ := json.Marshal(jsonRPCRequest{
