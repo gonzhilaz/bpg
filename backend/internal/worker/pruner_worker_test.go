@@ -137,3 +137,4 @@ func TestPrunerWorker_DryRunAndExecute(t *testing.T) {
 		t.Fatalf("expected old expired invoice to be deleted, but still found")
 	}
 }
+

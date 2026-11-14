@@ -35,7 +35,12 @@ func NewWatcherManager(
 
 	gracePeriod := time.Duration(cfg.InvoiceGracePeriodMin) * time.Minute
 
-	// Dynamic testnet / sandbox RPC switching
+	bscContract := BSC_USDT_CONTRACT
+	polyContract := POLYGON_USDT_CONTRACT
+	tronContract := TRON_USDT_CONTRACT
+	solMint := SOLANA_USDT_MINT
+
+	// Dynamic testnet / sandbox RPC & contract switching
 	if cfg.AppEnv == "sandbox" || cfg.AppEnv == "testnet" || cfg.AppEnv == "development" {
 		if cfg.TestnetBSCRPC != "" {
 			bscRPC = cfg.TestnetBSCRPC
@@ -49,17 +54,22 @@ func NewWatcherManager(
 		if cfg.TestnetSolanaRPC != "" {
 			solRPC = cfg.TestnetSolanaRPC
 		}
+
+		bscContract = TESTNET_BSC_USDT_CONTRACT
+		polyContract = TESTNET_POLYGON_USDT_CONTRACT
+		tronContract = TESTNET_TRON_USDT_CONTRACT
+		solMint = TESTNET_SOLANA_USDT_MINT
 	}
 
 	watchers := []NetworkWatcher{
 		// BSC EVM Indexer (USDT 18 Decimals)
-		NewEVMWatcher(domain.NetworkBSC, bscRPC, BSC_USDT_CONTRACT, 18, invRepo, invoiceSvc, gracePeriod),
+		NewEVMWatcher(domain.NetworkBSC, bscRPC, bscContract, 18, invRepo, invoiceSvc, gracePeriod),
 		// Polygon EVM Indexer (USDT 6 Decimals)
-		NewEVMWatcher(domain.NetworkPolygon, polyRPC, POLYGON_USDT_CONTRACT, 6, invRepo, invoiceSvc, gracePeriod),
+		NewEVMWatcher(domain.NetworkPolygon, polyRPC, polyContract, 6, invRepo, invoiceSvc, gracePeriod),
 		// TRON Indexer (USDT TRC-20 6 Decimals)
-		NewTronWatcher(tronGrid, cfg.TronAPIKey, invRepo, invoiceSvc, gracePeriod),
+		NewTronWatcher(tronGrid, cfg.TronAPIKey, tronContract, invRepo, invoiceSvc, gracePeriod),
 		// Solana Indexer (USDT/USDC SPL 6 Decimals)
-		NewSolanaWatcher(solRPC, invRepo, invoiceSvc, gracePeriod),
+		NewSolanaWatcher(solRPC, solMint, invRepo, invoiceSvc, gracePeriod),
 	}
 
 	return &WatcherManager{

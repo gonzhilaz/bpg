@@ -60,3 +60,4 @@ func TestFormatSSE(t *testing.T) {
 		t.Fatalf("missing trailing double newline: %s", formatted)
 	}
 }
+

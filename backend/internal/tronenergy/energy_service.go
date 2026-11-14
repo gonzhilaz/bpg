@@ -136,3 +136,4 @@ func (s *energyService) RentEnergy(ctx context.Context, receiver string, energyA
 	log.Printf("[TRON ENERGY SUCCESS] Delegated %d Energy to %s (Tx: %s). Fee reduced to %s.", energyAmount, receiver, txID, result.EstimatedCost)
 	return &result, nil
 }
+

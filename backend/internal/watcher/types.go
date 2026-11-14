@@ -20,6 +20,12 @@ const (
 	SOLANA_USDT_MINT = "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB" // 6 decimals
 	SOLANA_USDC_MINT = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v" // 6 decimals
 
+	// Standard Token Contract Addresses (Testnet / Sandbox)
+	TESTNET_BSC_USDT_CONTRACT     = "0x337610d27c682E347C9cD60BD4b3b107C9d34dDd" // 18 decimals (BSC Chapel)
+	TESTNET_POLYGON_USDT_CONTRACT = "0x1fd03A307f59d437A9B79d71A4eb8E85dD10787D" // 6 decimals (Polygon Amoy)
+	TESTNET_TRON_USDT_CONTRACT    = "TXYZopYRdj2D9XRtbG411XZZ3kM5VkAeBf"          // 6 decimals (TRON Nile)
+	TESTNET_SOLANA_USDT_MINT      = "Gh9ZwEmdLJ8DscKNTkTqPbNwLNNBjuSzaG9Vp2KGtKJr" // 6 decimals (Solana Devnet)
+
 	// ERC-20 / BEP-20 Transfer Event Keccak-256 Topic:
 	// Transfer(address indexed from, address indexed to, uint256 value)
 	EVM_TRANSFER_TOPIC = "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef"

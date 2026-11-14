@@ -64,3 +64,4 @@ func TestEnergyRentalService_Disabled(t *testing.T) {
 		t.Fatal("expected nil rental when service is disabled")
 	}
 }
+

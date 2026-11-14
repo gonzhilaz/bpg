@@ -265,3 +265,4 @@ function wc_13c_init_gateway_class() {
         }
     }
 }
+

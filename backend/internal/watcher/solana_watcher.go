@@ -19,6 +19,7 @@ import (
 // SolanaWatcher monitors Solana SPL token transfers to active deposit addresses
 type SolanaWatcher struct {
 	rpcURL      string
+	targetMint  string
 	invRepo     repository.InvoiceRepository
 	invoiceSvc  service.InvoiceService
 	httpClient  *http.Client
@@ -29,6 +30,7 @@ type SolanaWatcher struct {
 // NewSolanaWatcher creates a new Solana network indexer
 func NewSolanaWatcher(
 	rpcURL string,
+	targetMint string,
 	invRepo repository.InvoiceRepository,
 	invoiceSvc service.InvoiceService,
 	gracePeriod ...time.Duration,
@@ -37,9 +39,13 @@ func NewSolanaWatcher(
 	if len(gracePeriod) > 0 && gracePeriod[0] >= 0 {
 		grace = gracePeriod[0]
 	}
+	if targetMint == "" {
+		targetMint = SOLANA_USDT_MINT
+	}
 
 	return &SolanaWatcher{
 		rpcURL:      rpcURL,
+		targetMint:  targetMint,
 		invRepo:     invRepo,
 		invoiceSvc:  invoiceSvc,
 		gracePeriod: grace,
@@ -200,12 +206,12 @@ func (w *SolanaWatcher) calculateTokenDelta(tx *solParsedTx, ownerAddress string
 	var preAmount decimal.Decimal
 
 	for _, b := range tx.Meta.PostTokenBalances {
-		if b.Owner == ownerAddress && (b.Mint == SOLANA_USDT_MINT || b.Mint == SOLANA_USDC_MINT) {
+		if b.Owner == ownerAddress && (b.Mint == w.targetMint || b.Mint == SOLANA_USDT_MINT || b.Mint == SOLANA_USDC_MINT) {
 			postAmount, _ = decimal.NewFromString(b.UiAmount.UiAmountString)
 		}
 	}
 	for _, b := range tx.Meta.PreTokenBalances {
-		if b.Owner == ownerAddress && (b.Mint == SOLANA_USDT_MINT || b.Mint == SOLANA_USDC_MINT) {
+		if b.Owner == ownerAddress && (b.Mint == w.targetMint || b.Mint == SOLANA_USDT_MINT || b.Mint == SOLANA_USDC_MINT) {
 			preAmount, _ = decimal.NewFromString(b.UiAmount.UiAmountString)
 		}
 	}

@@ -93,3 +93,4 @@ func FormatSSE(event InvoiceEvent) string {
 	data, _ := json.Marshal(event)
 	return fmt.Sprintf("event: %s\ndata: %s\n\n", event.Event, string(data))
 }
+

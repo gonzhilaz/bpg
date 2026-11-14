@@ -17,19 +17,21 @@ import (
 
 // TronWatcher polls TronGrid for TRC-20 USDT Transfer events
 type TronWatcher struct {
-	gridURL     string
-	apiKey      string
-	invRepo     repository.InvoiceRepository
-	invoiceSvc  service.InvoiceService
-	httpClient  *http.Client
-	lastSeenTs  int64
-	gracePeriod time.Duration
+	gridURL         string
+	apiKey          string
+	contractAddress string
+	invRepo         repository.InvoiceRepository
+	invoiceSvc      service.InvoiceService
+	httpClient      *http.Client
+	lastSeenTs      int64
+	gracePeriod     time.Duration
 }
 
 // NewTronWatcher creates a new TRON network indexer
 func NewTronWatcher(
 	gridURL string,
 	apiKey string,
+	contractAddress string,
 	invRepo repository.InvoiceRepository,
 	invoiceSvc service.InvoiceService,
 	gracePeriod ...time.Duration,
@@ -38,13 +40,17 @@ func NewTronWatcher(
 	if len(gracePeriod) > 0 && gracePeriod[0] >= 0 {
 		grace = gracePeriod[0]
 	}
+	if contractAddress == "" {
+		contractAddress = TRON_USDT_CONTRACT
+	}
 
 	return &TronWatcher{
-		gridURL:     gridURL,
-		apiKey:      apiKey,
-		invRepo:     invRepo,
-		invoiceSvc:  invoiceSvc,
-		gracePeriod: grace,
+		gridURL:         gridURL,
+		apiKey:          apiKey,
+		contractAddress: contractAddress,
+		invRepo:         invRepo,
+		invoiceSvc:      invoiceSvc,
+		gracePeriod:     grace,
 		httpClient: &http.Client{
 			Timeout: 10 * time.Second,
 		},
@@ -89,7 +95,7 @@ func (w *TronWatcher) ScanBlocks(ctx context.Context) error {
 	}
 
 	url := fmt.Sprintf("%s/v1/contracts/%s/events?event_name=Transfer&only_confirmed=true&min_timestamp=%d&limit=50",
-		w.gridURL, TRON_USDT_CONTRACT, w.lastSeenTs)
+		w.gridURL, w.contractAddress, w.lastSeenTs)
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
