@@ -1,9 +1,9 @@
 "use client";
 
 import React, { useEffect, useState, use, Suspense } from "react";
-import { ArrowLeft, ShieldCheck, RefreshCw, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, ShieldCheck, RefreshCw, CheckCircle2, AlertCircle } from "lucide-react";
 import { Invoice } from "../../../types/invoice";
-import { fetchInvoiceById } from "../../../services/api";
+import { fetchInvoiceById, getInvoiceSSEUrl } from "../../../services/api";
 import { PaymentStatusPill } from "../../../components/checkout/PaymentStatusPill";
 import { CountdownTimer } from "../../../components/checkout/CountdownTimer";
 import { QRCodeBox } from "../../../components/checkout/QRCodeBox";
@@ -36,19 +36,56 @@ function CheckoutContent({ params }: { params: Promise<{ id: string }> }) {
   useEffect(() => {
     loadInvoice();
 
+    // 1. Real-Time SSE Stream for Instant Sub-Second Status Telemetry
+    let es: EventSource | null = null;
+    try {
+      es = new EventSource(getInvoiceSSEUrl(invoiceId));
+      es.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          if (data && data.status) {
+            setInvoice((prev) =>
+              prev
+                ? {
+                    ...prev,
+                    status: data.status,
+                    received_amount: data.received_amount || prev.received_amount,
+                  }
+                : prev
+            );
+            if (data.status === "PAID" || data.status === "EXPIRED") {
+              es?.close();
+            }
+          }
+        } catch {
+          // ignore parsing error
+        }
+      };
+      es.onerror = () => {
+        // SSE error, will fallback to interval poll
+      };
+    } catch {
+      // EventSource fallback
+    }
+
+    // 2. Defensive Fallback Polling (10s interval)
     const interval = setInterval(async () => {
       try {
         const data = await fetchInvoiceById(invoiceId);
         setInvoice(data);
         if (data.status === "PAID" || data.status === "EXPIRED") {
           clearInterval(interval);
+          es?.close();
         }
       } catch {
         // Silent poll error
       }
-    }, 4000);
+    }, 10000);
 
-    return () => clearInterval(interval);
+    return () => {
+      es?.close();
+      clearInterval(interval);
+    };
   }, [invoiceId]);
 
   if (loading && !invoice) {
@@ -64,7 +101,7 @@ function CheckoutContent({ params }: { params: Promise<{ id: string }> }) {
       <main className="min-h-screen bg-[#0B0E14] text-zinc-100 flex items-center justify-center p-4">
         <div className="w-full max-w-md p-6 bg-zinc-900 border border-zinc-800 rounded-2xl shadow-xl text-center space-y-4">
           <div className="w-12 h-12 mx-auto rounded-full bg-rose-500/10 flex items-center justify-center text-rose-400">
-            !
+            <AlertCircle className="w-6 h-6" />
           </div>
           <h2 className="text-lg font-semibold">Invoice Error</h2>
           <p className="text-sm text-zinc-400">{error}</p>

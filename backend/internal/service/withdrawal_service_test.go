@@ -172,3 +172,4 @@ func TestWithdrawal_EscrowSummary(t *testing.T) {
 		t.Fatalf("expected min withdrawal 50, got %s", summary.MinWithdrawalUSD.String())
 	}
 }
+

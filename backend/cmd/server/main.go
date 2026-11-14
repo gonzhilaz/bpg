@@ -22,8 +22,10 @@ import (
 	"13c-gateway/internal/payout"
 	"13c-gateway/internal/repository"
 	"13c-gateway/internal/service"
+	"13c-gateway/internal/tronenergy"
 	"13c-gateway/internal/watcher"
 	"13c-gateway/internal/webhook"
+	"13c-gateway/internal/worker"
 )
 
 func main() {
@@ -63,6 +65,8 @@ func main() {
 	payoutSvc := payout.NewPayoutService(payoutRepo)
 	webhookDispatcher := webhook.NewDispatcher()
 	withdrawalSvc := service.NewWithdrawalService(withdrawalRepo, merchantRepo)
+	energyRentalSvc := tronenergy.NewEnergyRentalService(cfg.TronEnergyRentalEnabled, cfg.TronEnergyProvider, "")
+	log.Printf("[TRON ENERGY] Initialized rental service (enabled=%v, provider=%s)", energyRentalSvc.IsRentalEnabled(), cfg.TronEnergyProvider)
 
 	invoiceSvc := service.NewInvoiceService(
 		invoiceRepo,
@@ -80,6 +84,10 @@ func main() {
 	// Initialize Multi-Chain Background Watchers (BSC, Polygon, TRON, Solana)
 	watcherManager := watcher.NewWatcherManager(cfg, invoiceRepo, invoiceSvc)
 	watcherManager.Start(watcherCtx)
+
+	// Initialize Automated Historical Database Pruner Worker (30 days retention)
+	prunerWorker := worker.NewPrunerWorker(db)
+	prunerWorker.Start(watcherCtx, 24*time.Hour, 30)
 
 	// Initialize Handlers
 	healthHandler := handler.NewHealthHandler()
@@ -131,6 +139,7 @@ func main() {
 
 		// Public Checkout Endpoints (for Customer Payment Screens)
 		v1.GET("/invoices/:id", invoiceHandler.GetByID)
+		v1.GET("/invoices/:id/events", invoiceHandler.StreamEvents)
 		v1.GET("/rates/gas", rateHandler.GetGasRates)
 
 		// Sandbox Simulation Endpoint (for dev/testing)

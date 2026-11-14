@@ -622,6 +622,39 @@ Portal ini dirancang untuk DevOps dan Operator Gateway dengan arsitektur <strong
 <ul><li><strong>Kill-Switch Seketika</strong>: Jika klien melanggar perjanjian atau belum menyelesaikan pembayaran, developer dapat menekan tombol <strong>"Kill Switch"</strong> di dashboard Vercel. Pada ping berikutnya, sistem klien langsung terkunci secara permanen hingga developer menekan <strong>"Restore"</strong>.</li></ul>
 
 <hr class="divider" />
+
+<h2 class="section-title">BAB 9: FITUR TINGKAT TINGGI & OPTIMISASI INDUSTRI</h2>
+
+<h3 class="sub-title">9.1 Real-Time Server-Sent Events (SSE) pada Checkout Widget</h3>
+<ul><li><strong>Endpoint Streaming</strong>: `GET /api/v1/invoices/:id/events` dengan header `text/event-stream`.</li></ul>
+<p><em> <strong>Telemetri Sub-Detik (< 500ms)</strong>: Menghilangkan jeda </em>polling<em> HTTP. Saat pembeli mengirimkan kripto, layar widget checkout langsung merespons secara </em>real-time*:</p>
+<p>  - Event `payment.detected`: Memperbarui status layar menjadi <em>"Transaction Detected"</em> disertai tautan blok explorer dan penghitung konfirmasi.</p>
+<p>  - Event `payment.paid`: Beralih ke layar pembayaran sukses seketika.</p>
+<ul><li><strong>Fallback Defensif</strong>: Tetap mempertahankan interval polling defensif (10 detik) jika koneksi SSE terputus oleh pembatasan firewall proxy klien.</li></ul>
+
+<h3 class="sub-title">9.2 Efisiensi Gas Biaya Sweeping via TRON Energy Rental</h3>
+<ul><li><strong>Masalah Biaya TRC-20</strong>: Transfer token USDT TRC-20 standar membakar <strong>31,895 Energy</strong> (membakar 13–32 TRX atau ~$2.50 per sweep jika tanpa energi).</li></ul>
+<ul><li><strong>Solusi Sewa Energi Otomatis (`internal/tronenergy`)</strong>:</li></ul>
+<p>  - Modul memverifikasi kuota energi Hot Wallet sebelum melakukan transfer konsolidasi.</p>
+<p>  - Jika energi di bawah 32,000, sistem menyewa delegasi energi terprogram secara instan.</p>
+<p>  - Memangkas biaya gas sweeping TRON hingga <strong>~80%</strong> (hanya ~$0.40 – $0.64 per transaksi), melipatgandakan margin keuntungan platform.</p>
+
+<h3 class="sub-title">9.3 Indeks Komposit Database & Automated Pruner Worker</h3>
+<ul><li><strong>Indeks Komposit B-Tree Berkecepatan Tinggi</strong>:</li></ul>
+<p>  - `idx_invoices_watcher` pada kolom `(pay_network, status, expires_at)` untuk mempercepat query pemindaian watcher di bawah 1ms.</p>
+<p>  - `idx_merchant_created` pada kolom `(merchant_id, created_at DESC)` untuk pagination instan di dashboard merchant.</p>
+<ul><li><strong>Background Pruner Worker (`internal/worker`)</strong>:</li></ul>
+<p>  - Berjalan otomatis secara periodik untuk membersihkan tagihan berstatus `EXPIRED` dan `CANCELLED` yang umurnya melewati retensi (30 hari).</p>
+<p>  - Riwayat transaksi berstatus `PAID`, `OVERPAID`, dan `UNDERPAID` dipertahankan secara permanen demi kepatuhan audit finansial (<em>immutable financial ledger</em>).</p>
+
+<h3 class="sub-title">9.4 Plugin Resmi WooCommerce WordPress (`plugins/woocommerce-13c-gateway`)</h3>
+<ul><li><strong>Integrasi Drop-In</strong>: Tersedia dalam format arsip instalasi langsung `plugins/woocommerce-13c-gateway.zip`.</li></ul>
+<ul><li><strong>Fitur Plugin</strong>:</li></ul>
+<p>  - Mendukung penerimaan USDT di 4 jaringan (TRON, BSC, Polygon, Solana).</p>
+<p>  - Validasi kriptografis HMAC-SHA256 pada webhook callback (`?wc-api=wc_gateway_13c`).</p>
+<p>  - Pembaruan otomatis status pesanan WooCommerce ke `Processing` atau `Completed` saat pembayaran terverifikasi on-chain.</p>
+
+<hr class="divider" />
 <p><em>Dokumen manual ini diperbarui secara resmi untuk 13C Crypto Payment Gateway v1.6 Enterprise Edition.</em></p>
 
 </body>

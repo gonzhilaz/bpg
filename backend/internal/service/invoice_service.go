@@ -14,6 +14,7 @@ import (
 	"13c-gateway/internal/domain"
 	"13c-gateway/internal/payout"
 	"13c-gateway/internal/repository"
+	"13c-gateway/internal/sse"
 	"13c-gateway/internal/webhook"
 )
 
@@ -320,6 +321,16 @@ func (s *invoiceService) RecordPayment(ctx context.Context, depositAddress strin
 	if s.dispatcher != nil && invoice.Merchant != nil {
 		s.dispatcher.DispatchInvoiceEvent(ctx, invoice, invoice.Merchant.SecretKey, eventName)
 	}
+
+	// 3. Broadcast real-time SSE event to live customer checkout screen
+	sse.GetHub().Broadcast(invoice.ID.String(), sse.InvoiceEvent{
+		Event:          string(invoice.Status),
+		InvoiceID:      invoice.ID.String(),
+		Status:         string(invoice.Status),
+		ReceivedAmount: invoice.ReceivedAmount.String(),
+		PayAmount:      invoice.PayAmount.String(),
+		TxHash:         txHash,
+	})
 
 	return invoice, nil
 }

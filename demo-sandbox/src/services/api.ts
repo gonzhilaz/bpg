@@ -4,6 +4,10 @@ import { getEnvUrl } from "../utils/env";
 
 const API_BASE_URL = getEnvUrl.api();
 
+export function getInvoiceSSEUrl(id: string): string {
+  return `${API_BASE_URL}/api/v1/invoices/${id}/events`;
+}
+
 export async function fetchInvoiceById(id: string): Promise<Invoice> {
   // Check if it's a demo mock ID first
   if (mockInvoices[id]) {

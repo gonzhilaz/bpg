@@ -486,4 +486,37 @@ Sistem 13C mendukung mode penyelesaian dana ganda per merchant:
 * **Kill-Switch Seketika**: Jika klien melanggar perjanjian atau belum menyelesaikan pembayaran, developer dapat menekan tombol **"Kill Switch"** di dashboard Vercel. Pada ping berikutnya, sistem klien langsung terkunci secara permanen hingga developer menekan **"Restore"**.
 
 ---
+
+## BAB 9: FITUR TINGKAT TINGGI & OPTIMISASI INDUSTRI
+
+### 9.1 Real-Time Server-Sent Events (SSE) pada Checkout Widget
+* **Endpoint Streaming**: `GET /api/v1/invoices/:id/events` dengan header `text/event-stream`.
+* **Telemetri Sub-Detik (< 500ms)**: Menghilangkan jeda *polling* HTTP. Saat pembeli mengirimkan kripto, layar widget checkout langsung merespons secara *real-time*:
+  - Event `payment.detected`: Memperbarui status layar menjadi *"Transaction Detected"* disertai tautan blok explorer dan penghitung konfirmasi.
+  - Event `payment.paid`: Beralih ke layar pembayaran sukses seketika.
+* **Fallback Defensif**: Tetap mempertahankan interval polling defensif (10 detik) jika koneksi SSE terputus oleh pembatasan firewall proxy klien.
+
+### 9.2 Efisiensi Gas Biaya Sweeping via TRON Energy Rental
+* **Masalah Biaya TRC-20**: Transfer token USDT TRC-20 standar membakar **31,895 Energy** (membakar 13–32 TRX atau ~$2.50 per sweep jika tanpa energi).
+* **Solusi Sewa Energi Otomatis (`internal/tronenergy`)**:
+  - Modul memverifikasi kuota energi Hot Wallet sebelum melakukan transfer konsolidasi.
+  - Jika energi di bawah 32,000, sistem menyewa delegasi energi terprogram secara instan.
+  - Memangkas biaya gas sweeping TRON hingga **~80%** (hanya ~$0.40 – $0.64 per transaksi), melipatgandakan margin keuntungan platform.
+
+### 9.3 Indeks Komposit Database & Automated Pruner Worker
+* **Indeks Komposit B-Tree Berkecepatan Tinggi**:
+  - `idx_invoices_watcher` pada kolom `(pay_network, status, expires_at)` untuk mempercepat query pemindaian watcher di bawah 1ms.
+  - `idx_merchant_created` pada kolom `(merchant_id, created_at DESC)` untuk pagination instan di dashboard merchant.
+* **Background Pruner Worker (`internal/worker`)**:
+  - Berjalan otomatis secara periodik untuk membersihkan tagihan berstatus `EXPIRED` dan `CANCELLED` yang umurnya melewati retensi (30 hari).
+  - Riwayat transaksi berstatus `PAID`, `OVERPAID`, dan `UNDERPAID` dipertahankan secara permanen demi kepatuhan audit finansial (*immutable financial ledger*).
+
+### 9.4 Plugin Resmi WooCommerce WordPress (`plugins/woocommerce-13c-gateway`)
+* **Integrasi Drop-In**: Tersedia dalam format arsip instalasi langsung `plugins/woocommerce-13c-gateway.zip`.
+* **Fitur Plugin**:
+  - Mendukung penerimaan USDT di 4 jaringan (TRON, BSC, Polygon, Solana).
+  - Validasi kriptografis HMAC-SHA256 pada webhook callback (`?wc-api=wc_gateway_13c`).
+  - Pembaruan otomatis status pesanan WooCommerce ke `Processing` atau `Completed` saat pembayaran terverifikasi on-chain.
+
+---
 *Dokumen manual ini diperbarui secara resmi untuk 13C Crypto Payment Gateway v1.6 Enterprise Edition.*

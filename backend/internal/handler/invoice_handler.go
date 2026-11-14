@@ -2,6 +2,7 @@ package handler
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -10,6 +11,7 @@ import (
 	"13c-gateway/internal/domain"
 	"13c-gateway/internal/middleware"
 	"13c-gateway/internal/service"
+	"13c-gateway/internal/sse"
 	"13c-gateway/pkg/response"
 )
 
@@ -103,5 +105,66 @@ func (h *InvoiceHandler) SimulatePayment(c *gin.Context) {
 		"received_amount": inv.ReceivedAmount,
 		"pay_amount":      inv.PayAmount,
 	})
+}
+
+// StreamEvents streams real-time invoice status updates via Server-Sent Events (SSE)
+func (h *InvoiceHandler) StreamEvents(c *gin.Context) {
+	idParam := c.Param("id")
+	invoiceID, err := uuid.Parse(idParam)
+	if err != nil {
+		c.String(http.StatusBadRequest, "Invalid invoice UUID")
+		return
+	}
+
+	inv, err := h.invoiceSvc.GetInvoice(c.Request.Context(), invoiceID)
+	if err != nil {
+		c.String(http.StatusNotFound, "Invoice not found or expired")
+		return
+	}
+
+	c.Writer.Header().Set("Content-Type", "text/event-stream")
+	c.Writer.Header().Set("Cache-Control", "no-cache")
+	c.Writer.Header().Set("Connection", "keep-alive")
+	c.Writer.Header().Set("Transfer-Encoding", "chunked")
+	c.Writer.Flush()
+
+	hub := sse.GetHub()
+	ch, cleanup := hub.Subscribe(idParam)
+	defer cleanup()
+
+	// 1. Send initial state immediately
+	initialEvt := sse.InvoiceEvent{
+		Event:          "connected",
+		InvoiceID:      idParam,
+		Status:         string(inv.Status),
+		ReceivedAmount: inv.ReceivedAmount.String(),
+		PayAmount:      inv.PayAmount.String(),
+	}
+	_, _ = c.Writer.WriteString(sse.FormatSSE(initialEvt))
+	c.Writer.Flush()
+
+	// 2. Stream events or ping heartbeat
+	ticker := time.NewTicker(15 * time.Second)
+	defer ticker.Stop()
+
+	for {
+		select {
+		case <-c.Request.Context().Done():
+			return
+		case <-ticker.C:
+			// SSE comment ping to prevent proxy/browser timeout
+			_, _ = c.Writer.WriteString(": ping\n\n")
+			c.Writer.Flush()
+		case evt, ok := <-ch:
+			if !ok {
+				return
+			}
+			_, _ = c.Writer.WriteString(sse.FormatSSE(evt))
+			c.Writer.Flush()
+			if evt.Status == string(domain.StatusPaid) || evt.Status == string(domain.StatusExpired) {
+				return
+			}
+		}
+	}
 }
 
