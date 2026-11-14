@@ -34,3 +34,4 @@ func (p *PaymentLink) BeforeCreate(tx *gorm.DB) error {
 	}
 	return nil
 }
+

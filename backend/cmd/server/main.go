@@ -79,6 +79,7 @@ func main() {
 		cfg.InvoiceExpiryMin,
 	)
 	invoiceSvc.SetWithdrawalRepo(withdrawalRepo)
+	invoiceSvc.SetPaymentLinkRepo(paymentLinkRepo)
 	invoiceSvc.SetUnderpaidTolerance(decimal.NewFromFloat(cfg.UnderpaidTolerancePercent))
 	invoiceSvc.SetGracePeriod(time.Duration(cfg.InvoiceGracePeriodMin) * time.Minute)
 

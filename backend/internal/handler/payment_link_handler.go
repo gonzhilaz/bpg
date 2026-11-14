@@ -115,3 +115,4 @@ func (h *PaymentLinkHandler) Pay(c *gin.Context) {
 
 	response.Success(c, http.StatusCreated, "Invoice generated for payment link", inv)
 }
+

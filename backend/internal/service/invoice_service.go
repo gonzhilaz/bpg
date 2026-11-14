@@ -59,6 +59,7 @@ type InvoiceService interface {
 	GetInvoice(ctx context.Context, id uuid.UUID) (*InvoiceResponse, error)
 	RecordPayment(ctx context.Context, depositAddress string, amount decimal.Decimal, txHash string, network domain.Network, blockNumber uint64) (*domain.Invoice, error)
 	SetWithdrawalRepo(repo repository.WithdrawalRepository)
+	SetPaymentLinkRepo(repo repository.PaymentLinkRepository)
 	SetUnderpaidTolerance(tolerance decimal.Decimal)
 	SetGracePeriod(gracePeriod time.Duration)
 }
@@ -67,6 +68,7 @@ type invoiceService struct {
 	invRepo                 repository.InvoiceRepository
 	txRepo                  repository.TransactionRepository
 	withdrawalRepo          repository.WithdrawalRepository
+	paymentLinkRepo         repository.PaymentLinkRepository
 	rateSvc                 RateService
 	payoutSvc               payout.PayoutService
 	dispatcher              webhook.Dispatcher
@@ -101,6 +103,10 @@ func NewInvoiceService(
 
 func (s *invoiceService) SetWithdrawalRepo(repo repository.WithdrawalRepository) {
 	s.withdrawalRepo = repo
+}
+
+func (s *invoiceService) SetPaymentLinkRepo(repo repository.PaymentLinkRepository) {
+	s.paymentLinkRepo = repo
 }
 
 func (s *invoiceService) SetUnderpaidTolerance(tolerance decimal.Decimal) {
@@ -313,6 +319,15 @@ func (s *invoiceService) RecordPayment(ctx context.Context, depositAddress strin
 			// Default: ESCROW_BALANCE (Pool funds in gateway master vault, credit merchant internal ledger)
 			if s.withdrawalRepo != nil {
 				_ = s.withdrawalRepo.CreditEscrowBalance(ctx, invoice.Merchant.ID, invoice.PayAmount)
+			}
+		}
+
+		// Update Payment Link Metrics if invoice originated from a Payment Link
+		if strings.HasPrefix(invoice.OrderID, "LINK-") && s.paymentLinkRepo != nil {
+			parts := strings.Split(invoice.OrderID, "-")
+			if len(parts) >= 2 {
+				slug := parts[1]
+				_ = s.paymentLinkRepo.RecordPaymentBySlug(ctx, slug, invoice.PayAmount)
 			}
 		}
 	}

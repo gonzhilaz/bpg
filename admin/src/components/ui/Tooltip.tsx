@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef } from "react";
 import { HelpCircle } from "lucide-react";
 
 export type TooltipPlacement = "auto" | "top" | "bottom" | "left" | "right";

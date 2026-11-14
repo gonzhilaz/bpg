@@ -27,6 +27,7 @@ func setupTestDB(t *testing.T) (*gorm.DB, repository.InvoiceRepository, reposito
 		&domain.BlockchainTransaction{},
 		&domain.PayoutTransfer{},
 		&domain.WithdrawalRequest{},
+		&domain.PaymentLink{},
 	)
 	if err != nil {
 		t.Fatalf("failed to auto migrate: %v", err)
@@ -251,5 +252,75 @@ func TestGracePeriod_GetInvoiceActiveDuringGrace(t *testing.T) {
 
 	if fetchedAfterGrace.Status != domain.StatusExpired {
 		t.Fatalf("expected StatusExpired after grace period elapsed, got: %s", fetchedAfterGrace.Status)
+	}
+}
+
+func TestPaymentLink_MetricsIncrementOnInvoicePaid(t *testing.T) {
+	db, invRepo, txRepo, merchant := setupTestDB(t)
+
+	linkRepo := repository.NewPaymentLinkRepository(db)
+	svc := service.NewInvoiceService(
+		invRepo,
+		txRepo,
+		service.NewRateService(),
+		nil,
+		nil,
+		"test_sec",
+		15,
+	)
+	svc.SetPaymentLinkRepo(linkRepo)
+
+	ctx := context.Background()
+
+	// 1. Create a PaymentLink
+	slug := "pl_testmetric"
+	amt := decimal.NewFromInt(50)
+	pl := &domain.PaymentLink{
+		MerchantID:     merchant.ID,
+		Slug:           slug,
+		Title:          "VIP Pass",
+		Amount:         &amt,
+		Currency:       "USD",
+		PayNetwork:     domain.NetworkBSC,
+		IsActive:       true,
+		TotalCollected: decimal.Zero,
+		PaymentCount:   0,
+	}
+	if err := linkRepo.Create(ctx, pl); err != nil {
+		t.Fatalf("failed to create link: %v", err)
+	}
+
+	// 2. Create invoice simulating Payment Link checkout (OrderID: LINK-pl_testmetric-123456)
+	invReq := &service.CreateInvoiceRequest{
+		OrderID:     "LINK-" + slug + "-123456",
+		Amount:      amt,
+		Currency:    "USD",
+		PayCurrency: "USDT",
+		PayNetwork:  domain.NetworkBSC,
+	}
+	invResp, err := svc.CreateInvoice(ctx, merchant, invReq)
+	if err != nil {
+		t.Fatalf("failed to create invoice: %v", err)
+	}
+
+	// 3. Simulate payment on deposit address with exact PayAmount
+	paidInv, err := svc.RecordPayment(ctx, invResp.DepositAddress, invResp.PayAmount, "0xtxhash_link_test", domain.NetworkBSC, 1000)
+	if err != nil {
+		t.Fatalf("failed to record payment: %v", err)
+	}
+	if paidInv.Status != domain.StatusPaid {
+		t.Fatalf("expected invoice status PAID, got: %s", paidInv.Status)
+	}
+
+	// 4. Verify PaymentLink metrics are updated
+	updatedLink, err := linkRepo.GetBySlug(ctx, slug)
+	if err != nil {
+		t.Fatalf("failed to get updated link: %v", err)
+	}
+	if updatedLink.PaymentCount != 1 {
+		t.Fatalf("expected payment_count 1, got: %d", updatedLink.PaymentCount)
+	}
+	if !updatedLink.TotalCollected.Equal(invResp.PayAmount) {
+		t.Fatalf("expected total_collected %s, got: %s", invResp.PayAmount.String(), updatedLink.TotalCollected.String())
 	}
 }

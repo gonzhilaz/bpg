@@ -19,6 +19,7 @@ type PaymentLinkRepository interface {
 	ListByMerchant(ctx context.Context, merchantID uuid.UUID) ([]domain.PaymentLink, error)
 	Update(ctx context.Context, pl *domain.PaymentLink) error
 	RecordPayment(ctx context.Context, id uuid.UUID, amount decimal.Decimal) error
+	RecordPaymentBySlug(ctx context.Context, slug string, amount decimal.Decimal) error
 }
 
 type paymentLinkRepository struct {
@@ -74,3 +75,13 @@ func (r *paymentLinkRepository) RecordPayment(ctx context.Context, id uuid.UUID,
 			"payment_count":   gorm.Expr("payment_count + 1"),
 		}).Error
 }
+
+func (r *paymentLinkRepository) RecordPaymentBySlug(ctx context.Context, slug string, amount decimal.Decimal) error {
+	return r.db.WithContext(ctx).Model(&domain.PaymentLink{}).
+		Where("slug = ?", slug).
+		Updates(map[string]interface{}{
+			"total_collected": gorm.Expr("total_collected + ?", amount),
+			"payment_count":   gorm.Expr("payment_count + 1"),
+		}).Error
+}
+

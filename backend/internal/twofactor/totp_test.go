@@ -59,3 +59,4 @@ func TestTOTP_GenerateOTPURL(t *testing.T) {
 		t.Fatalf("missing issuer in URL: %s", otpURL)
 	}
 }
+

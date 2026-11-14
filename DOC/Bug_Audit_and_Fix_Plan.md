@@ -1,7 +1,7 @@
 # Laporan Audit Teknis, Bug History & Rencana Remediasi (Remediation Plan)
 
 **Proyek**: 13C Crypto Payment Gateway  
-**Tanggal Audit**: 13 November 2026  
+**Tanggal Audit**: 14 November 2026  
 **Dokumen Pendamping**: [DOC/13C_Payment_Gateway_Manual.pdf](file:///d:/DEVELOPMENT/Projects/Captain/DOC/13C_Payment_Gateway_Manual.pdf)
 
 ---
@@ -27,6 +27,9 @@
 | **BUG-008** | Contract Sync | File `demo-sandbox/src/app/sandbox/page.tsx` masih mengirimkan header `X-API-KEY: cap_demo_api_key_12345678`, menyebabkan HTTP 401 saat menguji simulator terhadap backend yang telah direbrand ke `13c_demo_api_key_12345678`. | 🔴 CRITICAL | ✅ Fixed | Header disinkronkan ke `13c_demo_api_key_12345678`; verifikasi simulator pembuatan invoice berjalan 100% sukses. |
 | **BUG-009** | Decimal Math & Safety | Potensi crash division by zero pada `rate_service.go` saat menghitung konversi fiat `IDR` jika nilai tukar fallback bernilai nol. | 🔴 CRITICAL | ✅ Fixed | Ditambahkan defensive zero-check `if rate.IsZero() { rate = decimal.NewFromInt(16200) }` sebelum operasi `.Div(rate)`. |
 | **BUG-010** | Goroutine Lifecycle | Fungsi pengiriman webhook `deliverWithRetry` menggunakan `time.Sleep` tanpa `context.Context` sehingga goroutine tidak dapat dibatalkan saat graceful shutdown. | 🟡 MAJOR | ✅ Fixed | Parameter `ctx context.Context` ditambahkan ke `deliverWithRetry` dan diganti menggunakan `select { case <-ctx.Done(): return; case <-time.After(backoff): }`. |
+| **BUG-011** | Payment Link Metrics | Saat invoice yang berasal dari Payment Link (`LINK-pl_xxx`) diselesaikan/dibayar pelanggan, metrik `total_collected` dan `payment_count` pada link tersebut tidak terakumulasi secara atomik di database. | 🔴 CRITICAL | ✅ Fixed | Ditambahkan metode `RecordPaymentBySlug` pada `payment_link_repository.go` dan dipanggil secara otomatis di dalam `invoice_service.go` saat invoice berstatus `PAID`. Dilengkapi unit test `TestPaymentLink_MetricsIncrementOnInvoicePaid`. |
+| **BUG-012** | Merchant Dashboard API Sync | Halaman No-Code Payment Links (`payment-links/page.tsx`) awalnya hanya mengupdate state in-memory lokal tanpa sinkronisasi live ke endpoint backend `GET /api/v1/payment-links`, `POST /api/v1/payment-links`, dan `PATCH /api/v1/payment-links/:id/toggle`. | 🟡 MAJOR | ✅ Fixed | Diintegrasikan API call asinkronus dengan token autentikasi merchant, status loading `isCreating` untuk mencegah double-click, serta fallback optimistik jika backend offline. Modal pembuatan diekstrak ke `CreatePaymentLinkModal.tsx` agar ukuran file tetap <= 400 baris. |
+| **BUG-013** | Frontend Bundle Hygiene | Import `useEffect` tidak terpakai pada `admin/src/components/ui/Tooltip.tsx`. | 🟢 MINOR | ✅ Fixed | Unused import dihapus; `tsc --noEmit` diverifikasi bersih tanpa peringatan. |
 
 ---
 

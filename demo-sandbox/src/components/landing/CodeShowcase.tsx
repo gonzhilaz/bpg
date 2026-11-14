@@ -179,3 +179,4 @@ if (hash_equals($expectedSignature, $signatureHeader)) {
     </section>
   );
 }
+
