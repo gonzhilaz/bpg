@@ -1,4 +1,4 @@
-import { HotWalletBalance, WatcherStatus, AdminMerchant, PlatformMetrics, NetworkGasItem } from "../types/admin";
+import { HotWalletBalance, WatcherStatus, AdminMerchant, PlatformMetrics, NetworkGasItem, AdminWithdrawalRequest } from "../types/admin";
 
 export const mockNetworkGasList: NetworkGasItem[] = [
   {
@@ -143,6 +143,43 @@ export const mockMerchantsList: AdminMerchant[] = [
     auto_payout: true,
     status: "ACTIVE",
     created_at: "2026-11-01",
+  },
+];
+
+export const mockAdminWithdrawals: AdminWithdrawalRequest[] = [
+  {
+    id: "wd-001",
+    merchant_id: "m-1",
+    merchant_name: "13C Demo Store",
+    amount: "150.00",
+    currency: "USDT",
+    network: "TRON",
+    target_address: "TYUKBQ1AHuC6U1Qj88J7sE5FzW7xJg9vEa",
+    status: "PENDING",
+    requested_at: "2026-11-13T10:15:00Z",
+  },
+  {
+    id: "wd-002",
+    merchant_id: "m-2",
+    merchant_name: "CryptoGadgets Indonesia",
+    amount: "320.00",
+    currency: "USDT",
+    network: "POLYGON",
+    target_address: "0x71C8A3951F6b4d3E118bFE7c251d18fF2113f019",
+    status: "PENDING",
+    requested_at: "2026-11-13T09:40:00Z",
+  },
+  {
+    id: "wd-003",
+    merchant_id: "m-3",
+    merchant_name: "SaaS Cloud Hosting",
+    amount: "85.00",
+    currency: "USDT",
+    network: "BSC",
+    target_address: "0x88492021Bca4e3419Fa82D1219b18991823901",
+    status: "COMPLETED",
+    tx_hash: "0xescrow_payout_bsc_784921901a8b",
+    requested_at: "2026-11-12T16:20:00Z",
   },
 ];
 

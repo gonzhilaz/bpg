@@ -1,4 +1,4 @@
-import { MerchantProfile, DashboardInvoice, PayoutRecord, WebhookLog, NetworkGasRate } from "../types/merchant";
+import { MerchantProfile, DashboardInvoice, PayoutRecord, WebhookLog, NetworkGasRate, WithdrawalItem, EscrowSummary } from "../types/merchant";
 
 export const mockNetworkGasRates: NetworkGasRate[] = [
   {
@@ -168,3 +168,33 @@ export const mockSandboxWebhookLogs: WebhookLog[] = [
     timestamp: "Just now",
   },
 ];
+
+export const mockMerchantWithdrawals: WithdrawalItem[] = [
+  {
+    id: "wd-m-101",
+    amount: "150.00",
+    currency: "USDT",
+    network: "TRON",
+    target_address: "TYUKBQ1AHuC6U1Qj88J7sE5FzW7xJg9vEa",
+    status: "PENDING",
+    requested_at: "2026-11-13T10:15:00Z",
+  },
+  {
+    id: "wd-m-100",
+    amount: "280.00",
+    currency: "USDT",
+    network: "BSC",
+    target_address: "0x71C8A3951F6b4d3E118bFE7c251d18fF2113f019",
+    status: "COMPLETED",
+    tx_hash: "0xescrow_payout_bsc_784921901a8b",
+    requested_at: "2026-11-10T14:30:00Z",
+  },
+];
+
+export const mockEscrowSummary: EscrowSummary = {
+  available_balance_usd: "850.00",
+  locked_balance_usd: "150.00",
+  total_escrow_usd: "1000.00",
+  min_withdrawal_usd: "50.00",
+  settlement_mode: "ESCROW_BALANCE",
+};

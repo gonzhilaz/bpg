@@ -13,39 +13,17 @@ import {
   X,
 } from "lucide-react";
 import { WithdrawalItem, Network } from "../../../types/merchant";
+import { mockMerchantWithdrawals, mockEscrowSummary } from "../../../mocks/mockMerchant";
 import { Tooltip } from "../../../components/ui/Tooltip";
 import { IconButton } from "../../../components/ui/IconButton";
 import { useEnvironment } from "../../../context/EnvironmentContext";
 
-// Initial mock data adhering to Pillar 1
-const initialWithdrawals: WithdrawalItem[] = [
-  {
-    id: "wd-m-101",
-    amount: "150.00",
-    currency: "USDT",
-    network: "TRON",
-    target_address: "TYUKBQ1AHuC6U1Qj88J7sE5FzW7xJg9vEa",
-    status: "PENDING",
-    requested_at: "2026-11-13T10:15:00Z",
-  },
-  {
-    id: "wd-m-100",
-    amount: "280.00",
-    currency: "USDT",
-    network: "BSC",
-    target_address: "0x71C8A3951F6b4d3E118bFE7c251d18fF2113f019",
-    status: "COMPLETED",
-    tx_hash: "0xescrow_payout_bsc_784921901a8b",
-    requested_at: "2026-11-10T14:30:00Z",
-  },
-];
-
 export default function MerchantWithdrawalsPage() {
   const { profile } = useEnvironment();
-  const [withdrawals, setWithdrawals] = useState<WithdrawalItem[]>(initialWithdrawals);
+  const [withdrawals, setWithdrawals] = useState<WithdrawalItem[]>(mockMerchantWithdrawals);
   const [showRequestModal, setShowRequestModal] = useState(false);
-  const [availableBalance, setAvailableBalance] = useState("850.00");
-  const [lockedBalance, setLockedBalance] = useState("150.00");
+  const [availableBalance, setAvailableBalance] = useState(mockEscrowSummary.available_balance_usd);
+  const [lockedBalance, setLockedBalance] = useState(mockEscrowSummary.locked_balance_usd);
 
   // Form State
   const [amount, setAmount] = useState("");
