@@ -52,13 +52,32 @@ func (s *payoutService) executeSweep(ctx context.Context, invoice *domain.Invoic
 		payoutAmount = invoice.PayAmount
 	}
 
+	if payoutAmount.LessThanOrEqual(decimal.Zero) {
+		log.Printf("[PAYOUT SKIP] Invoice %s has non-positive amount %s", invoice.ID, payoutAmount)
+		return nil, nil
+	}
+
+	var netFee decimal.Decimal
+	switch invoice.PayNetwork {
+	case domain.NetworkBSC:
+		netFee = decimal.NewFromFloat(0.08)
+	case domain.NetworkPolygon:
+		netFee = decimal.NewFromFloat(0.02)
+	case domain.NetworkTron:
+		netFee = decimal.NewFromFloat(0.40)
+	case domain.NetworkSolana:
+		netFee = decimal.NewFromFloat(0.005)
+	default:
+		netFee = decimal.NewFromFloat(0.05)
+	}
+
 	payoutRecord := &domain.PayoutTransfer{
 		InvoiceID:        invoice.ID,
 		Network:          invoice.PayNetwork,
 		PayoutTxHash:     fmt.Sprintf("0xsweep_%s_%s", invoice.PayNetwork, uuid.New().String()[:8]),
 		RecipientAddress: invoice.PayoutAddress,
 		AmountSent:       payoutAmount,
-		NetworkFeePaid:   decimal.NewFromFloat(0.02),
+		NetworkFeePaid:   netFee,
 		PayoutType:       pType,
 		Status:           domain.PayoutStatusCompleted,
 	}

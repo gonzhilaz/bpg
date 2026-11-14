@@ -82,3 +82,4 @@ func TestDispatchSync_InjectsIdempotencyAndDeliveryHeaders(t *testing.T) {
 		t.Fatalf("expected ReplayResult.DeliveryID '%s' to match received '%s'", result.DeliveryID, receivedDeliveryID)
 	}
 }
+

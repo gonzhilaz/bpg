@@ -55,3 +55,4 @@ func TestRateLimitMiddleware_BlocksExcessiveRequests(t *testing.T) {
 		t.Fatalf("expected Retry-After 60, got: %s", w4.Header().Get("Retry-After"))
 	}
 }
+

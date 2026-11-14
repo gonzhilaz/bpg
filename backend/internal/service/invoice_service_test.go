@@ -324,3 +324,42 @@ func TestPaymentLink_MetricsIncrementOnInvoicePaid(t *testing.T) {
 		t.Fatalf("expected total_collected %s, got: %s", invResp.PayAmount.String(), updatedLink.TotalCollected.String())
 	}
 }
+
+func TestRecordPayment_IdempotentDuplicateTx(t *testing.T) {
+	_, invRepo, txRepo, merchant := setupTestDB(t)
+	svc := service.NewInvoiceService(invRepo, txRepo, service.NewRateService(), nil, nil, "12345678901234567890123456789012", 15)
+
+	ctx := context.Background()
+
+	invReq := &service.CreateInvoiceRequest{
+		OrderID:     "ORD-IDEMPOTENT-001",
+		Amount:      decimal.NewFromFloat(100.0),
+		Currency:    "USD",
+		PayCurrency: "USDT",
+		PayNetwork:  domain.NetworkBSC,
+	}
+	invResp, err := svc.CreateInvoice(ctx, merchant, invReq)
+	if err != nil {
+		t.Fatalf("failed to create invoice: %v", err)
+	}
+
+	txHash := "0xduplicate_test_hash_123"
+	// First call
+	inv1, err := svc.RecordPayment(ctx, invResp.DepositAddress, decimal.NewFromFloat(50.0), txHash, domain.NetworkBSC, 100)
+	if err != nil {
+		t.Fatalf("first payment failed: %v", err)
+	}
+	if !inv1.ReceivedAmount.Equal(decimal.NewFromFloat(50.0)) {
+		t.Fatalf("expected 50.0, got %s", inv1.ReceivedAmount)
+	}
+
+	// Second call with same txHash (simulating duplicate watcher or network replay)
+	inv2, err := svc.RecordPayment(ctx, invResp.DepositAddress, decimal.NewFromFloat(50.0), txHash, domain.NetworkBSC, 100)
+	if err != nil {
+		t.Fatalf("second duplicate payment should succeed idempotently, got error: %v", err)
+	}
+	// Balance must remain 50.0, NOT 100.0!
+	if !inv2.ReceivedAmount.Equal(decimal.NewFromFloat(50.0)) {
+		t.Fatalf("expected balance to remain 50.0 after duplicate tx, but got %s", inv2.ReceivedAmount)
+	}
+}

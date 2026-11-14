@@ -244,6 +244,7 @@ export const mockPaymentLinks: PaymentLinkItem[] = [
 export const mockWebhookDeliveries: WebhookDeliveryLog[] = [
   {
     id: "del-001",
+    delivery_id: "del_9f81a7b02c11",
     event: "invoice.paid",
     order_id: "ORD-98214",
     url: "https://myshop.com/api/webhooks/crypto",
@@ -268,6 +269,7 @@ export const mockWebhookDeliveries: WebhookDeliveryLog[] = [
   },
   {
     id: "del-002",
+    delivery_id: "del_3d42e1a90c55",
     event: "invoice.underpaid",
     order_id: "ORD-98210",
     url: "https://myshop.com/api/webhooks/crypto",
@@ -292,6 +294,7 @@ export const mockWebhookDeliveries: WebhookDeliveryLog[] = [
   },
   {
     id: "del-003",
+    delivery_id: "del_7a15b8e42f90",
     event: "invoice.expired",
     order_id: "ORD-98205",
     url: "https://myshop.com/api/webhooks/crypto",

@@ -102,6 +102,7 @@ export interface PaymentLinkItem {
 
 export interface WebhookDeliveryLog {
   id: string;
+  delivery_id?: string;
   event: string;
   order_id: string;
   url: string;

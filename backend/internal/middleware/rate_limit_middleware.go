@@ -115,3 +115,4 @@ func RateLimit(rate, capacity int, interval time.Duration) gin.HandlerFunc {
 		c.Next()
 	}
 }
+
