@@ -100,6 +100,12 @@ func (d *webhookDispatcher) DispatchInvoiceEvent(ctx context.Context, invoice *d
 }
 
 func (d *webhookDispatcher) deliverWithRetry(ctx context.Context, targetURL string, body []byte, signature string, ts int64) {
+	// SSRF Defense: strictly reject internal, loopback, or cloud-metadata destinations
+	if err := ValidateSafeWebhookURL(targetURL); err != nil {
+		log.Printf("[WEBHOOK SSRF BLOCKED] Target URL %s rejected: %v", targetURL, err)
+		return
+	}
+
 	maxRetries := 3
 	backoff := 2 * time.Second
 	deliveryID := fmt.Sprintf("del_%s", uuid.New().String()[:12])
@@ -146,6 +152,19 @@ func (d *webhookDispatcher) deliverWithRetry(ctx context.Context, targetURL stri
 
 // DispatchSync sends an immediate test or replay webhook and returns diagnostic telemetry
 func (d *webhookDispatcher) DispatchSync(ctx context.Context, targetURL, secretKey string, payload WebhookPayload) (*ReplayResult, error) {
+	deliveryID := fmt.Sprintf("del_%s", uuid.New().String()[:12])
+
+	// SSRF Defense: check target URL
+	if err := ValidateSafeWebhookURL(targetURL); err != nil {
+		return &ReplayResult{
+			StatusCode:   0,
+			DurationMs:   0,
+			Success:      false,
+			ResponseBody: fmt.Sprintf("Security Rejected: %v", err),
+			DeliveryID:   deliveryID,
+		}, nil
+	}
+
 	bodyBytes, err := json.Marshal(payload)
 	if err != nil {
 		return nil, err
@@ -154,7 +173,6 @@ func (d *webhookDispatcher) DispatchSync(ctx context.Context, targetURL, secretK
 	mac := hmac.New(sha256.New, []byte(secretKey))
 	mac.Write(bodyBytes)
 	signature := hex.EncodeToString(mac.Sum(nil))
-	deliveryID := fmt.Sprintf("del_%s", uuid.New().String()[:12])
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, targetURL, bytes.NewReader(bodyBytes))
 	if err != nil {

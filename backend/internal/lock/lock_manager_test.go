@@ -84,3 +84,4 @@ func TestLockManager_TryAcquire(t *testing.T) {
 	}
 	unlockThird()
 }
+

@@ -3,6 +3,7 @@ package handler
 import (
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -11,6 +12,7 @@ import (
 	"13c-gateway/internal/domain"
 	"13c-gateway/internal/middleware"
 	"13c-gateway/internal/service"
+	"13c-gateway/internal/twofactor"
 	"13c-gateway/pkg/response"
 )
 
@@ -29,6 +31,7 @@ type CreateRequestPayload struct {
 	Amount        decimal.Decimal `json:"amount" binding:"required"`
 	Network       domain.Network  `json:"network" binding:"required"`
 	TargetAddress string          `json:"target_address" binding:"required"`
+	TwoFactorCode string          `json:"two_factor_code"`
 }
 
 // RequestWithdrawal allows authenticated merchants to request payout from escrow
@@ -43,6 +46,18 @@ func (h *WithdrawalHandler) RequestWithdrawal(c *gin.Context) {
 	if err := c.ShouldBindJSON(&req); err != nil {
 		response.BadRequest(c, "Invalid withdrawal request payload", err.Error())
 		return
+	}
+
+	// 2FA Defense: If merchant has two-factor authentication enabled, require physical TOTP verification
+	if merchant.TwoFactorEnabled {
+		code := strings.TrimSpace(req.TwoFactorCode)
+		if code == "" {
+			code = strings.TrimSpace(c.GetHeader("X-2FA-Code"))
+		}
+		if code == "" || !twofactor.ValidateCode(merchant.TwoFactorSecret, code) {
+			response.Forbidden(c, "Valid 6-digit TOTP code is required to withdraw escrow funds")
+			return
+		}
 	}
 
 	record, err := h.withdrawalSvc.RequestWithdrawal(c.Request.Context(), merchant.ID, req.Amount, req.Network, req.TargetAddress)

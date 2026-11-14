@@ -11,6 +11,9 @@ import (
 )
 
 func TestDispatchSync_InjectsIdempotencyAndDeliveryHeaders(t *testing.T) {
+	AllowLocalhostForTesting = true
+	defer func() { AllowLocalhostForTesting = false }()
+
 	var receivedDeliveryID string
 	var receivedIdempotencyKey string
 	var receivedSignature string
@@ -80,6 +83,40 @@ func TestDispatchSync_InjectsIdempotencyAndDeliveryHeaders(t *testing.T) {
 
 	if result.DeliveryID != receivedDeliveryID {
 		t.Fatalf("expected ReplayResult.DeliveryID '%s' to match received '%s'", result.DeliveryID, receivedDeliveryID)
+	}
+}
+
+func TestValidateSafeWebhookURL_BlocksSSRF(t *testing.T) {
+	AllowLocalhostForTesting = false
+
+	dangerousTargets := []string{
+		"http://localhost:8080/admin",
+		"http://127.0.0.1:9000/internal",
+		"http://169.254.169.254/latest/meta-data/", // AWS metadata
+		"http://10.0.0.5/api",                      // Private IP
+		"http://192.168.1.1/router",                // Private IP
+		"http://172.16.0.10/database",              // Private IP
+		"ftp://myshop.com/webhook",                 // Non-HTTP
+	}
+
+	for _, target := range dangerousTargets {
+		err := ValidateSafeWebhookURL(target)
+		if err == nil {
+			t.Fatalf("expected SSRF error for target '%s', but it passed", target)
+		}
+	}
+
+	// Valid public target must pass
+	validTargets := []string{
+		"https://api.merchant.com/v1/callbacks",
+		"https://webhooks.store.io/crypto",
+	}
+
+	for _, valid := range validTargets {
+		err := ValidateSafeWebhookURL(valid)
+		if err != nil {
+			t.Fatalf("expected valid target '%s' to pass, got error: %v", valid, err)
+		}
 	}
 }
 

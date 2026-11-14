@@ -111,3 +111,4 @@ func (m *inMemoryLockManager) cleanupStaleLocks() {
 		})
 	}
 }
+

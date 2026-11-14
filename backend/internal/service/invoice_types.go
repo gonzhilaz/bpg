@@ -76,3 +76,4 @@ func formatInvoiceResponse(inv *domain.Invoice) *InvoiceResponse {
 		CreatedAt:          inv.CreatedAt,
 	}
 }
+
