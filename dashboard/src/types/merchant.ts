@@ -85,3 +85,30 @@ export interface EscrowSummary {
   min_withdrawal_usd: string;
   settlement_mode: string;
 }
+
+export interface PaymentLinkItem {
+  id: string;
+  slug: string;
+  title: string;
+  description?: string;
+  amount?: string;
+  currency: string;
+  pay_network: Network;
+  is_active: boolean;
+  total_collected: string;
+  payment_count: number;
+  created_at: string;
+}
+
+export interface WebhookDeliveryLog {
+  id: string;
+  event: string;
+  order_id: string;
+  url: string;
+  status_code: number;
+  duration_ms: number;
+  signature: string;
+  payload: string;
+  response_body: string;
+  timestamp: string;
+}

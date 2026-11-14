@@ -31,6 +31,8 @@ type Merchant struct {
 	BalanceUSD           decimal.Decimal `gorm:"type:numeric(28,8);default:0" json:"balance_usd"`
 	LockedBalanceUSD     decimal.Decimal `gorm:"type:numeric(28,8);default:0" json:"locked_balance_usd"`
 	WebhookURL           string          `gorm:"type:text" json:"webhook_url"`
+	TwoFactorEnabled     bool            `gorm:"default:false" json:"two_factor_enabled"`
+	TwoFactorSecret      string          `gorm:"type:varchar(64)" json:"-"`
 	CreatedAt            time.Time       `json:"created_at"`
 	UpdatedAt            time.Time       `json:"updated_at"`
 	DeletedAt            gorm.DeletedAt  `gorm:"index" json:"-"`

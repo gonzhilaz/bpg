@@ -5,6 +5,7 @@ import { Webhook, Radio, Send, CheckCircle2, ShieldCheck, Code, Check } from "lu
 import { useEnvironment } from "../../../context/EnvironmentContext";
 import { WebhookLogsCard } from "../../../components/dashboard/WebhookLogsCard";
 import { Tooltip } from "../../../components/ui/Tooltip";
+import { mockWebhookDeliveries } from "../../../mocks/mockMerchant";
 
 export default function WebhooksPage() {
   const { profile, webhookLogs } = useEnvironment();
@@ -105,7 +106,7 @@ export default function WebhooksPage() {
       </div>
 
       {/* Webhook Delivery Table */}
-      <WebhookLogsCard logs={webhookLogs} />
+      <WebhookLogsCard logs={mockWebhookDeliveries} />
 
       {/* JSON Payload Schema Example */}
       <div className="bg-zinc-900/60 border border-zinc-800 rounded-2xl p-5 space-y-3">

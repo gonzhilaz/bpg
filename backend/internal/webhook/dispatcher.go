@@ -29,9 +29,19 @@ type WebhookPayload struct {
 	Timestamp      int64  `json:"timestamp"`
 }
 
+// ReplayResult details the outcome of a manual or synchronous webhook delivery
+type ReplayResult struct {
+	StatusCode   int    `json:"status_code"`
+	DurationMs   int64  `json:"duration_ms"`
+	Success      bool   `json:"success"`
+	ResponseBody string `json:"response_body"`
+	Signature    string `json:"signature"`
+}
+
 // Dispatcher defines interface for delivering webhooks
 type Dispatcher interface {
 	DispatchInvoiceEvent(ctx context.Context, invoice *domain.Invoice, secretKey string, event string)
+	DispatchSync(ctx context.Context, targetURL, secretKey string, payload WebhookPayload) (*ReplayResult, error)
 }
 
 type webhookDispatcher struct {
@@ -124,4 +134,57 @@ func (d *webhookDispatcher) deliverWithRetry(ctx context.Context, targetURL stri
 	}
 
 	log.Printf("[WEBHOOK FAILED] Delivery permanently failed after %d attempts: %s", maxRetries, targetURL)
+}
+
+// DispatchSync sends an immediate test or replay webhook and returns diagnostic telemetry
+func (d *webhookDispatcher) DispatchSync(ctx context.Context, targetURL, secretKey string, payload WebhookPayload) (*ReplayResult, error) {
+	bodyBytes, err := json.Marshal(payload)
+	if err != nil {
+		return nil, err
+	}
+
+	mac := hmac.New(sha256.New, []byte(secretKey))
+	mac.Write(bodyBytes)
+	signature := hex.EncodeToString(mac.Sum(nil))
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, targetURL, bytes.NewReader(bodyBytes))
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("X-13C-Signature", signature)
+	req.Header.Set("X-Signature", signature)
+	req.Header.Set("X-Timestamp", strconv.FormatInt(payload.Timestamp, 10))
+	req.Header.Set("User-Agent", "13C-Crypto-Gateway/1.0")
+
+	start := time.Now()
+	resp, err := d.client.Do(req)
+	duration := time.Since(start).Milliseconds()
+
+	if err != nil {
+		return &ReplayResult{
+			StatusCode:   0,
+			DurationMs:   duration,
+			Success:      false,
+			ResponseBody: err.Error(),
+			Signature:    signature,
+		}, nil
+	}
+	defer resp.Body.Close()
+
+	buf := new(bytes.Buffer)
+	_, _ = buf.ReadFrom(resp.Body)
+	respStr := buf.String()
+	if len(respStr) > 500 {
+		respStr = respStr[:500] + "... (truncated)"
+	}
+
+	return &ReplayResult{
+		StatusCode:   resp.StatusCode,
+		DurationMs:   duration,
+		Success:      resp.StatusCode >= 200 && resp.StatusCode < 300,
+		ResponseBody: respStr,
+		Signature:    signature,
+	}, nil
 }

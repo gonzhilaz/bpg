@@ -1,4 +1,4 @@
-import { MerchantProfile, DashboardInvoice, PayoutRecord, WebhookLog, NetworkGasRate, WithdrawalItem, EscrowSummary } from "../types/merchant";
+import { MerchantProfile, DashboardInvoice, PayoutRecord, WebhookLog, NetworkGasRate, WithdrawalItem, EscrowSummary, PaymentLinkItem, WebhookDeliveryLog } from "../types/merchant";
 
 export const mockNetworkGasRates: NetworkGasRate[] = [
   {
@@ -198,3 +198,120 @@ export const mockEscrowSummary: EscrowSummary = {
   min_withdrawal_usd: "50.00",
   settlement_mode: "ESCROW_BALANCE",
 };
+
+export const mockPaymentLinks: PaymentLinkItem[] = [
+  {
+    id: "pl-001",
+    slug: "pl_vipdiscord",
+    title: "VIP Discord & Alpha Group Access",
+    description: "Monthly subscription for institutional DeFi intelligence",
+    amount: "79.00",
+    currency: "USD",
+    pay_network: "TRON",
+    is_active: true,
+    total_collected: "1,896.00",
+    payment_count: 24,
+    created_at: "2026-11-01",
+  },
+  {
+    id: "pl-002",
+    slug: "pl_techconsult",
+    title: "1-on-1 Blockchain Architecture Call",
+    description: "1 hour private session with core engineering team",
+    amount: "250.00",
+    currency: "USD",
+    pay_network: "BSC",
+    is_active: true,
+    total_collected: "1,250.00",
+    payment_count: 5,
+    created_at: "2026-11-08",
+  },
+  {
+    id: "pl-003",
+    slug: "pl_donations",
+    title: "Open Source Development Fund",
+    description: "Community tips and contributions (any amount welcome)",
+    amount: undefined, // Open amount
+    currency: "USD",
+    pay_network: "POLYGON",
+    is_active: true,
+    total_collected: "420.00",
+    payment_count: 12,
+    created_at: "2026-11-10",
+  },
+];
+
+export const mockWebhookDeliveries: WebhookDeliveryLog[] = [
+  {
+    id: "del-001",
+    event: "invoice.paid",
+    order_id: "ORD-98214",
+    url: "https://myshop.com/api/webhooks/crypto",
+    status_code: 200,
+    duration_ms: 45,
+    signature: "hmac_sha256_e819fa2...38",
+    payload: JSON.stringify(
+      {
+        event: "invoice.paid",
+        invoice_id: "inv-live-001",
+        order_id: "ORD-98214",
+        status: "PAID",
+        pay_amount: "250.0000",
+        received_amount: "250.0000",
+        pay_network: "BSC",
+      },
+      null,
+      2
+    ),
+    response_body: '{"success":true,"message":"Order ORD-98214 marked paid"}',
+    timestamp: "2026-11-13 14:22:10",
+  },
+  {
+    id: "del-002",
+    event: "invoice.underpaid",
+    order_id: "ORD-98210",
+    url: "https://myshop.com/api/webhooks/crypto",
+    status_code: 500,
+    duration_ms: 120,
+    signature: "hmac_sha256_b41a99f...12",
+    payload: JSON.stringify(
+      {
+        event: "invoice.underpaid",
+        invoice_id: "inv-live-003",
+        order_id: "ORD-98210",
+        status: "UNDERPAID",
+        pay_amount: "150.0000",
+        received_amount: "140.0000",
+        pay_network: "TRON",
+      },
+      null,
+      2
+    ),
+    response_body: '{"error":"Internal server database lock"}',
+    timestamp: "2026-11-13 11:05:44",
+  },
+  {
+    id: "del-003",
+    event: "invoice.expired",
+    order_id: "ORD-98205",
+    url: "https://myshop.com/api/webhooks/crypto",
+    status_code: 200,
+    duration_ms: 38,
+    signature: "hmac_sha256_cc82a01...77",
+    payload: JSON.stringify(
+      {
+        event: "invoice.expired",
+        invoice_id: "inv-live-004",
+        order_id: "ORD-98205",
+        status: "EXPIRED",
+        pay_amount: "75.0000",
+        received_amount: "0.0000",
+        pay_network: "POLYGON",
+      },
+      null,
+      2
+    ),
+    response_body: '{"status":"cancelled"}',
+    timestamp: "2026-11-12 18:30:00",
+  },
+];

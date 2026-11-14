@@ -62,6 +62,7 @@ func InitDatabase(cfg *Config) (*gorm.DB, error) {
 		&domain.BlockchainTransaction{},
 		&domain.PayoutTransfer{},
 		&domain.WithdrawalRequest{},
+		&domain.PaymentLink{},
 	); err != nil {
 		return nil, fmt.Errorf("failed to auto-migrate schema: %w", err)
 	}

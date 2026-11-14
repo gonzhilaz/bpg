@@ -59,6 +59,7 @@ func main() {
 	txRepo := repository.NewTransactionRepository(db)
 	payoutRepo := repository.NewPayoutRepository(db)
 	withdrawalRepo := repository.NewWithdrawalRepository(db)
+	paymentLinkRepo := repository.NewPaymentLinkRepository(db)
 
 	// Initialize Services
 	rateSvc := service.NewRateService()
@@ -81,6 +82,8 @@ func main() {
 	invoiceSvc.SetUnderpaidTolerance(decimal.NewFromFloat(cfg.UnderpaidTolerancePercent))
 	invoiceSvc.SetGracePeriod(time.Duration(cfg.InvoiceGracePeriodMin) * time.Minute)
 
+	paymentLinkSvc := service.NewPaymentLinkService(paymentLinkRepo, merchantRepo, invoiceSvc)
+
 	// Initialize Multi-Chain Background Watchers (BSC, Polygon, TRON, Solana)
 	watcherManager := watcher.NewWatcherManager(cfg, invoiceRepo, invoiceSvc)
 	watcherManager.Start(watcherCtx)
@@ -97,6 +100,8 @@ func main() {
 	authHandler := handler.NewAuthHandler(authSvc)
 	adminHandler := handler.NewAdminHandler(db, merchantRepo, invoiceRepo, payoutSvc)
 	withdrawalHandler := handler.NewWithdrawalHandler(withdrawalSvc)
+	paymentLinkHandler := handler.NewPaymentLinkHandler(paymentLinkSvc)
+	webhookHandler := handler.NewWebhookHandler(webhookDispatcher)
 
 	// Setup Router
 	r := gin.New()
@@ -134,13 +139,28 @@ func main() {
 				authProtected.GET("/escrow/summary", withdrawalHandler.GetEscrowSummary)
 				authProtected.POST("/withdrawals", withdrawalHandler.RequestWithdrawal)
 				authProtected.GET("/withdrawals", withdrawalHandler.ListMerchantWithdrawals)
+
+				// 2FA Management Endpoints
+				authProtected.POST("/2fa/setup", authHandler.Setup2FA)
+				authProtected.POST("/2fa/verify", authHandler.Verify2FA)
+				authProtected.POST("/2fa/disable", authHandler.Disable2FA)
+
+				// No-Code Payment Links
+				authProtected.GET("/payment-links", paymentLinkHandler.List)
+				authProtected.POST("/payment-links", paymentLinkHandler.Create)
+				authProtected.PATCH("/payment-links/:id/toggle", paymentLinkHandler.Toggle)
+
+				// Webhook Replay & Diagnostics
+				authProtected.POST("/webhooks/test", webhookHandler.TestDispatch)
 			}
 		}
 
-		// Public Checkout Endpoints (for Customer Payment Screens)
+		// Public Checkout & Payment Link Endpoints
 		v1.GET("/invoices/:id", invoiceHandler.GetByID)
 		v1.GET("/invoices/:id/events", invoiceHandler.StreamEvents)
 		v1.GET("/rates/gas", rateHandler.GetGasRates)
+		v1.GET("/pay/:slug", paymentLinkHandler.GetBySlug)
+		v1.POST("/pay/:slug/invoice", paymentLinkHandler.Pay)
 
 		// Sandbox Simulation Endpoint (for dev/testing)
 		v1.POST("/invoices/simulate-payment", invoiceHandler.SimulatePayment)
