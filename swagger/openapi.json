@@ -254,10 +254,10 @@
         }
       }
     },
-    "/api/v1/reports/financial": {
+    "/api/v1/admin/reports/financial": {
       "get": {
         "summary": "Financial Revenue & Ledger Reports",
-        "description": "Returns audited gross volume, platform fee revenue (0.4%), gas expended, and net profit.",
+        "description": "Returns audited gross volume, platform fee revenue (0.4%), gas expended, and net profit. Protected by Root Admin authorization.",
         "responses": {
           "200": { "description": "Financial accounting summary" }
         }

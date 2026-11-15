@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"os"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -27,11 +28,14 @@ func AdminAuth(masterSecretKey string) gin.HandlerFunc {
 		// 3. Check admin cookie
 		cookieToken, _ := c.Cookie("13c_admin_session")
 
-		// Validate against master secret key or root session
+		// Validate against master secret key
 		isValidKey := masterSecretKey != "" && (adminKey == masterSecretKey || bearerToken == masterSecretKey)
-		isValidSession := strings.HasPrefix(bearerToken, "13c_root_") || strings.HasPrefix(cookieToken, "13c_root_") || strings.HasPrefix(adminKey, "13c_root_")
 
-		if !isValidKey && !isValidSession {
+		// Dev root session is strictly restricted to non-production environments
+		isNonProd := os.Getenv("APP_ENV") != "production" && os.Getenv("APP_ENV") != "prod"
+		isValidDevSession := isNonProd && (strings.HasPrefix(bearerToken, "13c_root_") || strings.HasPrefix(cookieToken, "13c_root_") || strings.HasPrefix(adminKey, "13c_root_"))
+
+		if !isValidKey && !isValidDevSession {
 			response.Unauthorized(c, "Root administrative authorization required for /admin endpoints")
 			c.Abort()
 			return

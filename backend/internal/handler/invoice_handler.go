@@ -2,6 +2,7 @@ package handler
 
 import (
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -77,6 +78,11 @@ type SimulatePaymentRequest struct {
 
 // SimulatePayment simulates an on-chain transfer to test reconciliation & state machine
 func (h *InvoiceHandler) SimulatePayment(c *gin.Context) {
+	if os.Getenv("APP_ENV") == "production" || os.Getenv("APP_ENV") == "prod" {
+		response.Forbidden(c, "Simulated payments are strictly disabled in production environment")
+		return
+	}
+
 	var req SimulatePaymentRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		response.BadRequest(c, "Invalid simulation payload", err.Error())

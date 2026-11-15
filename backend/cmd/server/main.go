@@ -167,11 +167,10 @@ func main() {
 		v1.GET("/pay/:slug", paymentLinkHandler.GetBySlug)
 		v1.POST("/pay/:slug/invoice", publicRateLimiter, paymentLinkHandler.Pay)
 
-		// Sandbox Simulation Endpoint (for dev/testing)
-		v1.POST("/invoices/simulate-payment", invoiceHandler.SimulatePayment)
-
-		// Financial Reports (Public or session-scoped summary)
-		v1.GET("/reports/financial", adminHandler.GetFinancialReports)
+		// Sandbox Simulation Endpoint (restricted strictly to dev/testing environments)
+		if cfg.AppEnv != "production" && cfg.AppEnv != "prod" {
+			v1.POST("/invoices/simulate-payment", invoiceHandler.SimulatePayment)
+		}
 
 		// Platform Dev & DevOps Admin Routes (Protected by Root Admin Auth)
 		adminRoutes := v1.Group("/admin")
@@ -185,6 +184,7 @@ func main() {
 			adminRoutes.GET("/withdrawals", withdrawalHandler.AdminListWithdrawals)
 			adminRoutes.POST("/withdrawals/:id/approve", withdrawalHandler.AdminApproveWithdrawal)
 			adminRoutes.POST("/withdrawals/:id/reject", withdrawalHandler.AdminRejectWithdrawal)
+			adminRoutes.GET("/reports/financial", adminHandler.GetFinancialReports)
 		}
 
 		// Protected Merchant Invoicing (API Key Auth)

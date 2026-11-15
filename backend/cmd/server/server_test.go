@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
 	"time"
 
@@ -191,5 +192,28 @@ func TestCreateAndPayInvoice(t *testing.T) {
 	}
 	if payouts[0].Status != domain.PayoutStatusCompleted {
 		t.Fatalf("expected payout status COMPLETED, got %s", payouts[0].Status)
+	}
+}
+
+func TestSimulatePayment_ProductionGate(t *testing.T) {
+	r, _ := setupTestRouter(t)
+
+	os.Setenv("APP_ENV", "production")
+	defer os.Unsetenv("APP_ENV")
+
+	simPayload := handler.SimulatePaymentRequest{
+		DepositAddress: "0x1234567890abcdef1234567890abcdef12345678",
+		Amount:         decimal.NewFromFloat(10.0),
+		Network:        domain.NetworkBSC,
+	}
+	simBody, _ := json.Marshal(simPayload)
+
+	req := httptest.NewRequest(http.MethodPost, "/api/v1/invoices/simulate-payment", bytes.NewReader(simBody))
+	req.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+	r.ServeHTTP(w, req)
+
+	if w.Code != http.StatusForbidden {
+		t.Fatalf("expected status 403 Forbidden in production, got %d: %s", w.Code, w.Body.String())
 	}
 }

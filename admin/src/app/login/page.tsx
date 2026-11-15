@@ -29,6 +29,7 @@ export default function AdminLoginPage() {
       if (isValidKey && isValidTotp) {
         const sessionToken = `13c_root_${Date.now()}_${Math.random().toString(36).substring(2, 10)}`;
         sessionStorage.setItem("13c_admin_session", sessionToken);
+        sessionStorage.setItem("13c_admin_key", masterKey);
         router.push("/");
       } else {
         const nextAttempts = attempts + 1;

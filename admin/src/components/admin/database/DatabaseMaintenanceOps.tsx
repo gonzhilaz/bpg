@@ -52,8 +52,19 @@ export function DatabaseMaintenanceOps() {
     setPruneResult(null);
 
     try {
+      const session = typeof window !== "undefined" ? sessionStorage.getItem("13c_admin_session") : null;
+      const adminKey = typeof window !== "undefined" ? sessionStorage.getItem("13c_admin_key") : null;
+      const headers: Record<string, string> = { "Content-Type": "application/json" };
+      if (adminKey) {
+        headers["X-Admin-Key"] = adminKey;
+      }
+      if (session) {
+        headers["Authorization"] = `Bearer ${session}`;
+      }
+
       const res = await fetch(`${getEnvUrl.api()}/api/v1/admin/database/prune?days=${retentionDays}`, {
         method: "POST",
+        headers,
       });
       const data = await res.json();
       if (res.ok && data.success) {

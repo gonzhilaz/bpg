@@ -277,12 +277,19 @@ func (s *invoiceService) RecordPayment(ctx context.Context, depositAddress strin
 		minRequired = invoice.PayAmount.Mul(factor)
 	}
 
+	wasAlreadyPaid := invoice.Status == domain.StatusPaid
 	now := time.Now()
 	var eventName string
 	if invoice.ReceivedAmount.GreaterThanOrEqual(minRequired) {
 		invoice.Status = domain.StatusPaid
-		invoice.PaidAt = &now
-		eventName = "invoice.paid"
+		if invoice.PaidAt == nil {
+			invoice.PaidAt = &now
+		}
+		if wasAlreadyPaid {
+			eventName = "invoice.overpaid"
+		} else {
+			eventName = "invoice.paid"
+		}
 	} else {
 		invoice.Status = domain.StatusUnderpaid
 		eventName = "invoice.underpaid"
@@ -293,26 +300,42 @@ func (s *invoiceService) RecordPayment(ctx context.Context, depositAddress strin
 	}
 
 	// Settlement: Instant Forward or Escrow Balance
-	if invoice.Status == domain.StatusPaid && invoice.Merchant != nil {
-		if invoice.Merchant.SettlementMode == "INSTANT_FORWARD" {
-			if s.payoutSvc != nil {
-				go func(inv *domain.Invoice) {
-					pCtx, pCancel := context.WithTimeout(context.Background(), 2*time.Minute)
-					defer pCancel()
-					_, _ = s.payoutSvc.ProcessAutoPayout(pCtx, inv)
-				}(invoice)
+	if invoice.Merchant != nil {
+		if !wasAlreadyPaid && invoice.Status == domain.StatusPaid {
+			// First-time transition to PAID
+			if invoice.Merchant.SettlementMode == "INSTANT_FORWARD" {
+				if s.payoutSvc != nil {
+					go func(inv *domain.Invoice) {
+						pCtx, pCancel := context.WithTimeout(context.Background(), 2*time.Minute)
+						defer pCancel()
+						_, _ = s.payoutSvc.ProcessAutoPayout(pCtx, inv)
+					}(invoice)
+				}
+			} else if s.withdrawalRepo != nil {
+				// In Escrow mode, credit actual confirmed amount received
+				_ = s.withdrawalRepo.CreditEscrowBalance(ctx, invoice.Merchant.ID, invoice.ReceivedAmount)
 			}
-		} else {
-			if s.withdrawalRepo != nil {
-				_ = s.withdrawalRepo.CreditEscrowBalance(ctx, invoice.Merchant.ID, invoice.PayAmount)
-			}
-		}
 
-		if strings.HasPrefix(invoice.OrderID, "LINK-") && s.paymentLinkRepo != nil {
-			parts := strings.Split(invoice.OrderID, "-")
-			if len(parts) >= 2 {
-				slug := parts[1]
-				_ = s.paymentLinkRepo.RecordPaymentBySlug(ctx, slug, invoice.PayAmount)
+			if strings.HasPrefix(invoice.OrderID, "LINK-") && s.paymentLinkRepo != nil {
+				parts := strings.Split(invoice.OrderID, "-")
+				if len(parts) >= 2 {
+					slug := parts[1]
+					_ = s.paymentLinkRepo.RecordPaymentBySlug(ctx, slug, invoice.ReceivedAmount)
+				}
+			}
+		} else if wasAlreadyPaid {
+			// Post-settlement overpayment or additional delta deposit
+			if invoice.Merchant.SettlementMode == "INSTANT_FORWARD" {
+				if s.payoutSvc != nil {
+					go func(inv *domain.Invoice) {
+						pCtx, pCancel := context.WithTimeout(context.Background(), 2*time.Minute)
+						defer pCancel()
+						_, _ = s.payoutSvc.ProcessAutoPayout(pCtx, inv)
+					}(invoice)
+				}
+			} else if s.withdrawalRepo != nil {
+				// Credit only the incremental deposit amount
+				_ = s.withdrawalRepo.CreditEscrowBalance(ctx, invoice.Merchant.ID, amount)
 			}
 		}
 	}
