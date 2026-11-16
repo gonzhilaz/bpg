@@ -22,7 +22,7 @@ export function FeaturesBento() {
           <span>Complete Feature Matrix</span>
         </div>
         <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-          Everything You Expect from OxaPay, Built For Complete Sovereignty
+          Enterprise Non-Custodial Architecture, Built For Complete Sovereignty
         </h2>
         <p className="text-xs sm:text-sm text-zinc-400 max-w-2xl mx-auto">
           From no-code payment links to automated gas-optimized sweeping and real-time SSE push

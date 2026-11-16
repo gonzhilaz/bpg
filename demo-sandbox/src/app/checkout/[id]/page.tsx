@@ -214,7 +214,7 @@ function CheckoutContent({ params }: { params: Promise<{ id: string }> }) {
           </div>
         </div>
 
-        {/* OxaPay-Style Network Safety Notice */}
+        {/* Network Safety Notice */}
         <div className="mx-6 my-2 p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/25 flex items-center gap-2 text-[11px] text-amber-300">
           <AlertCircle className="w-4 h-4 text-amber-400 shrink-0" />
           <span>

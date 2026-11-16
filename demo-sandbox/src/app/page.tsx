@@ -2,7 +2,6 @@ import { Navbar } from "../components/landing/Navbar";
 import { HeroSection } from "../components/landing/HeroSection";
 import { FeaturesBento } from "../components/landing/FeaturesBento";
 import { CodeShowcase } from "../components/landing/CodeShowcase";
-import { ComparisonTable } from "../components/landing/ComparisonTable";
 import { Footer } from "../components/landing/Footer";
 
 export default function Home() {
@@ -13,7 +12,6 @@ export default function Home() {
         <HeroSection />
         <FeaturesBento />
         <CodeShowcase />
-        <ComparisonTable />
       </main>
       <Footer />
     </div>

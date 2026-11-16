@@ -40,9 +40,9 @@ export function HeroSection() {
 
         {/* Subtitle */}
         <p className="text-sm sm:text-base text-zinc-400 max-w-2xl mx-auto leading-relaxed">
-          The sovereign, non-custodial alternative to OxaPay and NOWPayments. Keep 100% of your
-          revenue with zero platform cut, real-time SSE payment detection, and zero risk of custodial
-          account freezes.
+          Enterprise-grade, non-custodial crypto payment infrastructure. Keep 100% of your
+          revenue with zero platform cut, real-time SSE payment detection, direct-to-wallet
+          settlement, and zero risk of third-party account freezes.
         </p>
 
         {/* Primary CTAs */}

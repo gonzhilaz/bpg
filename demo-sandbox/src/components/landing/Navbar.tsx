@@ -34,9 +34,6 @@ export function Navbar() {
           <a href="#developers" className="hover:text-white transition-colors">
             Developers
           </a>
-          <a href="#comparison" className="hover:text-white transition-colors">
-            Vs OxaPay
-          </a>
           <a
             href={getEnvUrl.swagger()}
             target="_blank"
@@ -94,13 +91,6 @@ export function Navbar() {
               className="px-2 py-1.5 rounded hover:bg-zinc-800"
             >
               Developers & SDKs
-            </a>
-            <a
-              href="#comparison"
-              onClick={() => setMobileMenuOpen(false)}
-              className="px-2 py-1.5 rounded hover:bg-zinc-800"
-            >
-              Vs OxaPay & Stripe
             </a>
           </nav>
           <div className="pt-2 border-t border-zinc-800 flex flex-col gap-2">

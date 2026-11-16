@@ -95,7 +95,7 @@ export default function RegisterPage() {
 
   return (
     <main className="min-h-screen bg-[#0B0E14] text-zinc-100 flex flex-col lg:grid lg:grid-cols-12 font-sans">
-      {/* Left OxaPay Showcase Panel */}
+      {/* Left Auth Showcase Panel */}
       <div className="lg:col-span-5 hidden lg:flex">
         <AuthShowcasePanel mode="register" />
       </div>

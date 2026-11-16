@@ -1,6 +1,6 @@
 # 13C Crypto Payment Gateway
 
-Sistem payment gateway cryptocurrency non-custodial selevel OxaPay dengan arsitektur modular multi-aplikasi:
+Sistem payment gateway cryptocurrency non-custodial enterprise-grade dengan arsitektur modular multi-aplikasi:
 
 ```
 13C-Gateway/
