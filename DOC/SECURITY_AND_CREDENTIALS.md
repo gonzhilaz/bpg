@@ -1,5 +1,7 @@
 # 13C Payment Gateway — Enterprise Security & Credentials Manual
 
+**Dokumen Kredensial Praktis**: Lihat [DOC/MASTER_CREDENTIALS_AND_ACCOUNTS.md](file:///d:/DEVELOPMENT/Projects/Captain/DOC/MASTER_CREDENTIALS_AND_ACCOUNTS.md) untuk daftar akun aktif, username, password, dan API keys bawaan sistem.
+
 ---
 
 ## 1. Zero Trust Security Architecture Overview
