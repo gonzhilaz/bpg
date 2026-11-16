@@ -71,6 +71,7 @@ export async function POST(req: NextRequest) {
       received_amount: "0.00",
       deposit_address: depositAddress,
       status: "PENDING",
+      seconds_remaining: 1800,
       expires_at: new Date(Date.now() + 30 * 60 * 1000).toISOString(),
       created_at: new Date().toISOString(),
     };

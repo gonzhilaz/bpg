@@ -176,11 +176,14 @@ function CheckoutContent({ params }: { params: Promise<{ id: string }> }) {
 
           <div className="flex items-center gap-2">
             <PaymentStatusPill status={invoice.status} />
-            <CountdownTimer initialSeconds={invoice.seconds_remaining} />
+            <CountdownTimer 
+              initialSeconds={invoice.seconds_remaining} 
+              expiresAt={invoice.expires_at}
+            />
           </div>
         </div>
 
-        <div className="px-6 pt-5 pb-3 text-center space-y-1">
+        <div className="px-6 pt-5 pb-2 text-center space-y-1">
           <div className="text-[11px] font-medium text-zinc-400 uppercase tracking-wider flex items-center justify-center">
             Total Payable
             <Tooltip content="Live crypto calculation based on your order total and network gas fee." />
@@ -209,6 +212,14 @@ function CheckoutContent({ params }: { params: Promise<{ id: string }> }) {
           <div className="text-xs text-zinc-500 font-medium pt-1">
             Order #{invoice.order_id} • Network: <span className="text-zinc-300 font-semibold">{invoice.pay_network}</span>
           </div>
+        </div>
+
+        {/* OxaPay-Style Network Safety Notice */}
+        <div className="mx-6 my-2 p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/25 flex items-center gap-2 text-[11px] text-amber-300">
+          <AlertCircle className="w-4 h-4 text-amber-400 shrink-0" />
+          <span>
+            Send only <strong className="text-white">{invoice.pay_currency}</strong> on <strong className="text-white">{invoice.pay_network}</strong> network.
+          </span>
         </div>
 
         <div className="px-6 py-2">

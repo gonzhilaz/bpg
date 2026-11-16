@@ -4,12 +4,24 @@ import React, { useEffect, useState } from "react";
 import { Clock } from "lucide-react";
 
 interface Props {
-  initialSeconds: number;
+  initialSeconds?: number;
+  expiresAt?: string;
   onExpire?: () => void;
 }
 
-export function CountdownTimer({ initialSeconds, onExpire }: Props) {
-  const [secondsLeft, setSecondsLeft] = useState(initialSeconds);
+export function CountdownTimer({ initialSeconds, expiresAt, onExpire }: Props) {
+  const getSafeInitial = (): number => {
+    if (typeof initialSeconds === "number" && !isNaN(initialSeconds) && initialSeconds > 0) {
+      return initialSeconds;
+    }
+    if (expiresAt) {
+      const diff = Math.floor((new Date(expiresAt).getTime() - Date.now()) / 1000);
+      return diff > 0 ? diff : 0;
+    }
+    return 1800; // Standard 30:00 minutes expiration
+  };
+
+  const [secondsLeft, setSecondsLeft] = useState<number>(getSafeInitial);
 
   useEffect(() => {
     if (secondsLeft <= 0) {
@@ -31,11 +43,12 @@ export function CountdownTimer({ initialSeconds, onExpire }: Props) {
     return () => clearInterval(interval);
   }, [secondsLeft, onExpire]);
 
-  const minutes = Math.floor(secondsLeft / 60);
-  const seconds = secondsLeft % 60;
+  const safeSeconds = typeof secondsLeft === "number" && !isNaN(secondsLeft) ? Math.max(0, secondsLeft) : 0;
+  const minutes = Math.floor(safeSeconds / 60);
+  const seconds = safeSeconds % 60;
   const formattedTime = `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
 
-  const isLow = secondsLeft > 0 && secondsLeft <= 300; // <= 5 minutes
+  const isLow = safeSeconds > 0 && safeSeconds <= 300; // <= 5 minutes
 
   return (
     <div

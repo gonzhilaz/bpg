@@ -34,6 +34,7 @@ export async function GET(
       received_amount: "0.00",
       deposit_address: "0x71C8A3951F6b4d3E118bFE7c251d18fF2113f019",
       status: "PENDING",
+      seconds_remaining: 1500,
       expires_at: new Date(Date.now() + 25 * 60 * 1000).toISOString(),
       created_at: new Date().toISOString(),
     },
