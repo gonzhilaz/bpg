@@ -238,9 +238,11 @@ func main() {
 func seedDefaultMerchant(db *gorm.DB) {
 	var count int64
 	db.Model(&domain.Merchant{}).Count(&count)
+	pwdHash, _ := crypto.HashPassword("password123")
 	if count == 0 {
 		defaultMerchant := domain.Merchant{
 			Email:                "demo@13c.local",
+			PasswordHash:         pwdHash,
 			Name:                 "13C Demo Store",
 			Role:                 "admin",
 			Status:               "ACTIVE",
@@ -258,7 +260,9 @@ func seedDefaultMerchant(db *gorm.DB) {
 			WebhookURL:          "http://localhost:3000/api/webhooks/crypto",
 		}
 		db.Create(&defaultMerchant)
-		log.Println("[INFO] Seeded default merchant with API Key: 13c_demo_api_key_12345678")
+		log.Println("[INFO] Seeded default merchant with API Key: 13c_demo_api_key_12345678 (password: password123)")
+	} else {
+		db.Model(&domain.Merchant{}).Where("email = ? AND (password_hash = '' OR password_hash IS NULL)", "demo@13c.local").Update("password_hash", pwdHash)
 	}
 }
 

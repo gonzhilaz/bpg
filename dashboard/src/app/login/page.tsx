@@ -19,7 +19,7 @@ import { getEnvUrl } from "../../utils/env";
 import { AuthShowcasePanel } from "../../components/auth/AuthShowcasePanel";
 
 export default function LoginPage() {
-  const [email, setEmail] = useState("merchant@company.com");
+  const [email, setEmail] = useState("demo@13c.local");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
@@ -90,7 +90,7 @@ export default function LoginPage() {
   };
 
   const handleQuickDemo = () => {
-    setEmail("merchant@company.com");
+    setEmail("demo@13c.local");
     setPassword("password123");
     setRequire2FA(false);
     setTwoFactorCode("");
