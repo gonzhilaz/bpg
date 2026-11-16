@@ -11,7 +11,8 @@ export const getEnvUrl = {
     if (typeof window !== "undefined" && window.location.hostname === "localhost") {
       return "http://localhost:8080";
     }
-    return "https://bpg-backend.onrender.com";
+    // On Vercel / production, use same-origin relative API route (100% immune to CORS)
+    return "";
   },
 
   merchant: (): string => {
@@ -51,7 +52,7 @@ export const getEnvUrl = {
     if (typeof window !== "undefined" && window.location.hostname === "localhost") {
       return "http://localhost:8080/swagger";
     }
-    return "https://bpg-backend.onrender.com/swagger";
+    return "/swagger";
   },
 };
 
