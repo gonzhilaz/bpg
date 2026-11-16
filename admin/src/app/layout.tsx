@@ -4,8 +4,19 @@ import { AdminAppProviders } from "../components/layout/AdminAppProviders";
 import { AdminShell } from "../components/auth/AdminShell";
 
 export const metadata: Metadata = {
-  title: "13C Platform Super Admin",
-  description: "Dev control dashboard for 13C Crypto Payment Gateway",
+  title: {
+    default: "13CPG | Platform Super Admin",
+    template: "%s | 13CPG Admin",
+  },
+  description:
+    "13CPG Platform Administration - Node monitoring, merchant management, and system operations.",
+  icons: {
+    icon: [
+      { url: "/icon.svg", type: "image/svg+xml" },
+      { url: "/favicon.ico", sizes: "any" },
+    ],
+    apple: "/apple-icon.png",
+  },
 };
 
 export default function RootLayout({

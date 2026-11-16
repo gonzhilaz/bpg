@@ -3,8 +3,19 @@ import "./globals.css";
 import { AppProviders } from "../components/layout/AppProviders";
 
 export const metadata: Metadata = {
-  title: "13C Merchant Dashboard",
-  description: "Non-custodial crypto payment gateway merchant portal",
+  title: {
+    default: "13CPG | Merchant Dashboard",
+    template: "%s | 13CPG Dashboard",
+  },
+  description:
+    "13CPG Merchant Portal - Real-time settlements, invoice management, and non-custodial crypto payments.",
+  icons: {
+    icon: [
+      { url: "/icon.svg", type: "image/svg+xml" },
+      { url: "/favicon.ico", sizes: "any" },
+    ],
+    apple: "/apple-icon.png",
+  },
 };
 
 export default function RootLayout({
