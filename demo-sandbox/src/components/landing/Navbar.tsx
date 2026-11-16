@@ -31,9 +31,6 @@ export function Navbar() {
           <a href="#features" className="hover:text-white transition-colors">
             Features
           </a>
-          <a href="#calculator" className="hover:text-cyan-400 transition-colors">
-            Fee Savings
-          </a>
           <a href="#developers" className="hover:text-white transition-colors">
             Developers
           </a>
@@ -90,13 +87,6 @@ export function Navbar() {
               className="px-2 py-1.5 rounded hover:bg-zinc-800"
             >
               Features
-            </a>
-            <a
-              href="#calculator"
-              onClick={() => setMobileMenuOpen(false)}
-              className="px-2 py-1.5 rounded hover:bg-zinc-800 text-cyan-400"
-            >
-              Fee Savings Calculator
             </a>
             <a
               href="#developers"

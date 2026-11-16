@@ -1,6 +1,5 @@
 import { Navbar } from "../components/landing/Navbar";
 import { HeroSection } from "../components/landing/HeroSection";
-import { FeeCalculator } from "../components/landing/FeeCalculator";
 import { FeaturesBento } from "../components/landing/FeaturesBento";
 import { CodeShowcase } from "../components/landing/CodeShowcase";
 import { ComparisonTable } from "../components/landing/ComparisonTable";
@@ -12,7 +11,6 @@ export default function Home() {
       <Navbar />
       <main className="flex-1">
         <HeroSection />
-        <FeeCalculator />
         <FeaturesBento />
         <CodeShowcase />
         <ComparisonTable />
