@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { Sparkles, Trash2, RefreshCw, CheckCircle2, AlertTriangle, ShieldAlert, Cpu } from "lucide-react";
+import { Button } from "../../ui/Button";
 import { getEnvUrl } from "../../../utils/env";
 
 export function DatabaseMaintenanceOps() {
@@ -108,14 +109,17 @@ export function DatabaseMaintenanceOps() {
 
         <div className="pt-2 flex items-center justify-between">
           <div className="text-[11px] text-zinc-500">Last run: 4 hours ago • Status: Clean</div>
-          <button
+          <Button
+            variant="outline"
+            size="sm"
             onClick={handleVacuum}
-            disabled={vacuuming}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-400 border border-cyan-500/30 text-xs font-bold transition-all disabled:opacity-50"
+            isLoading={vacuuming}
+            loadingText="Optimizing..."
+            icon={<RefreshCw className="w-3.5 h-3.5" />}
+            className="border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/15 font-bold"
           >
-            <RefreshCw className={`w-3.5 h-3.5 ${vacuuming ? "animate-spin" : ""}`} />
-            <span>{vacuuming ? "Optimizing Storage..." : "Run VACUUM & REINDEX"}</span>
-          </button>
+            Run Vacuum
+          </Button>
         </div>
       </div>
 
@@ -183,22 +187,29 @@ export function DatabaseMaintenanceOps() {
 
         {/* Action Buttons */}
         <div className="pt-1 flex items-center justify-between">
-          <button
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
             onClick={handleDryRun}
-            disabled={dryRunning || pruning}
-            className="text-xs text-zinc-400 hover:text-white underline font-medium transition-colors"
-          >
-            {dryRunning ? "Estimating..." : "Simulate Dry-Run"}
-          </button>
-
-          <button
-            onClick={handleLivePrune}
+            isLoading={dryRunning}
+            loadingText="Estimating..."
             disabled={pruning}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 text-rose-300 border border-rose-500/30 text-xs font-bold transition-all disabled:opacity-50"
           >
-            <Trash2 className="w-3.5 h-3.5" />
-            <span>{pruning ? "Purging..." : "Execute Prune"}</span>
-          </button>
+            Dry-Run Estimate
+          </Button>
+
+          <Button
+            type="button"
+            variant="danger"
+            size="sm"
+            onClick={handleLivePrune}
+            isLoading={pruning}
+            loadingText="Purging..."
+            icon={<Trash2 className="w-3.5 h-3.5" />}
+          >
+            Execute Prune
+          </Button>
         </div>
       </div>
     </div>

@@ -1,8 +1,9 @@
 "use client";
 
 import React, { useState } from "react";
-import { Wallet, Loader2, CheckCircle2 } from "lucide-react";
+import { Wallet, CheckCircle2 } from "lucide-react";
 import { Network } from "../../types/invoice";
+import { Button } from "../ui/Button";
 
 interface Props {
   network: Network;
@@ -60,24 +61,18 @@ export function Web3PayButton({ network, payAmount, payCurrency, depositAddress 
 
   return (
     <div className="space-y-3">
-      <button
+      <Button
         type="button"
+        variant="primary"
+        fullWidth
+        size="lg"
         onClick={handle1ClickPay}
-        disabled={connecting}
-        className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-medium text-sm text-zinc-950 bg-gradient-to-r from-cyan-400 to-emerald-400 hover:from-cyan-300 hover:to-emerald-300 transition-all shadow-lg shadow-cyan-500/20 disabled:opacity-50"
+        isLoading={connecting}
+        loadingText="Connecting..."
+        icon={<Wallet className="w-4 h-4" />}
       >
-        {connecting ? (
-          <>
-            <Loader2 className="w-4 h-4 animate-spin" />
-            Connecting...
-          </>
-        ) : (
-          <>
-            <Wallet className="w-4 h-4" />
-            Pay with Web3 Wallet
-          </>
-        )}
-      </button>
+        Pay with Wallet
+      </Button>
 
       {statusMessage && (
         <div className="text-xs text-center text-zinc-400 bg-zinc-800/40 p-2.5 rounded-lg border border-zinc-700/40 flex items-center justify-center gap-1.5">

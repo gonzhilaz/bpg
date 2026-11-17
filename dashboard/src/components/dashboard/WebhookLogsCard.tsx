@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { WebhookDeliveryLog } from "../../types/merchant";
 import { Tooltip } from "../ui/Tooltip";
+import { Button } from "../ui/Button";
 import { getEnvUrl } from "../../utils/env";
 import { WebhookInspectModal } from "./WebhookInspectModal";
 
@@ -325,27 +326,27 @@ export function WebhookLogsCard({ logs: initialLogs }: Props) {
                     <td className="py-3 px-3 text-zinc-500 text-[11px]">{log.timestamp}</td>
                     <td className="py-3 pl-4 text-right">
                       <div className="flex items-center justify-end gap-1.5 font-sans">
-                        <button
+                        <Button
                           type="button"
+                          variant="secondary"
+                          size="sm"
                           onClick={() => setSelectedLog(log)}
-                          className="px-2.5 py-1 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-[11px] font-medium border border-zinc-700/80 transition-colors inline-flex items-center gap-1 cursor-pointer"
+                          icon={<Eye className="w-3 h-3 text-cyan-400" />}
                         >
-                          <Eye className="w-3 h-3 text-cyan-400" />
-                          <span>Inspect</span>
-                        </button>
-                        <button
+                          Inspect
+                        </Button>
+                        <Button
                           type="button"
+                          variant="outline"
+                          size="sm"
                           onClick={() => handleReplay(log)}
-                          disabled={replayingId === log.id}
-                          className="px-2.5 py-1 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 text-[11px] font-medium border border-cyan-500/30 transition-colors inline-flex items-center gap-1 disabled:opacity-50 cursor-pointer"
+                          isLoading={replayingId === log.id}
+                          loadingText="Replaying..."
+                          icon={<RotateCw className="w-3 h-3 text-cyan-400" />}
+                          className="border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10"
                         >
-                          <RotateCw
-                            className={`w-3 h-3 text-cyan-400 ${
-                              replayingId === log.id ? "animate-spin" : ""
-                            }`}
-                          />
-                          <span>{replayingId === log.id ? "Replaying..." : "Replay"}</span>
-                        </button>
+                          Replay
+                        </Button>
                       </div>
                     </td>
                   </tr>

@@ -5,6 +5,7 @@ import { QRCodeSVG } from "qrcode.react";
 import { Copy, Check, ExternalLink } from "lucide-react";
 import { Network } from "../../types/invoice";
 import { Tooltip } from "../ui/Tooltip";
+import { Button } from "../ui/Button";
 
 interface Props {
   depositAddress: string;
@@ -67,14 +68,15 @@ export function QRCodeBox({ depositAddress, payAmount, payCurrency, network }: P
           </div>
         </div>
 
-        <button
+        <Button
           type="button"
+          variant="secondary"
+          size="sm"
           onClick={() => copyToClipboard(payAmount, "amount")}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-zinc-700/60 hover:bg-zinc-700 text-zinc-200 transition-colors"
+          icon={copiedAmount ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
         >
-          {copiedAmount ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
           {copiedAmount ? "Copied" : "Copy"}
-        </button>
+        </Button>
       </div>
 
       {/* Address Copy Row */}
@@ -90,14 +92,15 @@ export function QRCodeBox({ depositAddress, payAmount, payCurrency, network }: P
         </div>
 
         <div className="flex items-center gap-1 flex-shrink-0">
-          <button
+          <Button
             type="button"
+            variant="secondary"
+            size="sm"
             onClick={() => copyToClipboard(depositAddress, "addr")}
-            className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-lg bg-zinc-700/60 hover:bg-zinc-700 text-zinc-200 transition-colors"
+            icon={copiedAddr ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
           >
-            {copiedAddr ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
             {copiedAddr ? "Copied" : "Copy"}
-          </button>
+          </Button>
 
           <a
             href={getExplorerUrl()}

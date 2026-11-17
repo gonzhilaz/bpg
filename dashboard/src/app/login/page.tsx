@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { getEnvUrl } from "../../utils/env";
 import { AuthShowcasePanel } from "../../components/auth/AuthShowcasePanel";
+import { Button } from "../../components/ui/Button";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("demo@13c.local");
@@ -189,14 +190,15 @@ export default function LoginPage() {
                   </label>
                 </div>
 
-                <button
+                <Button
                   type="submit"
-                  disabled={loading}
-                  className="w-full py-2.5 px-4 rounded-xl font-bold text-xs text-zinc-950 bg-gradient-to-r from-cyan-400 to-emerald-400 hover:from-cyan-300 hover:to-emerald-300 transition-all flex items-center justify-center gap-2 shadow-lg shadow-cyan-500/10 disabled:opacity-50 cursor-pointer"
+                  fullWidth
+                  isLoading={loading}
+                  loadingText="Signing In..."
+                  iconRight={<ArrowRight className="w-3.5 h-3.5" />}
                 >
-                  <span>{loading ? "Authenticating Session..." : "Sign In to Dashboard"}</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </button>
+                  Sign In
+                </Button>
               </form>
             ) : (
               /* Step 2: 2FA TOTP Code Challenge */
@@ -231,27 +233,31 @@ export default function LoginPage() {
                 </div>
 
                 <div className="space-y-2 pt-1">
-                  <button
+                  <Button
                     type="submit"
-                    disabled={loading || twoFactorCode.length !== 6}
-                    className="w-full py-2.5 px-4 rounded-xl font-bold text-xs text-zinc-950 bg-gradient-to-r from-cyan-400 to-emerald-400 hover:from-cyan-300 hover:to-emerald-300 transition-all flex items-center justify-center gap-2 shadow-lg shadow-cyan-500/10 disabled:opacity-50 cursor-pointer"
+                    fullWidth
+                    disabled={twoFactorCode.length !== 6}
+                    isLoading={loading}
+                    loadingText="Verifying..."
+                    iconRight={<ArrowRight className="w-3.5 h-3.5" />}
                   >
-                    <span>{loading ? "Verifying Token..." : "Verify & Sign In"}</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </button>
+                    Verify 2FA
+                  </Button>
 
-                  <button
+                  <Button
                     type="button"
+                    variant="ghost"
+                    size="sm"
+                    fullWidth
                     onClick={() => {
                       setRequire2FA(false);
                       setTwoFactorCode("");
                       setError(null);
                     }}
-                    className="w-full py-2 px-3 text-[11px] text-zinc-400 hover:text-white flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                    icon={<ArrowLeft className="w-3 h-3" />}
                   >
-                    <ArrowLeft className="w-3 h-3" />
-                    <span>Back to Email & Password</span>
-                  </button>
+                    Back to Login
+                  </Button>
                 </div>
               </form>
             )}

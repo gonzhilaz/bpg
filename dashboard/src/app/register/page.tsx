@@ -21,6 +21,7 @@ import {
 import { getEnvUrl } from "../../utils/env";
 import { AuthShowcasePanel } from "../../components/auth/AuthShowcasePanel";
 import { PasswordStrengthMeter } from "../../components/auth/PasswordStrengthMeter";
+import { Button } from "../../components/ui/Button";
 
 export default function RegisterPage() {
   const [name, setName] = useState("");
@@ -270,14 +271,15 @@ export default function RegisterPage() {
                   </label>
                 </div>
 
-                <button
+                <Button
                   type="submit"
-                  disabled={loading}
-                  className="w-full py-2.5 px-4 rounded-xl font-bold text-xs text-zinc-950 bg-gradient-to-r from-cyan-400 to-emerald-400 hover:from-cyan-300 hover:to-emerald-300 transition-all flex items-center justify-center gap-2 shadow-lg shadow-cyan-500/10 disabled:opacity-50 cursor-pointer"
+                  fullWidth
+                  isLoading={loading}
+                  loadingText="Creating..."
+                  iconRight={<ArrowRight className="w-3.5 h-3.5" />}
                 >
-                  <span>{loading ? "Generating Merchant Keys..." : "Create Merchant Account"}</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </button>
+                  Create Account
+                </Button>
               </form>
 
               <div className="pt-3 border-t border-zinc-800/80 text-center text-xs text-zinc-400">

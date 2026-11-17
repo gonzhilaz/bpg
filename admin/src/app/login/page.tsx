@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Shield, Lock, KeyRound, Key, AlertTriangle, ArrowRight, ShieldCheck } from "lucide-react";
+import { Button } from "../../components/ui/Button";
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -129,14 +130,16 @@ export default function AdminLoginPage() {
               </div>
             </div>
 
-            <button
+            <Button
               type="submit"
-              disabled={loading || isLocked}
-              className="w-full py-2.5 px-4 rounded-xl font-bold text-xs text-zinc-950 bg-gradient-to-r from-cyan-400 to-emerald-400 hover:from-cyan-300 hover:to-emerald-300 transition-all flex items-center justify-center gap-2 shadow-lg shadow-cyan-500/10 disabled:opacity-50"
+              fullWidth
+              disabled={isLocked}
+              isLoading={loading}
+              loadingText="Authorizing..."
+              iconRight={<ArrowRight className="w-3.5 h-3.5" />}
             >
-              <span>{loading ? "Verifying Keys..." : "Authorize Root Console"}</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </button>
+              Authorize Console
+            </Button>
           </form>
 
           {/* Dev Quick-Fill Pill for Local Testing */}

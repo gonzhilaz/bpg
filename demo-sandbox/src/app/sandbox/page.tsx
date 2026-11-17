@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { ArrowLeft, Play, RefreshCw, CheckCircle2, ExternalLink, Zap } from "lucide-react";
+import { Button } from "../../components/ui/Button";
 import { Network } from "../../types/invoice";
 import { getEnvUrl } from "../../utils/env";
 
@@ -208,14 +209,15 @@ export default function SandboxPage() {
               </div>
             </div>
 
-            <button
+            <Button
               type="submit"
-              disabled={loading}
-              className="w-full py-2.5 px-4 rounded-xl font-medium text-xs text-zinc-950 bg-gradient-to-r from-cyan-400 to-emerald-400 hover:from-cyan-300 hover:to-emerald-300 transition-all flex items-center justify-center gap-2 shadow-lg shadow-cyan-500/10 disabled:opacity-50"
+              fullWidth
+              isLoading={loading}
+              loadingText="Generating..."
+              icon={<Play className="w-3.5 h-3.5" />}
             >
-              {loading ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Play className="w-3.5 h-3.5" />}
-              Generate Deposit Address
-            </button>
+              Generate Address
+            </Button>
           </form>
         </div>
 
@@ -233,7 +235,7 @@ export default function SandboxPage() {
                 target="_blank"
                 className="inline-flex items-center gap-1 text-xs text-cyan-400 hover:underline"
               >
-                Open Checkout Screen
+                Open Checkout
                 <ExternalLink className="w-3 h-3" />
               </Link>
             </div>
@@ -245,15 +247,17 @@ export default function SandboxPage() {
               <div className="text-cyan-400 font-semibold">{createdInvoice.pay_amount} {payCurrency}</div>
             </div>
 
-            <button
+            <Button
               type="button"
+              variant="secondary"
+              fullWidth
               onClick={handleSimulatePayment}
-              disabled={simulating}
-              className="w-full py-2.5 px-4 rounded-xl font-medium text-xs text-white bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+              isLoading={simulating}
+              loadingText="Simulating..."
+              icon={<Play className="w-3.5 h-3.5 text-emerald-400" />}
             >
-              {simulating ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Play className="w-3.5 h-3.5 text-emerald-400" />}
-              Simulate Blockchain Payment Deposit
-            </button>
+              Simulate Deposit
+            </Button>
 
             {simulationResult && (
               <div className="p-3 rounded-xl bg-emerald-950/40 border border-emerald-800/40 text-emerald-300 text-xs text-center">
