@@ -65,7 +65,7 @@ func setupTestRouter(t *testing.T) (*gin.Engine, *gorm.DB) {
 
 	healthHandler := handler.NewHealthHandler()
 	merchantHandler := handler.NewMerchantHandler(merchantRepo)
-	invoiceHandler := handler.NewInvoiceHandler(invoiceSvc)
+	invoiceHandler := handler.NewInvoiceHandler(invoiceSvc, invoiceRepo)
 
 	r := gin.New()
 	r.Use(middleware.CORSMiddleware())

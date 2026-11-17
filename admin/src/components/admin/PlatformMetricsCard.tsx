@@ -46,8 +46,8 @@ export function PlatformMetricsCard({ metrics }: Props) {
           label="Fee Revenue"
           value={`$${metrics.platform_fee_revenue_usd}`}
           icon={Percent}
-          tooltip="Platform commission (0.4%) automatically retained from settled invoices."
-          trend="0.4%"
+          tooltip="Platform commission automatically retained from settled invoices based on configured Fee Gateway (%)."
+          trend="Configured"
           trendUp={true}
         />
 

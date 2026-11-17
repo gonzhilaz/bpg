@@ -3,6 +3,7 @@ package handler
 import (
 	"net/http"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -11,6 +12,7 @@ import (
 
 	"13c-gateway/internal/domain"
 	"13c-gateway/internal/middleware"
+	"13c-gateway/internal/repository"
 	"13c-gateway/internal/service"
 	"13c-gateway/internal/sse"
 	"13c-gateway/pkg/response"
@@ -18,12 +20,16 @@ import (
 
 // InvoiceHandler handles invoice HTTP endpoints
 type InvoiceHandler struct {
-	invoiceSvc service.InvoiceService
+	invoiceSvc  service.InvoiceService
+	invoiceRepo repository.InvoiceRepository
 }
 
 // NewInvoiceHandler creates a new InvoiceHandler
-func NewInvoiceHandler(invoiceSvc service.InvoiceService) *InvoiceHandler {
-	return &InvoiceHandler{invoiceSvc: invoiceSvc}
+func NewInvoiceHandler(invoiceSvc service.InvoiceService, invoiceRepo repository.InvoiceRepository) *InvoiceHandler {
+	return &InvoiceHandler{
+		invoiceSvc:  invoiceSvc,
+		invoiceRepo: invoiceRepo,
+	}
 }
 
 // Create generates a new invoice with an ephemeral deposit address
@@ -172,5 +178,45 @@ func (h *InvoiceHandler) StreamEvents(c *gin.Context) {
 			}
 		}
 	}
+}
+
+// ListMerchantInvoices retrieves paginated invoices belonging to authenticated merchant
+func (h *InvoiceHandler) ListMerchantInvoices(c *gin.Context) {
+	merchant := middleware.GetCurrentMerchant(c)
+	if merchant == nil {
+		response.Unauthorized(c, "Merchant not authenticated")
+		return
+	}
+
+	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "20"))
+	status := c.DefaultQuery("status", "")
+	network := c.DefaultQuery("network", "")
+
+	if page < 1 {
+		page = 1
+	}
+	if limit < 1 || limit > 100 {
+		limit = 20
+	}
+	offset := (page - 1) * limit
+
+	if h.invoiceRepo == nil {
+		response.InternalServerError(c, "Invoice repository not configured", nil)
+		return
+	}
+
+	invoices, total, err := h.invoiceRepo.ListByMerchantID(c.Request.Context(), merchant.ID, limit, offset, status, network)
+	if err != nil {
+		response.InternalServerError(c, "Failed to retrieve invoices", err.Error())
+		return
+	}
+
+	response.Success(c, http.StatusOK, "Merchant invoices list", gin.H{
+		"invoices": invoices,
+		"total":    total,
+		"page":     page,
+		"limit":    limit,
+	})
 }
 

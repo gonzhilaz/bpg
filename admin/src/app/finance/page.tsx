@@ -21,7 +21,7 @@ export default function FinancePage() {
           <h1 className="text-xl font-bold tracking-tight text-white flex items-center gap-2">
             <TrendingUp className="w-5 h-5 text-emerald-400" />
             <span>Platform Revenue Ledger</span>
-            <Tooltip content="Audited global platform turnover, 0.4% platform fee collections, gas expenditures, and net operational margins." />
+            <Tooltip content="Audited global platform turnover, Fee Gateway (%) collections, gas expenditures, and net operational margins." />
           </h1>
           <p className="text-xs text-zinc-400">
             Real-time multi-chain fee attribution and net operational profitability.
@@ -38,7 +38,7 @@ export default function FinancePage() {
           <div className="flex items-center gap-2">
             <Layers className="w-4 h-4 text-cyan-400" />
             <h2 className="text-xs font-bold text-white uppercase tracking-wider">Chain Breakdown</h2>
-            <Tooltip content="Turnover volume, 0.4% fees, and sweep gas costs itemized per blockchain." />
+            <Tooltip content="Turnover volume, Fee Gateway (%) revenue, and sweep gas costs itemized per blockchain." />
           </div>
           <span className="text-[10px] text-zinc-500 font-mono">Real-time Attribution</span>
         </div>
@@ -49,7 +49,7 @@ export default function FinancePage() {
               <tr className="border-b border-zinc-800 text-zinc-400 font-sans text-[11px]">
                 <th className="pb-2.5 font-semibold">Network</th>
                 <th className="pb-2.5 font-semibold text-right">Volume</th>
-                <th className="pb-2.5 font-semibold text-right">Fee (0.4%)</th>
+                <th className="pb-2.5 font-semibold text-right">Fee Gateway (%)</th>
                 <th className="pb-2.5 font-semibold text-right">Gas Spent</th>
                 <th className="pb-2.5 font-semibold text-right">Net Margin</th>
               </tr>

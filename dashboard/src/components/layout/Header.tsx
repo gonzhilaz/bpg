@@ -10,7 +10,7 @@ import { MerchantNotificationDropdown } from "./MerchantNotificationDropdown";
 
 export function Header() {
   const pathname = usePathname();
-  const { setIsMobileNavOpen } = useEnvironment();
+  const { setIsMobileNavOpen, isDbConnected, isLoading, reload } = useEnvironment();
   const { theme, toggleTheme } = useTheme();
   const { lang, setLang, t } = useLanguage();
 
@@ -60,10 +60,23 @@ export function Header() {
 
       {/* Right: Notifications, Language, Theme */}
       <div className="flex items-center gap-2.5">
-        <div className="hidden lg:flex items-center gap-2 text-xs font-medium text-emerald-400 bg-emerald-950/30 border border-emerald-800/40 px-3 py-1.5 rounded-xl">
-          <ShieldCheck className="w-3.5 h-3.5" />
-          <span>{t("connected")}</span>
-        </div>
+        <button
+          onClick={reload}
+          disabled={isLoading}
+          className={`hidden sm:flex items-center gap-2 text-xs font-medium px-3 py-1.5 rounded-xl border transition-all ${
+            isDbConnected
+              ? "text-emerald-400 bg-emerald-950/30 border-emerald-800/40 hover:bg-emerald-950/50"
+              : "text-rose-400 bg-rose-950/30 border-rose-800/40 hover:bg-rose-950/50 animate-pulse"
+          }`}
+          title={isDbConnected ? "Connected to Real DB (PostgreSQL / SQLite WAL)" : "Database unreachable - Click to retry"}
+        >
+          <span
+            className={`w-2 h-2 rounded-full ${
+              isDbConnected ? "bg-emerald-400 animate-pulse" : "bg-rose-500"
+            }`}
+          />
+          <span>{isDbConnected ? "Real DB Active" : "DB Disconnected"}</span>
+        </button>
 
         {/* Merchant Notifications */}
         <MerchantNotificationDropdown />

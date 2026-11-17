@@ -1,33 +1,28 @@
 "use client";
 
-import React, { useState } from "react";
-import { Webhook, Radio, Send, CheckCircle2, ShieldCheck, Code, Check } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Webhook, Send, CheckCircle2, ShieldCheck, Code, Check, AlertCircle } from "lucide-react";
 import { useEnvironment } from "../../../context/EnvironmentContext";
 import { WebhookLogsCard } from "../../../components/dashboard/WebhookLogsCard";
 import { Tooltip } from "../../../components/ui/Tooltip";
+import { Button } from "../../../components/ui/Button";
+import { MerchantService } from "../../../services/merchantService";
 import { mockWebhookDeliveries } from "../../../mocks/mockMerchant";
 
 export default function WebhooksPage() {
-  const { profile, webhookLogs } = useEnvironment();
-  const [url, setUrl] = useState(profile.webhook_url || "https://example-store.com/api/webhooks/crypto");
-  const [isPinging, setIsPinging] = useState(false);
-  const [pingSuccess, setPingSuccess] = useState(false);
+  const { profile, updateProfile } = useEnvironment();
+  const [url, setUrl] = useState(profile.webhook_url || "");
+  const [isSaving, setIsSaving] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
+  const [isPinging, setIsPinging] = useState(false);
+  const [pingResult, setPingResult] = useState<{ success: boolean; message: string } | null>(null);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
-  const handleSave = (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSaved(true);
-    setTimeout(() => setIsSaved(false), 2000);
-  };
-
-  const handleTestPing = () => {
-    setIsPinging(true);
-    setTimeout(() => {
-      setIsPinging(false);
-      setPingSuccess(true);
-      setTimeout(() => setPingSuccess(false), 3000);
-    }, 1000);
-  };
+  useEffect(() => {
+    if (profile.webhook_url) {
+      setUrl(profile.webhook_url);
+    }
+  }, [profile.webhook_url]);
 
   const samplePayload = {
     event: "INVOICE_PAID",
@@ -40,6 +35,63 @@ export default function WebhooksPage() {
     tx_hash: "3a9f02...e4c1",
     signature: "sha256=4f3c7...98a",
     timestamp: "2026-11-13T09:00:00Z",
+  };
+
+  const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSaving(true);
+    setSaveError(null);
+    try {
+      const res = await updateProfile({ webhook_url: url.trim() });
+      if (res.success) {
+        setIsSaved(true);
+        setTimeout(() => setIsSaved(false), 3000);
+      } else {
+        setSaveError(res.error || "Failed to save webhook URL to database");
+      }
+    } catch (err: unknown) {
+      setSaveError(err instanceof Error ? err.message : "Error saving webhook URL");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleTestPing = async () => {
+    if (!url.trim()) {
+      setSaveError("Please enter a valid webhook destination URL first.");
+      return;
+    }
+    setIsPinging(true);
+    setPingResult(null);
+    setSaveError(null);
+
+    try {
+      const res = await MerchantService.testWebhook({
+        url: url.trim(),
+        event: "INVOICE_PAID",
+        order_id: "ORD-TEST-9901",
+        payload: samplePayload,
+      });
+
+      if (res.data) {
+        setPingResult({
+          success: res.data.success || res.data.status_code < 300,
+          message: `Webhook delivered in ${res.data.duration_ms}ms (HTTP ${res.data.status_code}). Delivery ID: ${res.data.delivery_id}`,
+        });
+      } else {
+        setPingResult({
+          success: false,
+          message: res.error || "Webhook test dispatch failed to reach target URL",
+        });
+      }
+    } catch (err: unknown) {
+      setPingResult({
+        success: false,
+        message: err instanceof Error ? err.message : "Network error testing webhook",
+      });
+    } finally {
+      setIsPinging(false);
+    }
   };
 
   return (
@@ -62,7 +114,7 @@ export default function WebhooksPage() {
           </div>
 
           <span className="text-[11px] font-mono text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full">
-            Signature Verification: Enabled
+            HMAC-SHA256 Signing
           </span>
         </div>
 
@@ -78,29 +130,52 @@ export default function WebhooksPage() {
           </div>
 
           <div className="flex items-center gap-2">
-            <button
+            <Button
               type="submit"
-              className="flex-1 sm:flex-none px-4 py-2 rounded-xl bg-cyan-500 text-zinc-950 font-bold text-xs hover:bg-cyan-400 transition-colors"
+              variant="primary"
+              size="sm"
+              isLoading={isSaving}
+              loadingText="Saving..."
+              icon={isSaved ? <Check className="w-3.5 h-3.5" /> : <ShieldCheck className="w-3.5 h-3.5" />}
             >
-              {isSaved ? "Saved!" : "Save URL"}
-            </button>
+              {isSaved ? "Saved" : "Save URL"}
+            </Button>
 
-            <button
+            <Button
               type="button"
+              variant="secondary"
+              size="sm"
               onClick={handleTestPing}
-              disabled={isPinging}
-              className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs font-medium border border-zinc-700 transition-colors disabled:opacity-50"
+              isLoading={isPinging}
+              loadingText="Pinging..."
+              icon={<Send className="w-3.5 h-3.5 text-cyan-400" />}
             >
-              <Send className="w-3.5 h-3.5 text-cyan-400" />
-              <span>{isPinging ? "Pinging..." : "Test Ping"}</span>
-            </button>
+              Test Ping
+            </Button>
           </div>
         </form>
 
-        {pingSuccess && (
-          <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-400 flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4" />
-            <span>Test ping delivered successfully: HTTP 200 OK returned by endpoint.</span>
+        {saveError && (
+          <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-xs text-rose-400 flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 shrink-0" />
+            <span>{saveError}</span>
+          </div>
+        )}
+
+        {pingResult && (
+          <div
+            className={`p-3 rounded-xl text-xs flex items-center gap-2 border ${
+              pingResult.success
+                ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
+                : "bg-amber-500/10 border-amber-500/20 text-amber-400"
+            }`}
+          >
+            {pingResult.success ? (
+              <CheckCircle2 className="w-4 h-4 shrink-0" />
+            ) : (
+              <AlertCircle className="w-4 h-4 shrink-0" />
+            )}
+            <span>{pingResult.message}</span>
           </div>
         )}
       </div>
@@ -125,4 +200,3 @@ export default function WebhooksPage() {
     </div>
   );
 }
-

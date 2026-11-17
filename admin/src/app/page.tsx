@@ -183,7 +183,7 @@ export default function AdminOverviewPage() {
             </div>
             <ArrowUpRight className="w-3.5 h-3.5 text-zinc-500 group-hover:text-emerald-400 transition-colors" />
           </div>
-          <div className="text-[11px] text-zinc-400 font-mono">0.4% Platform Margin • Ledger</div>
+          <div className="text-[11px] text-zinc-400 font-mono">Fee Gateway (%) Margin • Ledger</div>
         </Link>
 
         <Link

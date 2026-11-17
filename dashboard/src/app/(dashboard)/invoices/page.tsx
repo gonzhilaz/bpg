@@ -1,16 +1,15 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
-import { Search, Filter, RotateCcw, Receipt, ChevronDown } from "lucide-react";
+import { Search, Filter, RotateCcw, Receipt, ChevronDown, AlertCircle, RefreshCw } from "lucide-react";
 import { useEnvironment } from "../../../context/EnvironmentContext";
 import { useLanguage } from "../../../context/LanguageContext";
 import { InvoicesTable } from "../../../components/dashboard/InvoicesTable";
 import { IconButton } from "../../../components/ui/IconButton";
-import { Tooltip } from "../../../components/ui/Tooltip";
-import { Network } from "../../../types/merchant";
+import { Button } from "../../../components/ui/Button";
 
 export default function InvoicesPage() {
-  const { invoices } = useEnvironment();
+  const { invoices, isLoading, isDbConnected, error, reload } = useEnvironment();
   const { t } = useLanguage();
   const [search, setSearch] = useState("");
   const [selectedNetwork, setSelectedNetwork] = useState<string>("ALL");
@@ -45,12 +44,39 @@ export default function InvoicesPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight text-white">{t("invoicesTitle")}</h1>
-        <p className="text-xs text-zinc-400 mt-1">
-          {t("invoicesSubtitle")}
-        </p>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight text-white">{t("invoicesTitle")}</h1>
+          <p className="text-xs text-zinc-400 mt-1">{t("invoicesSubtitle")}</p>
+        </div>
+
+        <Button
+          variant="secondary"
+          size="sm"
+          onClick={reload}
+          isLoading={isLoading}
+          loadingText="Syncing..."
+          icon={<RefreshCw className="w-3.5 h-3.5" />}
+        >
+          Sync DB
+        </Button>
       </div>
+
+      {/* Database Connection Error State */}
+      {!isDbConnected && error && (
+        <div className="p-4 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5">
+            <AlertCircle className="w-5 h-5 text-rose-400 shrink-0" />
+            <div>
+              <div className="font-semibold text-rose-200">Database Connection Error</div>
+              <div className="text-[11px] text-rose-400/80">{error}</div>
+            </div>
+          </div>
+          <Button variant="danger" size="sm" onClick={reload} isLoading={isLoading}>
+            Retry Connection
+          </Button>
+        </div>
+      )}
 
       {/* Filter Toolbar: Search + Dropdown Filters + Reset */}
       <div className="bg-zinc-900/60 border border-zinc-800 p-4 rounded-2xl">
@@ -102,18 +128,22 @@ export default function InvoicesPage() {
 
           {/* Reset Button */}
           {isFiltered && (
-            <IconButton
-              icon={RotateCcw}
-              tooltip={t("reset")}
-              onClick={handleReset}
-              size="md"
-            />
+            <IconButton icon={RotateCcw} tooltip={t("reset")} onClick={handleReset} size="md" />
           )}
         </div>
       </div>
 
-      {/* Invoices List or Empty State */}
-      {filteredInvoices.length > 0 ? (
+      {/* Loading Shimmer State */}
+      {isLoading ? (
+        <div className="bg-zinc-900/60 border border-zinc-800 rounded-2xl p-6 space-y-4 animate-pulse">
+          <div className="h-4 bg-zinc-800 rounded w-1/4"></div>
+          <div className="space-y-3">
+            {[1, 2, 3, 4, 5].map((i) => (
+              <div key={i} className="h-10 bg-zinc-800/60 rounded-xl"></div>
+            ))}
+          </div>
+        </div>
+      ) : filteredInvoices.length > 0 ? (
         <InvoicesTable invoices={filteredInvoices} />
       ) : (
         <div className="p-12 text-center bg-zinc-900/40 border border-zinc-800/80 rounded-2xl space-y-3">
@@ -121,9 +151,7 @@ export default function InvoicesPage() {
             <Receipt className="w-6 h-6" />
           </div>
           <div className="text-sm font-semibold text-white">{t("emptyData")}</div>
-          <p className="text-xs text-zinc-400 max-w-sm mx-auto">
-            {t("emptyFilterDesc")}
-          </p>
+          <p className="text-xs text-zinc-400 max-w-sm mx-auto">{t("emptyFilterDesc")}</p>
           <button
             onClick={handleReset}
             className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-400 text-xs font-semibold border border-cyan-500/30 transition-colors mt-2"

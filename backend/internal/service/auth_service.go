@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/shopspring/decimal"
 
 	"13c-gateway/internal/crypto"
 	"13c-gateway/internal/domain"
@@ -51,10 +52,24 @@ type RegenerateKeyResponse struct {
 	RawSecretKey string `json:"raw_secret_key"`
 }
 
+// UpdateProfileRequest defines parameters for updating merchant settings
+type UpdateProfileRequest struct {
+	Name                 string           `json:"name"`
+	PayoutAddressBSC     string           `json:"payout_address_bsc"`
+	PayoutAddressPolygon string           `json:"payout_address_polygon"`
+	PayoutAddressTron    string           `json:"payout_address_tron"`
+	PayoutAddressSolana  string           `json:"payout_address_solana"`
+	AutoPayoutEnabled    *bool            `json:"auto_payout_enabled"`
+	FeePayer             string           `json:"fee_payer"`
+	UnderpaidTolerance   *decimal.Decimal `json:"underpaid_tolerance"`
+	WebhookURL           string           `json:"webhook_url"`
+}
+
 // AuthService defines business logic for registration and session handling
 type AuthService interface {
 	Register(ctx context.Context, req *RegisterRequest) (*AuthResponse, error)
 	Login(ctx context.Context, req *LoginRequest) (*AuthResponse, error)
+	UpdateProfile(ctx context.Context, merchantID uuid.UUID, req *UpdateProfileRequest) (*domain.Merchant, error)
 	RegenerateAPIKey(ctx context.Context, merchantID uuid.UUID) (*RegenerateKeyResponse, error)
 	Setup2FA(ctx context.Context, merchantID uuid.UUID) (*Setup2FAResponse, error)
 	Verify2FA(ctx context.Context, merchantID uuid.UUID, passcode string) (bool, error)
@@ -284,5 +299,52 @@ func (s *authService) RegenerateAPIKey(ctx context.Context, merchantID uuid.UUID
 		APIKeyPrefix: keyPrefix,
 		RawSecretKey: secretKey,
 	}, nil
+}
+
+func (s *authService) UpdateProfile(ctx context.Context, merchantID uuid.UUID, req *UpdateProfileRequest) (*domain.Merchant, error) {
+	merchant, err := s.merchantRepo.GetByID(ctx, merchantID)
+	if err != nil {
+		return nil, err
+	}
+	if merchant == nil {
+		return nil, errors.New("merchant not found")
+	}
+
+	if req.Name != "" {
+		merchant.Name = strings.TrimSpace(req.Name)
+	}
+	if req.PayoutAddressBSC != "" {
+		merchant.PayoutAddressBSC = strings.TrimSpace(req.PayoutAddressBSC)
+	}
+	if req.PayoutAddressPolygon != "" {
+		merchant.PayoutAddressPolygon = strings.TrimSpace(req.PayoutAddressPolygon)
+	}
+	if req.PayoutAddressTron != "" {
+		merchant.PayoutAddressTron = strings.TrimSpace(req.PayoutAddressTron)
+	}
+	if req.PayoutAddressSolana != "" {
+		merchant.PayoutAddressSolana = strings.TrimSpace(req.PayoutAddressSolana)
+	}
+	if req.AutoPayoutEnabled != nil {
+		merchant.AutoPayoutEnabled = *req.AutoPayoutEnabled
+	}
+	if req.FeePayer != "" {
+		fp := strings.ToLower(strings.TrimSpace(req.FeePayer))
+		if fp == "customer" || fp == "merchant" {
+			merchant.FeePayer = fp
+		}
+	}
+	if req.UnderpaidTolerance != nil {
+		merchant.UnderpaidTolerance = *req.UnderpaidTolerance
+	}
+	if req.WebhookURL != "" {
+		merchant.WebhookURL = strings.TrimSpace(req.WebhookURL)
+	}
+
+	if err := s.merchantRepo.Update(ctx, merchant); err != nil {
+		return nil, fmt.Errorf("failed to save merchant profile: %w", err)
+	}
+
+	return merchant, nil
 }
 

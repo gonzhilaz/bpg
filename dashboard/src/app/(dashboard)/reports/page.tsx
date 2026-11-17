@@ -12,7 +12,7 @@ export default function ReportsPage() {
       <div>
         <h1 className="text-2xl font-bold tracking-tight text-white flex items-center gap-2">
           <span>Financial Accounting</span>
-          <Tooltip content="Audited revenue breakdowns, 0.4% platform margin, network gas, and cold wallet settlements." />
+          <Tooltip content="Audited revenue breakdowns, Fee Gateway (%), network gas, and cold wallet settlements." />
         </h1>
         <p className="text-xs text-zinc-400 mt-1">
           Revenue breakdowns, fee deductions, and net settlement reconciliations.
@@ -28,7 +28,7 @@ export default function ReportsPage() {
           <div className="flex items-center gap-2">
             <Percent className="w-4 h-4 text-emerald-400" />
             <h3 className="text-sm font-bold text-white">Fee Efficiency</h3>
-            <Tooltip content="Flat 0.4% non-custodial crypto settlement vs traditional processor fees." />
+            <Tooltip content="Configurable Fee Gateway (%) non-custodial crypto settlement vs traditional processor fees." />
           </div>
           <span className="text-xs text-emerald-400 font-semibold font-mono">Save ~85%</span>
         </div>
@@ -39,7 +39,7 @@ export default function ReportsPage() {
               <span className="font-semibold text-zinc-200">13C Gateway</span>
               <span className="text-[10px] text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-1.5 py-0.5 rounded">Active</span>
             </div>
-            <div className="text-lg font-bold text-emerald-400 font-mono">0.40% Flat</div>
+            <div className="text-lg font-bold text-emerald-400 font-mono">Fee Gateway (%)</div>
             <div className="text-[11px] text-zinc-500">Zero chargebacks • Instant sweeping</div>
           </div>
 

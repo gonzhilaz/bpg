@@ -1,10 +1,12 @@
 "use client";
 
-import React, { useState } from "react";
-import { Wallet, ShieldCheck, Check, UserCheck, Building2, Flame, Percent } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Wallet, ShieldCheck, Check, UserCheck, Building2, Flame, Percent, AlertCircle } from "lucide-react";
 import { Tooltip } from "../ui/Tooltip";
+import { Button } from "../ui/Button";
 import { MerchantProfile, NetworkGasRate } from "../../types/merchant";
 import { mockNetworkGasRates } from "../../mocks/mockMerchant";
+import { useEnvironment } from "../../context/EnvironmentContext";
 
 interface Props {
   profile: MerchantProfile;
@@ -12,23 +14,61 @@ interface Props {
 }
 
 export function PayoutSettingsCard({ profile, gasRates = mockNetworkGasRates }: Props) {
-  const [tronAddr, setTronAddr] = useState(profile.payout_address_tron);
-  const [bscAddr, setBscAddr] = useState(profile.payout_address_bsc);
-  const [polygonAddr, setPolygonAddr] = useState(profile.payout_address_polygon);
-  const [solanaAddr, setSolanaAddr] = useState(profile.payout_address_solana);
-  const [autoPayout, setAutoPayout] = useState(profile.auto_payout_enabled);
+  const { updateProfile } = useEnvironment();
+  const [tronAddr, setTronAddr] = useState(profile.payout_address_tron || "");
+  const [bscAddr, setBscAddr] = useState(profile.payout_address_bsc || "");
+  const [polygonAddr, setPolygonAddr] = useState(profile.payout_address_polygon || "");
+  const [solanaAddr, setSolanaAddr] = useState(profile.payout_address_solana || "");
+  const [autoPayout, setAutoPayout] = useState(profile.auto_payout_enabled ?? true);
   const [feePayer, setFeePayer] = useState<"customer" | "merchant">(profile.fee_payer || "customer");
   const [tolerance, setTolerance] = useState(
     profile.underpaid_tolerance !== undefined ? profile.underpaid_tolerance.toFixed(2) : "0.00"
   );
+  const [isSaving, setIsSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setTronAddr(profile.payout_address_tron || "");
+    setBscAddr(profile.payout_address_bsc || "");
+    setPolygonAddr(profile.payout_address_polygon || "");
+    setSolanaAddr(profile.payout_address_solana || "");
+    setAutoPayout(profile.auto_payout_enabled ?? true);
+    setFeePayer(profile.fee_payer || "customer");
+    setTolerance(
+      profile.underpaid_tolerance !== undefined ? profile.underpaid_tolerance.toFixed(2) : "0.00"
+    );
+  }, [profile]);
 
   const getRate = (net: string) => gasRates.find((r) => r.network === net);
 
-  const handleSave = (e: React.FormEvent) => {
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2500);
+    setIsSaving(true);
+    setSaveError(null);
+    try {
+      const tolNum = parseFloat(tolerance) || 0.0;
+      const res = await updateProfile({
+        payout_address_tron: tronAddr.trim(),
+        payout_address_bsc: bscAddr.trim(),
+        payout_address_polygon: polygonAddr.trim(),
+        payout_address_solana: solanaAddr.trim(),
+        auto_payout_enabled: autoPayout,
+        fee_payer: feePayer,
+        underpaid_tolerance: tolNum,
+      });
+
+      if (res.success) {
+        setSaved(true);
+        setTimeout(() => setSaved(false), 3000);
+      } else {
+        setSaveError(res.error || "Failed to update settings in database");
+      }
+    } catch (err: unknown) {
+      setSaveError(err instanceof Error ? err.message : "Error saving to database");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const tronRate = getRate("TRON");
@@ -203,13 +243,24 @@ export function PayoutSettingsCard({ profile, gasRates = mockNetworkGasRates }: 
           />
         </div>
 
-        <button
+        {saveError && (
+          <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 shrink-0" />
+            <span>{saveError}</span>
+          </div>
+        )}
+
+        <Button
           type="submit"
-          className="w-full py-2 px-3 rounded-xl font-medium text-xs text-zinc-950 bg-emerald-400 hover:bg-emerald-300 transition-colors flex items-center justify-center gap-1.5"
+          fullWidth
+          variant="primary"
+          size="sm"
+          isLoading={isSaving}
+          loadingText="Saving to Database..."
+          icon={saved ? <Check className="w-3.5 h-3.5" /> : <ShieldCheck className="w-3.5 h-3.5" />}
         >
-          {saved ? <Check className="w-3.5 h-3.5" /> : <ShieldCheck className="w-3.5 h-3.5" />}
           {saved ? "Saved" : "Save Payout Settings"}
-        </button>
+        </Button>
       </form>
     </div>
   );

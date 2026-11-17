@@ -81,7 +81,7 @@ export default function SettingsPage() {
               <div className="space-y-1">
                 <div className="flex items-center justify-between">
                   <label className="text-[11px] text-zinc-400 font-medium">Platform Fee</label>
-                  <Tooltip content="Platform commission cut (0.4%) retained from payouts." />
+                  <Tooltip content="Configurable platform commission cut (Fee Gateway %) retained from payouts." />
                 </div>
                 <div className="relative">
                   <input

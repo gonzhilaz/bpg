@@ -20,6 +20,7 @@ type InvoiceRepository interface {
 	GetActiveInvoicesWithGrace(ctx context.Context, network domain.Network, gracePeriod time.Duration) ([]domain.Invoice, error)
 	Update(ctx context.Context, invoice *domain.Invoice) error
 	ExpireOverdueInvoices(ctx context.Context, now time.Time) (int64, error)
+	ListByMerchantID(ctx context.Context, merchantID uuid.UUID, limit, offset int, status string, network string) ([]domain.Invoice, int64, error)
 }
 
 type invoiceRepository struct {
@@ -82,5 +83,28 @@ func (r *invoiceRepository) ExpireOverdueInvoices(ctx context.Context, now time.
 		Where("status = ? AND expires_at <= ?", domain.StatusPending, now).
 		Update("status", domain.StatusExpired)
 	return res.RowsAffected, res.Error
+}
+
+func (r *invoiceRepository) ListByMerchantID(ctx context.Context, merchantID uuid.UUID, limit, offset int, status string, network string) ([]domain.Invoice, int64, error) {
+	var invoices []domain.Invoice
+	var total int64
+
+	q := r.db.WithContext(ctx).Model(&domain.Invoice{}).Where("merchant_id = ?", merchantID)
+	if status != "" && status != "ALL" {
+		q = q.Where("status = ?", status)
+	}
+	if network != "" && network != "ALL" {
+		q = q.Where("pay_network = ?", network)
+	}
+
+	if err := q.Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+
+	if limit <= 0 {
+		limit = 20
+	}
+	err := q.Order("created_at DESC").Limit(limit).Offset(offset).Find(&invoices).Error
+	return invoices, total, err
 }
 

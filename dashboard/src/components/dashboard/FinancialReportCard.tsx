@@ -1,53 +1,66 @@
 "use client";
 
-import React, { useState } from "react";
-import { DollarSign, Download, TrendingUp, Layers, Flame, Percent } from "lucide-react";
+import React, { useState, useEffect, useCallback } from "react";
+import { DollarSign, Download, TrendingUp, Layers, Flame, Percent, RefreshCw, AlertCircle } from "lucide-react";
 import { Tooltip } from "../ui/Tooltip";
 import { IconButton } from "../ui/IconButton";
 import { StatTile } from "../ui/StatTile";
+import { MerchantService, FinancialLedgerData } from "../../services/merchantService";
 
 export function FinancialReportCard() {
   const [dateRange, setDateRange] = useState<"7D" | "30D" | "ALL">("30D");
+  const [ledger, setLedger] = useState<FinancialLedgerData>({
+    range: "30D",
+    gross_volume: "$0.00",
+    net_settled: "$0.00",
+    platform_fee: "$0.00",
+    gas_fees_paid: "$0.00",
+    payouts_count: 0,
+    avg_order: "$0.00",
+  });
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const reports = {
-    "7D": {
-      grossVolume: "$1,850.00",
-      netSettled: "$1,842.60",
-      platformFee: "$7.40",
-      gasFeesPaid: "$0.42",
-      payoutsCount: 8,
-      avgOrder: "$231.25",
-    },
-    "30D": {
-      grossVolume: "$8,420.00",
-      netSettled: "$8,386.32",
-      platformFee: "$33.68",
-      gasFeesPaid: "$1.85",
-      payoutsCount: 36,
-      avgOrder: "$233.88",
-    },
-    ALL: {
-      grossVolume: "$24,500.00",
-      netSettled: "$24,402.00",
-      platformFee: "$98.00",
-      gasFeesPaid: "$5.10",
-      payoutsCount: 112,
-      avgOrder: "$218.75",
-    },
-  };
+  const fetchLedger = useCallback(async (range: "7D" | "30D" | "ALL") => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const res = await MerchantService.getLedger(range);
+      if (res.data) {
+        setLedger(res.data);
+      } else {
+        // If DB has 0 records or error, fallback to zero state gracefully
+        setLedger({
+          range,
+          gross_volume: "$0.00",
+          net_settled: "$0.00",
+          platform_fee: "$0.00",
+          gas_fees_paid: "$0.00",
+          payouts_count: 0,
+          avg_order: "$0.00",
+        });
+      }
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Failed to load financial ledger");
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
-  const current = reports[dateRange];
+  useEffect(() => {
+    fetchLedger(dateRange);
+  }, [dateRange, fetchLedger]);
 
   const handleExportCSV = () => {
     const csvContent =
       "data:text/csv;charset=utf-8," +
       "Metric,Amount\n" +
-      `Gross Volume,${current.grossVolume}\n` +
-      `Net Settled,${current.netSettled}\n` +
-      `Platform Fee (0.4%),${current.platformFee}\n` +
-      `Gas Fees Paid,${current.gasFeesPaid}\n` +
-      `Settlement Transfers,${current.payoutsCount}\n` +
-      `Average Order Value,${current.avgOrder}\n`;
+      `Gross Volume,${ledger.gross_volume}\n` +
+      `Net Settled,${ledger.net_settled}\n` +
+      `Fee Gateway (%),${ledger.platform_fee}\n` +
+      `Gas Fees Paid,${ledger.gas_fees_paid}\n` +
+      `Settlement Transfers,${ledger.payouts_count}\n` +
+      `Average Order Value,${ledger.avg_order}\n`;
 
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
@@ -65,7 +78,7 @@ export function FinancialReportCard() {
         <div className="flex items-center gap-2">
           <TrendingUp className="w-4 h-4 text-emerald-400" />
           <h2 className="text-sm font-semibold text-zinc-100">Financial Ledger</h2>
-          <Tooltip content="Audited accounting metrics of gross sales, platform fees, and network gas deductions." />
+          <Tooltip content="Audited accounting metrics of gross sales, platform fees, and network gas deductions computed from database." />
         </div>
 
         <div className="flex items-center gap-2">
@@ -87,6 +100,15 @@ export function FinancialReportCard() {
             ))}
           </div>
 
+          {/* Refresh Button */}
+          <IconButton
+            icon={RefreshCw}
+            tooltip="Refresh Ledger"
+            onClick={() => fetchLedger(dateRange)}
+            size="sm"
+            className={isLoading ? "animate-spin text-cyan-400" : ""}
+          />
+
           {/* Export CSV Button */}
           <IconButton
             icon={Download}
@@ -97,20 +119,35 @@ export function FinancialReportCard() {
         </div>
       </div>
 
+      {error && (
+        <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-400 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 shrink-0" />
+            <span>{error}</span>
+          </div>
+          <button
+            onClick={() => fetchLedger(dateRange)}
+            className="underline font-semibold hover:text-amber-300"
+          >
+            Retry
+          </button>
+        </div>
+      )}
+
       {/* Metrics 4-Box Grid using StatTile */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <StatTile
           label="Gross Sales"
-          value={current.grossVolume}
+          value={isLoading ? "..." : ledger.gross_volume}
           icon={DollarSign}
           tooltip="Total cryptocurrency payments received before fees."
-          trend={`${current.payoutsCount} txs`}
+          trend={`${ledger.payouts_count} txs`}
           trendUp={true}
         />
 
         <StatTile
           label="Net Settled"
-          value={current.netSettled}
+          value={isLoading ? "..." : ledger.net_settled}
           icon={Layers}
           tooltip="Net tokens successfully forwarded to cold wallets."
           trend="Delivered"
@@ -118,17 +155,17 @@ export function FinancialReportCard() {
         />
 
         <StatTile
-          label="Fee (0.4%)"
-          value={current.platformFee}
+          label="Fee Gateway (%)"
+          value={isLoading ? "..." : ledger.platform_fee}
           icon={Percent}
-          tooltip="Flat 0.4% platform gateway service commission."
-          trend="0.40%"
+          tooltip="Dynamic platform gateway service commission."
+          trend="Configured"
           trendUp={true}
         />
 
         <StatTile
           label="Sweep Gas"
-          value={current.gasFeesPaid}
+          value={isLoading ? "..." : ledger.gas_fees_paid}
           icon={Flame}
           tooltip="Blockchain gas costs consumed during automated sweeping."
           trend="Network"

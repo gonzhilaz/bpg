@@ -95,10 +95,10 @@ func main() {
 
 	// Initialize Handlers
 	healthHandler := handler.NewHealthHandler()
-	invoiceHandler := handler.NewInvoiceHandler(invoiceSvc)
+	invoiceHandler := handler.NewInvoiceHandler(invoiceSvc, invoiceRepo)
 	rateHandler := handler.NewRateHandler(rateSvc)
 	authSvc := service.NewAuthService(merchantRepo, cfg.JWTSecret)
-	authHandler := handler.NewAuthHandler(authSvc)
+	authHandler := handler.NewAuthHandler(authSvc, db)
 	adminHandler := handler.NewAdminHandler(db, merchantRepo, invoiceRepo, payoutSvc)
 	withdrawalHandler := handler.NewWithdrawalHandler(withdrawalSvc)
 	paymentLinkHandler := handler.NewPaymentLinkHandler(paymentLinkSvc)
@@ -140,6 +140,9 @@ func main() {
 			authProtected.Use(middleware.JWTAuth(cfg.JWTSecret, merchantRepo))
 			{
 				authProtected.GET("/me", authHandler.Me)
+				authProtected.PUT("/profile", authHandler.UpdateProfile)
+				authProtected.GET("/invoices", invoiceHandler.ListMerchantInvoices)
+				authProtected.GET("/ledger", authHandler.GetLedger)
 				authProtected.POST("/regenerate-key", authHandler.RegenerateKey)
 				authProtected.GET("/escrow/summary", withdrawalHandler.GetEscrowSummary)
 				authProtected.POST("/withdrawals", withdrawalHandler.RequestWithdrawal)

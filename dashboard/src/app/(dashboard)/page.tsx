@@ -18,11 +18,17 @@ import { StatTile } from "../../components/ui/StatTile";
 import { Tooltip } from "../../components/ui/Tooltip";
 
 export default function OverviewPage() {
-  const { mode, profile, invoices } = useEnvironment();
+  const { mode, profile, invoices, isLoading } = useEnvironment();
 
-  const totalVolume = mode === "LIVE" ? "$750.00" : "$35.00";
-  const totalSettled = mode === "LIVE" ? "$500.00" : "$20.00";
-  const activeOrders = mode === "LIVE" ? "1 Order" : "1 Order";
+  const paidInvoices = invoices.filter((inv) => inv.status === "PAID");
+  const activeCount = invoices.filter((inv) => inv.status === "PENDING" || inv.status === "DETECTED").length;
+
+  const totalVolumeNum = paidInvoices.reduce((acc, inv) => acc + (parseFloat(inv.pay_amount) || 0), 0);
+  const totalSettledNum = paidInvoices.reduce((acc, inv) => acc + (parseFloat(inv.received_amount) || parseFloat(inv.pay_amount) || 0), 0);
+
+  const totalVolume = `$${totalVolumeNum.toFixed(2)}`;
+  const totalSettled = `$${totalSettledNum.toFixed(2)}`;
+  const activeOrders = `${activeCount} Order${activeCount === 1 ? "" : "s"}`;
 
   const recentInvoices = invoices.slice(0, 5);
 

@@ -40,7 +40,7 @@ export function PlatformFinancialReportCard() {
       "data:text/csv;charset=utf-8," +
       "Metric,Amount\n" +
       `Gross Platform Volume,${current.grossVolume}\n` +
-      `Platform Fee Revenue (0.4%),${current.feeRevenue}\n` +
+      `Fee Gateway (%) Revenue,${current.feeRevenue}\n` +
       `Hot Wallet Gas Consumed,${current.hotWalletGasSpent}\n` +
       `Net Gateway Profit,${current.netProfit}\n` +
       `Total Completed Transactions,${current.totalTransactions}\n`;
@@ -61,7 +61,7 @@ export function PlatformFinancialReportCard() {
         <div className="flex items-center gap-2">
           <TrendingUp className="w-4 h-4 text-emerald-400" />
           <h2 className="text-xs font-bold text-white uppercase tracking-wider">Revenue & Margin</h2>
-          <Tooltip content="Audited global platform volume, 0.4% platform fee collection, and net gateway profitability." />
+          <Tooltip content="Audited global platform volume, Fee Gateway (%) collection, and net gateway profitability." />
         </div>
 
         <div className="flex items-center gap-2">
@@ -104,8 +104,8 @@ export function PlatformFinancialReportCard() {
           label="Fee Cut"
           value={current.feeRevenue}
           icon={Percent}
-          tooltip="Platform commission collected directly (0.4%) from gross transactions."
-          trend="0.4%"
+          tooltip="Platform commission collected directly based on configured Fee Gateway (%)."
+          trend="Configured"
           trendUp={true}
         />
         <StatTile
