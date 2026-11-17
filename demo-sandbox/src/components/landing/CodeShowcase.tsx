@@ -1,8 +1,9 @@
 "use client";
 
 import React, { useState } from "react";
-import { Terminal, Copy, Check, Code, ExternalLink } from "lucide-react";
+import { Terminal, Copy, Check, Code } from "lucide-react";
 import { getEnvUrl } from "../../utils/env";
+import { Button } from "../ui/Button";
 
 export function CodeShowcase() {
   const [activeTab, setActiveTab] = useState<"curl" | "go" | "node" | "php">("curl");
@@ -10,7 +11,7 @@ export function CodeShowcase() {
 
   const snippets = {
     curl: `curl -X POST "${getEnvUrl.api()}/api/v1/invoices" \\
-  -H "Authorization: Bearer 13c_live_9a8b7c6d5e4f" \\
+  -H "X-API-KEY: your_merchant_api_key" \\
   -H "Content-Type: application/json" \\
   -d '{
     "order_id": "ORD-9901",
@@ -149,24 +150,15 @@ if (hash_equals($expectedSignature, $signatureHeader)) {
             </div>
 
             <div className="flex items-center gap-3">
-              <a
-                href={getEnvUrl.swagger()}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hidden sm:inline-flex items-center gap-1 text-[11px] text-zinc-400 hover:text-white"
-              >
-                <span>Full OpenAPI Specs</span>
-                <ExternalLink className="w-3 h-3" />
-              </a>
-
-              <button
+              <Button
                 type="button"
+                variant="secondary"
+                size="sm"
                 onClick={handleCopy}
-                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs font-medium border border-zinc-700 transition-colors"
+                icon={copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
               >
-                {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-                <span>{copied ? "Copied" : "Copy Code"}</span>
-              </button>
+                {copied ? "Copied" : "Copy Code"}
+              </Button>
             </div>
           </div>
 

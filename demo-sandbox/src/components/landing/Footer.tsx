@@ -75,29 +75,13 @@ export function Footer() {
             </div>
             <ul className="space-y-1.5 text-zinc-400">
               <li>
-                <a
-                  href={getEnvUrl.swagger()}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-emerald-400 transition-colors inline-flex items-center gap-1"
-                >
-                  <span>Swagger OpenAPI</span>
-                  <ExternalLink className="w-3 h-3 opacity-50" />
-                </a>
-              </li>
-              <li>
-                <a
-                  href="https://github.com/gonzhilaz/bpg"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-white transition-colors inline-flex items-center gap-1"
-                >
-                  <Code2 className="w-3 h-3 text-cyan-400" />
-                  <span>GitHub Repository</span>
-                </a>
+                <span className="text-zinc-300 font-mono text-[11px]">REST API v1</span>
               </li>
               <li>
                 <span className="text-zinc-500">Go SDK • TypeScript SDK</span>
+              </li>
+              <li>
+                <span className="text-zinc-500">HMAC-SHA256 Webhooks</span>
               </li>
             </ul>
           </div>

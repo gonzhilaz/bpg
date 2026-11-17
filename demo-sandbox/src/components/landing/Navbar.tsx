@@ -34,15 +34,6 @@ export function Navbar() {
           <a href="#developers" className="hover:text-white transition-colors">
             Developers
           </a>
-          <a
-            href={getEnvUrl.swagger()}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hover:text-emerald-400 transition-colors inline-flex items-center gap-1"
-          >
-            <span>Docs</span>
-            <ExternalLink className="w-3 h-3 opacity-60" />
-          </a>
         </nav>
 
         {/* Action CTAs */}
