@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>13C Crypto Payment Gateway - Pitch Deck Resume</title>
+  <style>
+    @page {
+      size: A3 landscape;
+      margin: 10mm;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: #f1f5f9;
+      color: #0f172a;
+      line-height: 1.4;
+      padding: 10px;
+      font-size: 11px;
+    }
+
+    /* Top Header Banner */
+    .header-banner {
+      background: linear-gradient(135deg, #091e42 0%, #0052cc 50%, #00875a 100%);
+      color: #ffffff;
+      border-radius: 14px;
+      padding: 18px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+    }
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .resume-pill {
+      background: #00b8d9;
+      color: #002b36;
+      font-weight: 900;
+      font-size: 13px;
+      padding: 6px 14px;
+      border-radius: 8px;
+      letter-spacing: 1px;
+    }
+    .title-group h1 {
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      margin-bottom: 2px;
+    }
+    .title-group p {
+      font-size: 12px;
+      color: #e2e8f0;
+    }
+    .header-meta {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(8px);
+      padding: 10px 16px;
+      border-radius: 10px;
+      font-size: 10.5px;
+      line-height: 1.6;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    /* Grid Layout */
+    .deck-grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 12px;
+    }
+
+    /* Card Base */
+    .card {
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 14px 16px;
+      border: 1px solid #cbd5e1;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+      display: flex;
+      flex-col: column;
+    }
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+      padding-bottom: 6px;
+      border-bottom: 1.5px solid #e2e8f0;
+    }
+    .card-title {
+      font-size: 13px;
+      font-weight: 800;
+      color: #0c4a6e;
+    }
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: 9.5px;
+      font-weight: 700;
+    }
+    .badge-blue { background: #e0f2fe; color: #0284c7; }
+    .badge-green { background: #dcfce7; color: #15803d; }
+    .badge-amber { background: #fef3c7; color: #b45309; }
+
+    /* Column Spans */
+    .col-3 { grid-column: span 3; }
+    .col-4 { grid-column: span 4; }
+    .col-5 { grid-column: span 5; }
+    .col-6 { grid-column: span 6; }
+    .col-7 { grid-column: span 7; }
+    .col-8 { grid-column: span 8; }
+    .col-9 { grid-column: span 9; }
+    .col-12 { grid-column: span 12; }
+
+    /* Specific Elements */
+    .flow-steps {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      margin-top: 6px;
+    }
+    .flow-node {
+      background: #f8fafc;
+      border: 1px solid #94a3b8;
+      border-radius: 8px;
+      padding: 8px 6px;
+      text-align: center;
+      flex: 1;
+      min-height: 62px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .flow-node-title {
+      font-weight: 700;
+      color: #0f172a;
+      font-size: 10px;
+      margin-bottom: 2px;
+    }
+    .flow-node-sub {
+      font-size: 9px;
+      color: #64748b;
+    }
+    .flow-arrow {
+      color: #0284c7;
+      font-weight: 900;
+      font-size: 14px;
+    }
+
+    /* Table */
+    table.data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 10px;
+      margin-top: 4px;
+    }
+    table.data-table th, table.data-table td {
+      padding: 6px 8px;
+      border: 1px solid #e2e8f0;
+      text-align: left;
+    }
+    table.data-table th {
+      background: #f1f5f9;
+      color: #334155;
+      font-weight: 700;
+    }
+    table.data-table tr:nth-child(even) {
+      background: #f8fafc;
+    }
+
+    /* Bullet List */
+    ul.check-list {
+      list-style: none;
+      padding-left: 0;
+      margin-top: 4px;
+    }
+    ul.check-list li {
+      position: relative;
+      padding-left: 16px;
+      margin-bottom: 5px;
+      font-size: 10.5px;
+      color: #334155;
+    }
+    ul.check-list li::before {
+      content: "✔";
+      position: absolute;
+      left: 0;
+      color: #10b981;
+      font-weight: bold;
+      font-size: 11px;
+    }
+    ul.warn-list li::before {
+      content: "▲";
+      color: #f59e0b;
+    }
+
+    /* Stat Box */
+    .stat-hero {
+      background: #f0fdf4;
+      border: 1.5px solid #86efac;
+      border-radius: 10px;
+      padding: 10px;
+      text-align: center;
+      margin-bottom: 8px;
+    }
+    .stat-number {
+      font-size: 26px;
+      font-weight: 900;
+      color: #15803d;
+      font-family: monospace;
+    }
+    .stat-label {
+      font-size: 10px;
+      font-weight: 700;
+      color: #166534;
+      text-transform: uppercase;
+    }
+
+    /* Footer Cards */
+    .footer-card {
+      border-radius: 10px;
+      padding: 12px 14px;
+    }
+    .footer-green {
+      background: #ecfdf5;
+      border: 1px solid #a7f3d0;
+    }
+    .footer-blue {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+    }
+    .footer-yellow {
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header Banner -->
+  <header class="header-banner">
+    <div class="header-left">
+      <div class="resume-pill">RESUME</div>
+      <div class="title-group">
+        <h1>Panduan Operasional & Dokumentasi 13C Crypto Payment Gateway</h1>
+        <p>Ringkasan panduan penggunaan, spesifikasi teknis, dan integrasi sistem pembayaran kripto 13C.</p>
+      </div>
+    </div>
+    <div class="header-meta">
+      <div><strong>⚙ Versi:</strong> 1.6.0 (Enterprise)</div>
+      <div><strong>📅 Tanggal:</strong> November 2026</div>
+      <div><strong>📖 Klasifikasi:</strong> User Manual & Integration Specification</div>
+      <div><strong>🔗 Repositori:</strong> github.com/gonzhilaz/bpg</div>
+    </div>
+  </header>
+
+  <!-- 12-Column Deck Grid -->
+  <div class="deck-grid">
+
+    <!-- Row 1: Intro & Core Flow -->
+    <div class="card col-3">
+      <div>
+        <div class="card-header">
+          <span class="card-title">Apa itu 13C?</span>
+        </div>
+        <p style="font-size: 11px; color: #334155; line-height: 1.5;">
+          Infrastruktur payment gateway berbasis cryptocurrency untuk toko online/merchant, yang memungkinkan penerimaan pembayaran kripto (USDT/USDC) dengan arsitektur <strong>non-custodial</strong>.
+        </p>
+        <div style="margin-top: 10px; padding: 8px; background: #e0f2fe; border-radius: 8px; font-size: 10px; color: #0369a1; font-weight: 600;">
+          💡 100% Self-Hosted & Non-Custodial Direct-to-Wallet
+        </div>
+      </div>
+    </div>
+
+    <div class="card col-3">
+      <div>
+        <div class="card-header">
+          <span class="card-title">Konsep Utama</span>
+        </div>
+        <ul class="check-list">
+          <li><strong>Non-Custodial:</strong> Dana tidak pernah disimpan di pihak gateway perantara.</li>
+          <li><strong>Instant Forwarding:</strong> Pembayaran langsung diteruskan ke Cold Wallet pribadi merchant.</li>
+          <li><strong>Aman & Transparan:</strong> Didukung multi-chain berbiaya rendah dan zero holding pool.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card col-6">
+      <div style="width: 100%;">
+        <div class="card-header">
+          <span class="card-title">Alur Transaksi (Payment Lifecycle)</span>
+        </div>
+        <div class="flow-steps">
+          <div class="flow-node">
+            <span class="flow-node-title">1. Pelanggan</span>
+            <span class="flow-node-sub">Membayar USDT/USDC</span>
+          </div>
+          <span class="flow-arrow">➔</span>
+          <div class="flow-node">
+            <span class="flow-node-title">2. Alamat Invoice</span>
+            <span class="flow-node-sub">Dedicated Ephemeral</span>
+          </div>
+          <span class="flow-arrow">➔</span>
+          <div class="flow-node">
+            <span class="flow-node-title">3. Verifikasi</span>
+            <span class="flow-node-sub">On-Chain Watcher</span>
+          </div>
+          <span class="flow-arrow">➔</span>
+          <div class="flow-node">
+            <span class="flow-node-title">4. Auto-Sweep</span>
+            <span class="flow-node-sub">Ke Cold Wallet</span>
+          </div>
+          <span class="flow-arrow">➔</span>
+          <div class="flow-node">
+            <span class="flow-node-title">5. Webhook</span>
+            <span class="flow-node-sub">Notifikasi HMAC</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Row 2: Networks, Invoicing & Merchant Features -->
+    <div class="card col-4">
+      <div>
+        <div class="card-header">
+          <span class="card-title">Jaringan Blockchain yang Didukung</span>
+        </div>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Blockchain</th>
+              <th>Standar Token</th>
+              <th>Konfirmasi</th>
+              <th>Biaya Sweep</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Polygon PoS</strong></td>
+              <td>ERC-20 (USDT/USDC)</td>
+              <td>~ 2 Detik</td>
+              <td>~ $0.02</td>
+            </tr>
+            <tr>
+              <td><strong>BSC (BNB Chain)</strong></td>
+              <td>BEP-20 (USDT/USDC)</td>
+              <td>~ 3 Detik</td>
+              <td>~ $0.05</td>
+            </tr>
+            <tr>
+              <td><strong>TRON Network</strong></td>
+              <td>TRC-20 (USDT)</td>
+              <td>~ 1 Detik</td>
+              <td>~ $1.20</td>
+            </tr>
+            <tr>
+              <td><strong>Solana</strong></td>
+              <td>SPL (USDT/USDC)</td>
+              <td>~ 400 ms</td>
+              <td>~ $0.01</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card col-3">
+      <div>
+        <div class="card-header">
+          <span class="card-title">Siklus Tagihan (Invoice)</span>
+        </div>
+        <ol style="padding-left: 16px; font-size: 10.5px; color: #334155; line-height: 1.6;">
+          <li><strong>Keypair Baru:</strong> Pembuatan keypair independen per invoice (ECDSA EVM/TRON, Ed25519 Solana).</li>
+          <li><strong>Enkripsi Militer:</strong> Private key dienkripsi dengan AES-256-GCM sebelum disimpan ke DB.</li>
+          <li><strong>Masa Berlaku:</strong> Kedaluwarsa 15–30 menit; jika lewat, alamat otomatis dinonaktifkan.</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="card col-5">
+      <div>
+        <div class="card-header">
+          <span class="card-title">Fitur Merchant Portal</span>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+          <ul class="check-list">
+            <li>Registrasi & Reveal-Once API Key</li>
+            <li>Autentikasi & Navigasi Dashboard</li>
+            <li>Konfigurasi Cold Wallet Payout</li>
+            <li>Pengaturan Fee Payer (Surcharge/Absorb)</li>
+          </ul>
+          <ul class="check-list">
+            <li>Laporan Finansial & Ekspor CSV</li>
+            <li>Monitoring Riwayat & Webhook Logs</li>
+            <li>Filter Dropdown & Pencarian Instan</li>
+            <li>Dukungan Bilingual (ID / EN)</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Row 3: Integration, DevOps, Cost & Security -->
+    <div class="card col-3">
+      <div>
+        <div class="card-header">
+          <span class="card-title">Integrasi & Pengujian</span>
+        </div>
+        <div style="font-size: 10.5px; font-weight: 700; color: #0284c7; margin-bottom: 2px;">Integrasi Toko Online:</div>
+        <ul class="check-list" style="margin-bottom: 8px;">
+          <li>Pembuatan tagihan via REST API (cURL, Node.js, PHP, Python)</li>
+          <li>Checkout Widget responsif pelanggan</li>
+          <li>Validasi signature Webhook HMAC-SHA256</li>
+        </ul>
+        <div style="font-size: 10.5px; font-weight: 700; color: #0284c7; margin-bottom: 2px;">Pengujian Sistem:</div>
+        <ul class="check-list">
+          <li>Sandbox simulator interaktif bawaan</li>
+          <li>Transaksi on-chain via faucet testnet</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card col-3">
+      <div>
+        <div class="card-header">
+          <span class="card-title">DevOps & Super Admin</span>
+        </div>
+        <ul class="check-list">
+          <li>Dashboard monitoring node & telemetri</li>
+          <li>Manajemen cadangan gas Hot Wallet & alert</li>
+          <li>Penyapuan dana manual (Manual Sweeper)</li>
+          <li>Pemeliharaan DB (Vacuum & Pruning atomic)</li>
+          <li>Emergency Circuit Breaker pembekuan darurat</li>
+          <li>Deployment mandiri VPS (Docker Compose)</li>
+          <li>Resolusi dinamis endpoint cloud-ready</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card col-3">
+      <div>
+        <div class="card-header">
+          <span class="card-title">Struktur Biaya & Ledger</span>
+        </div>
+        <div class="stat-hero">
+          <div class="stat-number">0.00%</div>
+          <div class="stat-label">Biaya Gateway (Self-Hosted Model)</div>
+        </div>
+        <div style="font-size: 10px; color: #64748b; line-height: 1.5;">
+          <strong>Komponen Laporan Keuangan:</strong><br>
+          • <strong>Gross Sales:</strong> Total volume pembayaran bruto.<br>
+          • <strong>Net Settled:</strong> Dana bersih yang masuk ke wallet.<br>
+          • <strong>Sweep Gas:</strong> Biaya riil jaringan blockchain.
+        </div>
+      </div>
+    </div>
+
+    <div class="card col-3">
+      <div>
+        <div class="card-header">
+          <span class="card-title">Keamanan Sistem</span>
+        </div>
+        <ul class="check-list">
+          <li>API Key disimpan dalam bentuk hash SHA-256.</li>
+          <li>Private key ephemeral dienkripsi AES-256-GCM.</li>
+          <li>Webhook terlindungi signature HMAC-SHA256.</li>
+          <li>Proteksi SSRF link-local & private IP.</li>
+          <li>Two-Factor Authentication (2FA TOTP Google Authenticator) pada penarikan dana.</li>
+          <li>Dana langsung ke Cold Wallet pribadi merchant.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Row 4: Summary, Advantages & Best Practices -->
+    <div class="card col-4 footer-card footer-green">
+      <div>
+        <div style="font-weight: 800; font-size: 12px; color: #166534; margin-bottom: 6px;">🎯 Kesimpulan</div>
+        <p style="font-size: 10.5px; color: #14532d; line-height: 1.5;">
+          13C adalah crypto payment gateway non-custodial yang memungkinkan merchant menerima pembayaran USDT/USDC di 4 jaringan blockchain, dengan proses aman, cepat, dan terintegrasi melalui API serta dashboard lengkap. Sangat cocok untuk platform/marketplace yang ingin kedaulatan pembayaran kripto langsung ke wallet pribadi.
+        </p>
+      </div>
+    </div>
+
+    <div class="card col-4 footer-card footer-blue">
+      <div>
+        <div style="font-weight: 800; font-size: 12px; color: #1e40af; margin-bottom: 6px;">⭐ Keunggulan Utama</div>
+        <ul class="check-list" style="color: #1e3a8a;">
+          <li>Mendukung 4 jaringan blockchain tercepat & termurah.</li>
+          <li>Setiap invoice memiliki alamat deposit tersendiri.</li>
+          <li>Dana langsung disapu ke wallet pribadi merchant.</li>
+          <li>Tersedia REST API dan widget checkout responsif.</li>
+          <li>Dashboard lengkap dengan laporan keuangan & webhook logs.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card col-4 footer-card footer-yellow">
+      <div>
+        <div style="font-weight: 800; font-size: 12px; color: #92400e; margin-bottom: 6px;">⚠️ Hal yang Perlu Diperhatikan</div>
+        <ul class="check-list warn-list" style="color: #78350f;">
+          <li>Amankan private key master dan kredensial server.</li>
+          <li>Uji transaksi end-to-end di testnet/sandbox sebelum rilis.</li>
+          <li>Pantau cadangan saldo gas Hot Wallet untuk proses sweep.</li>
+          <li>Patuhi regulasi dan aspek legalitas lokal wilayah bisnis Anda.</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>
