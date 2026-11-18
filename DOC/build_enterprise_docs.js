@@ -5,16 +5,20 @@ const { execSync } = require('child_process');
 const chromePath = 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
 
 function parseMarkdownToHtml(md, title) {
-  let html = md
-    // Mermaid diagrams
+  const mermaidBlocks = [];
+  const codeBlocks = [];
+
+  // Protect Mermaid and code blocks with placeholders
+  let text = md
     .replace(/```mermaid([\s\S]*?)```/g, (match, p1) => {
-      const code = p1.trim();
-      return `<div class="mermaid-diagram"><div class="mermaid">\n${code}\n</div></div>`;
+      const idx = mermaidBlocks.length;
+      mermaidBlocks.push(p1.trim());
+      return `\n__MERMAID_BLOCK_${idx}__\n`;
     })
-    // Generic Code blocks
     .replace(/```([\s\S]*?)```/g, (match, p1) => {
-      const escaped = p1.replace(/</g, '&lt;').replace(/>/g, '&gt;');
-      return `<pre class="code-block"><code>${escaped}</code></pre>`;
+      const idx = codeBlocks.length;
+      codeBlocks.push(p1.trim());
+      return `\n__CODE_BLOCK_${idx}__\n`;
     })
     // Headers
     .replace(/^# (.*$)/gim, '<h1 class="doc-title">$1</h1>')
@@ -31,8 +35,8 @@ function parseMarkdownToHtml(md, title) {
     // Blockquotes
     .replace(/^\> (.*$)/gim, '<blockquote>$1</blockquote>');
 
-  // Convert Markdown Tables & Lists
-  const lines = html.split('\n');
+  // Convert Tables, Lists, and Paragraphs
+  const lines = text.split('\n');
   let inTable = false;
   let tableRows = [];
   let processedLines = [];
@@ -60,12 +64,14 @@ function parseMarkdownToHtml(md, title) {
         tableRows = [];
       }
 
-      if (line.startsWith('* ')) {
+      if (line.startsWith('__MERMAID_BLOCK_') || line.startsWith('__CODE_BLOCK_')) {
+        processedLines.push(line);
+      } else if (line.startsWith('* ')) {
         processedLines.push(`<li>${line.substring(2)}</li>`);
       } else if (line.match(/^\d+\.\s+/)) {
         processedLines.push(`<li>${line.replace(/^\d+\.\s+/, '')}</li>`);
       } else if (line.length > 0) {
-        if (!line.match(/^<(h1|h2|h3|h4|div|hr|blockquote|pre|code|table|thead|tbody|tr|th|td)/)) {
+        if (!line.match(/^<(h1|h2|h3|h4|div|hr|blockquote|table|thead|tbody|tr|th|td)/)) {
           processedLines.push(`<p>${line}</p>`);
         } else {
           processedLines.push(line);
@@ -89,6 +95,21 @@ function parseMarkdownToHtml(md, title) {
 
   let finalBody = processedLines.join('\n');
   finalBody = finalBody.replace(/(<li>.*?<\/li>\s*)+/gs, (match) => `<ul>${match}</ul>`);
+
+  // Restore protected blocks
+  mermaidBlocks.forEach((code, idx) => {
+    finalBody = finalBody.replace(
+      `__MERMAID_BLOCK_${idx}__`,
+      `<div class="mermaid-diagram"><div class="mermaid">\n${code}\n</div></div>`
+    );
+  });
+  codeBlocks.forEach((code, idx) => {
+    const escaped = code.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    finalBody = finalBody.replace(
+      `__CODE_BLOCK_${idx}__`,
+      `<pre class="code-block"><code>${escaped}</code></pre>`
+    );
+  });
 
   return `<!DOCTYPE html>
 <html lang="id">
@@ -193,7 +214,7 @@ function parseMarkdownToHtml(md, title) {
     }
     .mermaid-diagram {
       margin: 14px 0;
-      padding: 12px 10px;
+      padding: 14px 10px;
       background: #f8fafc;
       border: 1px solid #e2e8f0;
       border-radius: 8px;
