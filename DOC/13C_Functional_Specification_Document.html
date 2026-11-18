@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>13C Payment Gateway - Functional Specification Document (FSD)</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 16mm 14mm 18mm 14mm;
+      @bottom-right {
+        content: counter(page);
+      }
+    }
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      color: #0f172a;
+      line-height: 1.55;
+      font-size: 10pt;
+      background: #ffffff;
+      margin: 0;
+      padding: 0;
+    }
+    .doc-title {
+      font-size: 20pt;
+      font-weight: 800;
+      color: #0f172a;
+      border-bottom: 3px solid #0284c7;
+      padding-bottom: 6px;
+      margin-top: 5px;
+      margin-bottom: 12px;
+      letter-spacing: -0.5px;
+    }
+    .section-title {
+      font-size: 14pt;
+      font-weight: 700;
+      color: #0369a1;
+      border-bottom: 1.5px solid #e2e8f0;
+      padding-bottom: 5px;
+      margin-top: 24px;
+      margin-bottom: 10px;
+      page-break-after: avoid;
+      break-after: avoid;
+    }
+    .sub-title {
+      font-size: 11.5pt;
+      font-weight: 600;
+      color: #0f172a;
+      margin-top: 14px;
+      margin-bottom: 6px;
+      page-break-after: avoid;
+      break-after: avoid;
+    }
+    .sub2-title {
+      font-size: 10.5pt;
+      font-weight: 600;
+      color: #334155;
+      margin-top: 10px;
+      margin-bottom: 4px;
+      page-break-after: avoid;
+      break-after: avoid;
+    }
+    p {
+      margin: 6px 0;
+      text-align: justify;
+    }
+    strong {
+      color: #0f172a;
+    }
+    ul, ol {
+      margin: 6px 0 10px 18px;
+      padding: 0;
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+    li {
+      margin-bottom: 4px;
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+    .divider {
+      border: 0;
+      height: 1px;
+      background: #e2e8f0;
+      margin: 16px 0;
+    }
+    .code-block {
+      background: #091e42;
+      color: #38bdf8;
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-family: "Consolas", "Courier New", monospace;
+      font-size: 8.5pt;
+      overflow-x: auto;
+      margin: 10px 0;
+      page-break-inside: avoid;
+      break-inside: avoid;
+      border: 1px solid #1e293b;
+    }
+    .table-wrapper {
+      margin: 12px 0;
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 8.5pt;
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+    th, td {
+      border: 1px solid #cbd5e1;
+      padding: 6px 8px;
+      text-align: left;
+      vertical-align: top;
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+    th {
+      background: #f1f5f9;
+      font-weight: 700;
+      color: #0f172a;
+    }
+    tr:nth-child(even) {
+      background: #f8fafc;
+    }
+    blockquote {
+      border-left: 3.5px solid #0284c7;
+      background: #f0f9ff;
+      padding: 8px 12px;
+      margin: 10px 0;
+      border-radius: 0 6px 6px 0;
+      font-size: 9.5pt;
+      color: #0369a1;
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+    .img-box {
+      margin: 14px 0;
+      text-align: center;
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+    .img-box img {
+      max-width: 90%;
+      height: auto;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.06);
+    }
+    .caption {
+      font-size: 8.5pt;
+      color: #64748b;
+      margin-top: 4px;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+  <h1 class="doc-title">FUNCTIONAL SPECIFICATION DOCUMENT (FSD)</h1>
+<blockquote><strong>13C Crypto Payment Gateway System</strong>  </blockquote>
+<blockquote><strong>Klasifikasi:</strong> Business Architecture & Functional Requirements Specification  </blockquote>
+<blockquote><strong>Versi:</strong> 2.1.0 | <strong>Tanggal:</strong> November 2026 | <strong>Status:</strong> Approved for Production  </blockquote>
+<blockquote><strong>Repositori:</strong> [github.com/gonzhilaz/bpg](https://github.com/gonzhilaz/bpg)</blockquote>
+<hr class="divider" />
+<h2 class="section-title">1. Executive Summary & Product Vision</h2>
+<p>Dokumen Spesifikasi Fungsional (<em>Functional Specification Document / FSD</em>) ini mendefinisikan seluruh kapabilitas bisnis, interaksi pengguna, aturan validasi, alur proses transaksi, dan batasan operasional dari <strong>13C Crypto Payment Gateway</strong>.</p>
+<h3 class="sub-title">Visi Produk</h3>
+<p>Memberikan kedaulatan finansial penuh bagi pelaku bisnis digital dan toko online dalam menerima pembayaran mata uang kripto (USDT & USDC) melalui arsitektur non-custodial tanpa risiko pembekuan sepihak (<em>fund freezing</em>), dengan biaya pemrosesan rendah dan penyapuan instan ke dompet Cold Storage pribadi.</p>
+<hr class="divider" />
+<h2 class="section-title">2. Stakeholder Matrix & User Personas</h2>
+<div class="table-wrapper"><table>
+<thead><tr><th>Role</th><th>Aktor</th><th>Tanggung Jawab & Interaksi Utama</th></tr></thead>
+<tbody><tr><td><strong>Merchant Owner</strong></td><td>Pemilik Toko Online</td><td>Registrasi akun, pendaftaran alamat Cold Wallet payout, konfigurasi aturan pembebanan gas (<em>fee payer</em>), pengelolaan API key, dan monitoring buku besar keuangan (<em>financial ledger</em>).</td></tr>
+<tr><td><strong>Buyer / Customer</strong></td><td>Pelanggan Toko</td><td>Memilih koin & jaringan pembayaran (BSC, Polygon, TRON, Solana) pada halaman checkout widget, mentransfer dana sesuai nominal tagihan, dan menerima konfirmasi status lunas.</td></tr>
+<tr><td><strong>Super Admin / DevOps</strong></td><td>Pengelola Platform</td><td>Memantau kesehatan node RPC blockchain, mengontrol cadangan gas native Hot Wallet, mengeksekusi penyapuan darurat (<em>manual sweeper</em>), memelihara basis data, dan mengaktifkan <em>circuit breaker</em>.</td></tr>
+<tr><td><strong>System Daemon</strong></td><td>Background Workers</td><td>Memindai log transaksi on-chain (<em>Watcher</em>), menyapu dana ke dompet merchant (<em>Sweeper</em>), mengirimkan webhook bertanda tangan HMAC ke toko, dan memangkas data kedaluwarsa (<em>Pruner</em>).</td></tr>
+</tbody></table></div>
+
+<hr class="divider" />
+<h2 class="section-title">3. AS-IS vs TO-BE Process Workflows</h2>
+<pre class="code-block"><code>mermaid
+<p>flowchart TD</p>
+<p>subgraph AS_IS["AS-IS: Payment Gateway Kripto Sentralistik Konvensional"]</p>
+<p>A1["Pelanggan Bayar Kripto"] --&gt; A2["Dana Masuk ke Rekening Penampung Gateway"]</p>
+<p>A2 --&gt; A3["Saldo Mengendap di Dompet Pihak Ketiga (Custodial)"]</p>
+<p>A3 --&gt; A4["Merchant Mengajukan Penarikan (Withdrawal Request)"]</p>
+<p>A4 --&gt; A5["Review Manual Admin & Potongan Biaya Ganda (2% - 5%)"]</p>
+<p>A5 --&gt; A6["Dana Cair Setelah 24 - 72 Jam (Risiko Akun Dibekukan)"]</p>
+<p>end</p>
+<p>subgraph TO_BE["TO-BE: 13C Non-Custodial Multi-Chain Gateway"]</p>
+<p>B1["Pelanggan Bayar Kripto"] --&gt; B2["Dana Masuk ke Ephemeral Invoice Address"]</p>
+<p>B2 --&gt; B3["Watcher Memverifikasi Kedalaman Blok On-Chain"]</p>
+<p>B3 --&gt; B4["Auto-Sweeper Langsung Meneruskan Dana ke Cold Wallet Merchant"]</p>
+<p>B4 --&gt; B5["Webhook HMAC-SHA256 Terkirim Instan ke Backend Toko"]</p>
+<p>B5 --&gt; B6["Selesai dalam Hitungan Detik (Zero Custody, Fee Gateway %)"]</p>
+<p>end</p>
+<p></code></pre></p>
+<hr class="divider" />
+<h2 class="section-title">4. Scope of the System</h2>
+<h3 class="sub-title">4.1 In-Scope Capabilities</h3>
+<ul><li>Penerimaan setoran stablecoin USDT & USDC pada 4 jaringan blockchain: BSC (BEP-20), Polygon (ERC-20), TRON (TRC-20), dan Solana (SPL Token).</li>
+<li>Pembangkitan pasangan kunci unik per invoice (<em>1 Invoice = 1 Ephemeral Deposit Address</em>) tanpa ketergantungan pada Memo/Tag.</li>
+<li>Otomatisasi penyapuan likuiditas (<em>instant sweeping</em>) ke alamat Cold Wallet merchant.</li>
+<li>Pemilihan penanggung biaya gas jaringan (<em>Customer Surcharge</em> vs <em>Merchant Absorbed</em>).</li>
+<li>Sistem notifikasi webhook terotentikasi HMAC-SHA256 dengan mekanisme <em>exponential backoff retry</em> dan <em>SSRF protection</em>.</li>
+<li>Buku besar keuangan (<em>Financial Ledger</em>) dengan kemampuan ekspor data akuntansi ke format CSV.</li>
+<li>Portal Merchant dan Super Admin berbasis Next.js App Router dengan arsitektur sidebar persisten dan indikator status database riil.</li>
+<li>Manajemen multi-toko (<em>Multi-Store per Merchant</em>) yang memungkinkan 1 entitas merchant mengelola banyak cabang toko digital dengan API key dan payout address terpisah.</li>
+</ul><h3 class="sub-title">4.2 Out-of-Scope Capabilities</h3>
+<ul><li>Konversi instan kripto ke mata uang fiat (IDR/USD bank transfer) di dalam platform (diserahkan kepada pertukaran kripto terlisensi).</li>
+<li>Pemrosesan kartu kredit tradisional / transfer bank konvensional.</li>
+<li>Penyimpanan saldo fiat atau kustodian aset kripto jangka panjang.</li>
+</ul><hr class="divider" />
+<h2 class="section-title">5. Detailed Functional Requirements (FR)</h2>
+<h3 class="sub-title">FR-001: Pendaftaran Merchant & Protokol <em>Reveal Once</em> Kredensial</h3>
+<ul><li><strong>Deskripsi:</strong> Pengguna dapat mendaftarkan akun toko baru dengan memasukkan nama bisnis, email, dan password.</li>
+<li><strong>Prekondisi:</strong> Email belum pernah terdaftar sebelumnya di sistem.</li>
+<li><strong>Alur Utama:</strong></li>
+<li>Pengguna mengisi form pendaftaran di `/register`.</li>
+<li>Sistem memvalidasi format email dan kompleksitas password (minimal 6 karakter).</li>
+<li>Sistem membuat UUID merchant baru, menghasilkan hash password dengan `bcrypt`, dan membangkitkan pasangan kunci `API Key` dan `Webhook Secret`.</li>
+<li>Sistem menyimpan hash `SHA-256` dari API key ke basis data dan menampilkan kunci mentah (<em>raw plaintext</em>) satu kali saja ke pengguna dalam kartu modal khusus.</li>
+<li><strong>Postkondisi:</strong> Akun merchant berstatus `ACTIVE` dan siap membuat transaksi.</li>
+</ul><h3 class="sub-title">FR-002: Pembuatan Tagihan Pembayaran Multi-Chain</h3>
+<ul><li><strong>Deskripsi:</strong> Merchant atau checkout widget memicu pembuatan tagihan melalui REST API atau formulir pembayaran.</li>
+<li><strong>Prekondisi:</strong> Header HTTP memuat `X-API-KEY` valid atau merchant telah login dengan token JWT.</li>
+<li><strong>Alur Utama:</strong></li>
+<li>Merchant mengirim payload berisi `order_id`, `amount`, `currency`, `pay_network`, dan `fee_payer`.</li>
+<li>Sistem membangkitkan pasangan kunci baru (<em>ephemeral keypair</em>): ECDSA untuk EVM/TRON atau Ed25519 untuk Solana.</li>
+<li>Sistem mengenkripsi kunci privat menggunakan <strong>AES-256-GCM</strong> dengan Master Secret Key.</li>
+<li>Sistem menghitung nominal pembayaran akhir berdasarkan aturan `fee_payer` (jika <em>customer surcharge</em>, biaya gas sweep ditambahkan ke total bayar pelanggan).</li>
+<li>Sistem mencatat tagihan ke basis data dengan status `PENDING` dan menetapkan masa aktif 15–30 menit.</li>
+<li>Mengembalikan URL checkout, alamat deposit, QR code, dan batas waktu kedaluwarsa.</li>
+</ul><h3 class="sub-title">FR-003: Pemindaian Transaksi Masuk (<em>Blockchain Watcher</em>)</h3>
+<ul><li><strong>Deskripsi:</strong> Daemon latar belakang memindai blockchain secara berkala untuk mendeteksi deposit pelanggan.</li>
+<li><strong>Alur Utama:</strong></li>
+<li>Watcher memindai log transfer pada alamat deposit aktif menggunakan filter topic terarah.</li>
+<li>Saat transaksi ditemukan, status invoice diperbarui menjadi `DETECTED`.</li>
+<li>Sistem menunggu konfirmasi kedalaman blok minimum (BSC: 3 blok, Polygon: 15 blok, TRON: 19 konfirmasi, Solana: 32 slot).</li>
+<li>Setelah konfirmasi terpenuhi, sistem memvalidasi nominal yang diterima terhadap nominal tagihan.</li>
+<li>Jika nominal sesuai atau berada dalam batas toleransi kurang bayar (<em>underpaid tolerance</em>), status invoice diubah menjadi `PAID`.</li>
+</ul><h3 class="sub-title">FR-004: Penyapuan Likuiditas Otomatis (<em>Auto-Sweeping</em>)</h3>
+<ul><li><strong>Deskripsi:</strong> Memindahkan dana dari alamat deposit sementara ke Cold Wallet pribadi merchant.</li>
+<li><strong>Alur Utama:</strong></li>
+<li>Engine sweeper mengakuisisi <em>distributed lock</em> untuk invoice terkait.</li>
+<li>Mengambil kunci privat alamat deposit dari database dan mendekripsinya dengan AES-256-GCM.</li>
+<li>Menyusun transaksi transfer on-chain:</li>
+<li>Menghitung gas fee yang diperlukan dari Hot Wallet cadangan gas.</li>
+<li>Mentransfer seluruh saldo USDT/USDC ke `PayoutAddress` milik merchant.</li>
+<li>Merekam riwayat mutasi ke tabel `payout_transfers`.</li>
+<li>Merilis <em>distributed lock</em> dan menghapus kunci privat dari memori kerja.</li>
+</ul><h3 class="sub-title">FR-005: Notifikasi Webhook Terotentikasi & Anti-SSRF</h3>
+<ul><li><strong>Deskripsi:</strong> Mengirimkan callback status pembayaran ke backend toko online merchant.</li>
+<li><strong>Alur Utama:</strong></li>
+<li>Sistem memvalidasi URL webhook merchant terhadap daftar hitam SSRF (pemblokiran IP privat RFC 1918, loopback 127.0.0.1, dan cloud metadata).</li>
+<li>Menyusun payload JSON event (misal `INVOICE_PAID`, `INVOICE_UNDERPAID`, `INVOICE_EXPIRED`).</li>
+<li>Menghitung tanda tangan digital <strong>HMAC-SHA256</strong> menggunakan `secret_key` merchant dan menyematkannya pada header `X-13C-Signature`.</li>
+<li>Mengirimkan HTTP POST ke endpoint merchant dengan timeout 10 detik.</li>
+<li>Jika respon selain HTTP 2xx, sistem menjadwalkan pengiriman ulang hingga 5 kali dengan <em>exponential backoff</em>.</li>
+</ul><h3 class="sub-title">FR-006: Pengaturan Dompet Payout & Biaya Gas (Wallets & Gas Config)</h3>
+<ul><li><strong>Deskripsi:</strong> Merchant dapat memperbarui alamat dompet tujuan penerimaan dana di 4 jaringan blockchain.</li>
+<li><strong>Validasi:</strong> Alamat EVM wajib berformat hex 42 karakter (`0x...`), alamat TRON wajib berformat Base58 diawali huruf `T` (34 karakter), dan alamat Solana berformat Base58 (32-44 karakter). Perubahan tersimpan permanen di tabel `merchants`.</li>
+</ul><h3 class="sub-title">FR-007: Laporan Buku Besar Keuangan (<em>Financial Ledger</em>)</h3>
+<ul><li><strong>Deskripsi:</strong> Rekapitulasi audit akuntansi keuangan merchant secara transparan.</li>
+<li><strong>Metrik Utama:</strong></li>
+<li><strong>Gross Sales:</strong> Akumulasi volume pembayaran kotor yang disetor pelanggan.</li>
+<li><strong>Net Settled:</strong> Dana bersih yang berhasil mendarat di Cold Wallet merchant.</li>
+<li><strong>Fee Gateway (%):</strong> Potongan biaya layanan gateway sesuai persentase yang dikonfigurasi admin.</li>
+<li><strong>Sweep Gas:</strong> Biaya riil jaringan blockchain yang dikeluarkan untuk transaksi penarikan.</li>
+<li><strong>Fitur Tambahan:</strong> Filter rentang waktu (`7D`, `30D`, `ALL`) dan tombol <strong>Export CSV</strong> untuk audit pembukuan.</li>
+</ul><h3 class="sub-title">FR-008: Fitur Multi-Toko (<em>Multi-Store Management</em>)</h3>
+<ul><li><strong>Deskripsi:</strong> Merchant dapat mengelola beberapa toko/cabang/proyek digital di bawah satu akun organisasi.</li>
+</ul><p><em> <strong>Alur:</strong> Merchant dapat beralih antar toko melalui </em>Store Switcher*, di mana setiap toko memiliki nama, webhook URL, dan pasangan alamat penampung Cold Wallet mandiri.</p>
+<h3 class="sub-title">FR-009: Konsol Super Admin & Manajemen Cadangan Gas</h3>
+<ul><li><strong>Deskripsi:</strong> Super admin memantau cadangan native gas pada Hot Wallet platform (BNB, POL, TRX, SOL) dengan sistem peringatan otomatis jika saldo berada di bawah batas ambang aman sweeping.</li>
+</ul><h3 class="sub-title">FR-010: Emergency Circuit Breaker (Pembekuan Darurat)</h3>
+<ul><li><strong>Deskripsi:</strong> Saklar darurat bagi super admin untuk menghentikan seluruh aktivitas auto-sweeping dan pembuatan invoice seketika jika terdeteksi anomali keamanan pada node blockchain.</li>
+</ul><hr class="divider" />
+<h2 class="section-title">6. Non-Functional Requirements (NFR)</h2>
+<h3 class="sub-title">6.1 Performance & Latency</h3>
+<ul><li><strong>API Response Time:</strong> Pembangkitan invoice dan pembacaan profil wajib diselesaikan dalam waktu kurang dari <strong>150 milidetik</strong> pada beban kerja 95th percentile (P95).</li>
+<li><strong>Throughput:</strong> Mampu memproses minimal <strong>1.000 request/detik</strong> secara konkuren dengan kolam koneksi basis data optimal.</li>
+</ul><h3 class="sub-title">6.2 Security & Compliance</h3>
+<ul><li><strong>Zero Plaintext Sensitive Data:</strong> Kunci privat dan API key wajib dienkripsi/dihash secara kriptografis at-rest.</li>
+<li><strong>Anti-SSRF Enforcement:</strong> Webhook dispatcher tidak boleh dapat digunakan untuk memindai jaringan lokal hosting.</li>
+<li><strong>Defense-in-Depth:</strong> Perlindungan rate limiting ketat pada rute publik untuk mencegah eksploitasi denial-of-service.</li>
+</ul><h3 class="sub-title">6.3 Reliability & Availability</h3>
+<ul><li><strong>High Availability (HA):</strong> Ketersediaan sistem minimum <strong>99.9% uptime</strong> per bulan.</li>
+</ul><p><em> <strong>Zero Double-Spending:</strong> Penegakan kedalaman blok konfirmasi minimum dan </em>distributed lock* menjamin tidak pernah terjadi penyapuan ganda atau klaim pesanan palsu.</p>
+<hr class="divider" />
+<h2 class="section-title">7. Business Exceptions & Edge Cases Handling</h2>
+<div class="table-wrapper"><table>
+<thead><tr><th>Kasus Khusus</th><th>Skenario Bisnis</th><th>Penanganan Sistem 13C</th></tr></thead>
+<tbody><tr><td><strong>Kurang Bayar (Underpaid)</strong></td><td>Pelanggan mentransfer 48 USDT untuk tagihan 50 USDT karena salah memperhitungkan biaya transfer exchange.</td><td>Jika selisih berada dalam `UnderpaidTolerance` (misal 5%), tagihan tetap ditandai `PAID`. Jika melebihi batas, status menjadi `UNDERPAID`, webhook notifikasi dikirim ke merchant, dan dana tidak disapu sebelum dikonfirmasi merchant.</td></tr>
+<tr><td><strong>Kelebihan Bayar (Overpaid)</strong></td><td>Pelanggan mentransfer 120 USDT untuk tagihan 100 USDT.</td><td>Seluruh 120 USDT disapu ke Cold Wallet merchant; webhook mencatat `received_amount = 120.00` dan pesanan toko ditandai lunas.</td></tr>
+<tr><td><strong>Kedaluwarsa (Expired)</strong></td><td>Pelanggan tidak melakukan transfer dalam batas waktu 30 menit.</td><td>Status invoice otomatis menjadi `EXPIRED`. Alamat deposit dinonaktifkan dari pemindaian rutin watcher.</td></tr>
+<tr><td><strong>Deposit Terlambat</strong></td><td>Pelanggan mentransfer dana setelah invoice dinyatakan kedaluwarsa.</td><td>Sistem menyediakan fasilitas <em>Grace Period</em> (15 menit). Jika lewat grace period, transaksi masuk tetap dicatat di tabel audit dan admin/merchant dapat memicu penyapuan dana secara manual via <em>Manual Sweeper</em>.</td></tr>
+</tbody></table></div>
+
+</body>
+</html>

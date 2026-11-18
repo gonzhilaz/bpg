@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>13C Payment Gateway - Technical Specification Document (TSD)</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 16mm 14mm 18mm 14mm;
+      @bottom-right {
+        content: counter(page);
+      }
+    }
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      color: #0f172a;
+      line-height: 1.55;
+      font-size: 10pt;
+      background: #ffffff;
+      margin: 0;
+      padding: 0;
+    }
+    .doc-title {
+      font-size: 20pt;
+      font-weight: 800;
+      color: #0f172a;
+      border-bottom: 3px solid #0284c7;
+      padding-bottom: 6px;
+      margin-top: 5px;
+      margin-bottom: 12px;
+      letter-spacing: -0.5px;
+    }
+    .section-title {
+      font-size: 14pt;
+      font-weight: 700;
+      color: #0369a1;
+      border-bottom: 1.5px solid #e2e8f0;
+      padding-bottom: 5px;
+      margin-top: 24px;
+      margin-bottom: 10px;
+      page-break-after: avoid;
+      break-after: avoid;
+    }
+    .sub-title {
+      font-size: 11.5pt;
+      font-weight: 600;
+      color: #0f172a;
+      margin-top: 14px;
+      margin-bottom: 6px;
+      page-break-after: avoid;
+      break-after: avoid;
+    }
+    .sub2-title {
+      font-size: 10.5pt;
+      font-weight: 600;
+      color: #334155;
+      margin-top: 10px;
+      margin-bottom: 4px;
+      page-break-after: avoid;
+      break-after: avoid;
+    }
+    p {
+      margin: 6px 0;
+      text-align: justify;
+    }
+    strong {
+      color: #0f172a;
+    }
+    ul, ol {
+      margin: 6px 0 10px 18px;
+      padding: 0;
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+    li {
+      margin-bottom: 4px;
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+    .divider {
+      border: 0;
+      height: 1px;
+      background: #e2e8f0;
+      margin: 16px 0;
+    }
+    .code-block {
+      background: #091e42;
+      color: #38bdf8;
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-family: "Consolas", "Courier New", monospace;
+      font-size: 8.5pt;
+      overflow-x: auto;
+      margin: 10px 0;
+      page-break-inside: avoid;
+      break-inside: avoid;
+      border: 1px solid #1e293b;
+    }
+    .table-wrapper {
+      margin: 12px 0;
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 8.5pt;
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+    th, td {
+      border: 1px solid #cbd5e1;
+      padding: 6px 8px;
+      text-align: left;
+      vertical-align: top;
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+    th {
+      background: #f1f5f9;
+      font-weight: 700;
+      color: #0f172a;
+    }
+    tr:nth-child(even) {
+      background: #f8fafc;
+    }
+    blockquote {
+      border-left: 3.5px solid #0284c7;
+      background: #f0f9ff;
+      padding: 8px 12px;
+      margin: 10px 0;
+      border-radius: 0 6px 6px 0;
+      font-size: 9.5pt;
+      color: #0369a1;
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+    .img-box {
+      margin: 14px 0;
+      text-align: center;
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+    .img-box img {
+      max-width: 90%;
+      height: auto;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.06);
+    }
+    .caption {
+      font-size: 8.5pt;
+      color: #64748b;
+      margin-top: 4px;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+  <h1 class="doc-title">TECHNICAL SPECIFICATION DOCUMENT (TSD)</h1>
+<blockquote><strong>13C Non-Custodial Multi-Chain Crypto Payment Gateway</strong>  </blockquote>
+<blockquote><strong>Klasifikasi:</strong> Enterprise Architecture & Technical Specification Blueprint  </blockquote>
+<blockquote><strong>Versi:</strong> 2.1.0 | <strong>Tanggal:</strong> November 2026 | <strong>Status:</strong> Production-Ready  </blockquote>
+<blockquote><strong>Repositori:</strong> [github.com/gonzhilaz/bpg](https://github.com/gonzhilaz/bpg)</blockquote>
+<hr class="divider" />
+<h2 class="section-title">1. Executive Summary & Architectural Scope</h2>
+<p>13C Crypto Payment Gateway adalah infrastruktur pemrosesan pembayaran cryptocurrency berskala enterprise yang mengimplementasikan arsitektur <strong>Non-Custodial Instant Forwarding</strong>. Sistem ini memungkinkan toko online dan merchant e-commerce menerima pembayaran stablecoin (USDT & USDC) lintas 4 jaringan blockchain terpopuler (BSC, Polygon, TRON, dan Solana) dengan kepastian dana langsung disapu (<em>swept</em>) ke Cold Storage pribadi milik merchant tanpa pengendapan dana di pihak ketiga.</p>
+<h3 class="sub-title">Core Architectural Axioms</h3>
+<ul><li><strong>Zero-Custody Guarantee:</strong> Gateway tidak pernah menyimpan atau menahan likuiditas merchant. Kunci privat alamat deposit sementara hanya berumur pendek (<em>ephemeral</em>) dan langsung dihapus logikanya setelah proses penyapuan selesai.</li>
+<li><strong>1 Invoice = 1 Ephemeral Address:</strong> Setiap tagihan memiliki pasangan kunci kriptografis tersendiri, menghilangkan kebutuhan Memo/Tag dan mencegah tabrakan deposit antar pelanggan.</li>
+<li><strong>Cryptographic Defense-in-Depth:</strong> Kunci privat dienkripsi at-rest menggunakan <strong>AES-256-GCM</strong>, kredensial API disimpan sebagai hash searah <strong>SHA-256</strong>, dan webhook diotentikasi via <strong>HMAC-SHA256</strong>.</li>
+</ul><hr class="divider" />
+<h2 class="section-title">2. C4 Architecture Model</h2>
+<h3 class="sub-title">2.1 Level 1: System Context Diagram</h3>
+<pre class="code-block"><code>mermaid
+<p>flowchart TD</p>
+<p>Customer["Pelanggan Toko (Customer)"]</p>
+<p>Merchant["Merchant / Toko Online"]</p>
+<p>Admin["Super Admin & DevOps"]</p>
+<p>subgraph System["13C Payment Gateway System"]</p>
+<p>CoreAPI["13C Core API Engine (Go)"]</p>
+<p>Dash["Merchant Portal (Next.js)"]</p>
+<p>AdminPortal["Admin Console (Next.js)"]</p>
+<p>end</p>
+<p>Blockchains["4 Blockchain Networks (BSC, Polygon, TRON, Solana)"]</p>
+<p>ColdWallet["Merchant Cold Storage (Ledger/Trezor/Safe)"]</p>
+<p>StoreBackend["Merchant Store Backend / Webhook Receiver"]</p>
+<p>Customer --&gt;|"Bayar USDT/USDC ke Deposit Address"| Blockchains</p>
+<p>Merchant --&gt;|"Kelola Akun, Cold Wallet & API Keys"| Dash</p>
+<p>Dash --&gt;|"REST API (JWT)"| CoreAPI</p>
+<p>Admin --&gt;|"Monitoring Hot Wallet & DB Maintenance"| AdminPortal</p>
+<p>AdminPortal --&gt;|"Admin REST API (Master Secret)"| CoreAPI</p>
+<p>CoreAPI --&gt;|"Scan Block & Event Logs"| Blockchains</p>
+<p>CoreAPI --&gt;|"Sweep Dana Otomatis"| ColdWallet</p>
+<p>CoreAPI --&gt;|"Notifikasi Transaksi (HMAC-SHA256)"| StoreBackend</p>
+<p></code></pre></p>
+<h3 class="sub-title">2.2 Level 2: Container Topology Diagram</h3>
+<pre class="code-block"><code>mermaid
+<p>flowchart LR</p>
+<p>subgraph ClientLayer["Frontend Client Tier"]</p>
+<p>UI_Dash["Merchant Dashboard\n(Next.js App Router :3001)"]</p>
+<p>UI_Admin["Admin Telemetry Console\n(Next.js App Router :3002)"]</p>
+<p>UI_Widget["Checkout Widget / Sandbox\n(Next.js :3000)"]</p>
+<p>end</p>
+<p>subgraph AppTier["Application Core Tier (Go Engine :8080)"]</p>
+<p>GinRouter["Gin HTTP Router & Middlewares\n(CORS, RateLimiter, JWT/APIKey Auth)"]</p>
+<p>InvoiceSvc["Invoice & Pricing Service"]</p>
+<p>PayoutEngine["Payout & Sweeper Engine"]</p>
+<p>WebhookDisp["Webhook Dispatcher\n(SSRF Guard & Retry Backoff)"]</p>
+<p>WatcherMgr["Watcher Daemon Manager"]</p>
+<p>PrunerWorker["Automated DB Pruner Daemon"]</p>
+<p>end</p>
+<p>subgraph DataTier["Data & Security Storage Tier"]</p>
+<p>DB[(PostgreSQL / SQLite WAL Engine)]</p>
+<p>LockMgr["In-Memory / Distributed Mutex Lock"]</p>
+<p>KMS["AES-256-GCM Cryptographic Vault"]</p>
+<p>end</p>
+<p>UI_Dash --&gt;|"HTTP / REST"| GinRouter</p>
+<p>UI_Admin --&gt;|"HTTP / REST"| GinRouter</p>
+<p>UI_Widget --&gt;|"HTTP / SSE"| GinRouter</p>
+<p>GinRouter --&gt; InvoiceSvc</p>
+<p>GinRouter --&gt; PayoutEngine</p>
+<p>InvoiceSvc --&gt; KMS</p>
+<p>InvoiceSvc --&gt; DB</p>
+<p>PayoutEngine --&gt; LockMgr</p>
+<p>PayoutEngine --&gt; DB</p>
+<p>WatcherMgr --&gt; DB</p>
+<p>WatcherMgr --&gt; PayoutEngine</p>
+<p>WatcherMgr --&gt; WebhookDisp</p>
+<p>PrunerWorker --&gt; DB</p>
+<p></code></pre></p>
+<hr class="divider" />
+<h2 class="section-title">3. Database Architecture & Relational Data Dictionary</h2>
+<h3 class="sub-title">3.1 Entity-Relationship Diagram (ERD)</h3>
+<pre class="code-block"><code>mermaid
+<p>erDiagram</p>
+<p>MERCHANT ||--o{ INVOICE : generates</p>
+<p>MERCHANT ||--o{ PAYMENT_LINK : creates</p>
+<p>MERCHANT ||--o{ WITHDRAWAL_REQUEST : submits</p>
+<p>INVOICE ||--o{ BLOCKCHAIN_TRANSACTION : records</p>
+<p>INVOICE ||--o{ PAYOUT_TRANSFER : triggers</p>
+<p>MERCHANT {</p>
+<p>uuid id PK</p>
+<p>string email UK</p>
+<p>string password_hash</p>
+<p>string name</p>
+<p>string role</p>
+<p>string status</p>
+<p>string api_key UK</p>
+<p>string api_key_hash "index"</p>
+<p>string api_key_prefix</p>
+<p>string secret_key</p>
+<p>string payout_address_bsc</p>
+<p>string payout_address_polygon</p>
+<p>string payout_address_tron</p>
+<p>string payout_address_solana</p>
+<p>boolean auto_payout_enabled</p>
+<p>string fee_payer</p>
+<p>numeric underpaid_tolerance</p>
+<p>numeric balance_usd</p>
+<p>text webhook_url</p>
+<p>boolean two_factor_enabled</p>
+<p>timestamptz created_at</p>
+<p>}</p>
+<p>INVOICE {</p>
+<p>uuid id PK</p>
+<p>uuid merchant_id FK "index"</p>
+<p>string order_id "index"</p>
+<p>numeric amount_requested</p>
+<p>string currency_requested</p>
+<p>string pay_currency</p>
+<p>string pay_network "composite index"</p>
+<p>numeric pay_amount</p>
+<p>numeric received_amount</p>
+<p>string status "composite index"</p>
+<p>string deposit_address "unique index"</p>
+<p>text encrypted_priv_key</p>
+<p>text callback_url</p>
+<p>string payout_address</p>
+<p>timestamptz expires_at "composite index"</p>
+<p>timestamptz paid_at</p>
+<p>timestamptz created_at</p>
+<p>}</p>
+<p>BLOCKCHAIN_TRANSACTION {</p>
+<p>uuid id PK</p>
+<p>uuid invoice_id FK "index"</p>
+<p>string tx_hash "unique index"</p>
+<p>string network</p>
+<p>string from_address</p>
+<p>string to_address</p>
+<p>numeric amount</p>
+<p>string token_symbol</p>
+<p>uint64 block_number</p>
+<p>uint64 confirmations</p>
+<p>string status</p>
+<p>timestamptz detected_at</p>
+<p>}</p>
+<p>PAYOUT_TRANSFER {</p>
+<p>uuid id PK</p>
+<p>uuid invoice_id FK "index"</p>
+<p>uuid merchant_id FK</p>
+<p>string network</p>
+<p>string tx_hash "unique index"</p>
+<p>string from_address</p>
+<p>string to_address</p>
+<p>numeric amount</p>
+<p>numeric fee_paid</p>
+<p>string status</p>
+<p>timestamptz created_at</p>
+<p>}</p>
+<p>PAYMENT_LINK {</p>
+<p>uuid id PK</p>
+<p>uuid merchant_id FK "index"</p>
+<p>string slug "unique index"</p>
+<p>string title</p>
+<p>text description</p>
+<p>numeric amount</p>
+<p>string currency</p>
+<p>string pay_network</p>
+<p>boolean is_active</p>
+<p>numeric total_collected</p>
+<p>int payment_count</p>
+<p>timestamptz created_at</p>
+<p>}</p>
+<p></code></pre></p>
+<h3 class="sub-title">3.2 Indexing Strategy & Concurrency Tuning</h3>
+<p><em> <strong>Composite Index `idx_invoices_watcher`:</strong> Terpasang pada kolom `(pay_network, status, expires_at)`. Memungkinkan background watcher memindai ribuan tagihan aktif dalam kompleksitas waktu <strong>O(log N)</strong> tanpa </em>full table scan*.</p>
+<ul><li><strong>Composite Index `idx_merchant_created`:</strong> Terpasang pada `(merchant_id, created_at)` untuk eksekusi paginasi dashboard instan.</li>
+<li><strong>Database Connection Pooling:</strong></li>
+<li><strong>PostgreSQL:</strong> `MaxOpenConns = 100`, `MaxIdleConns = 10`, `ConnMaxLifetime = 1 Hour`.</li>
+<li><strong>SQLite WAL Mode:</strong> Diaktifkan `PRAGMA journal_mode=WAL;`, `PRAGMA busy_timeout=5000;`, dan `PRAGMA synchronous=NORMAL;` untuk menjamin nol kegagalan lock saat multi-goroutine paralel membaca dan menulis data.</li>
+</ul><hr class="divider" />
+<h2 class="section-title">4. Cryptographic Protocols & Key Management System (KMS)</h2>
+<h3 class="sub-title">4.1 Ephemeral Keypair Lifecycle</h3>
+<p>Untuk setiap invoice yang dibuat, sistem mengeksekusi pembangkitan kunci kriptografis dinamis:</p>
+<ul><li><strong>EVM Networks (BSC & Polygon) & TRON:</strong> Menggunakan kurva eliptis <strong>ECDSA secp256k1</strong>. Alamat TRON diturunkan dari <em>uncompressed public key</em> (Keccak-256, ambil 20-byte terakhir, prefix byte `0x41`, dan dienkode ke <strong>Base58Check</strong>).</li>
+<li><strong>Solana Network:</strong> Menggunakan algoritma tanda tangan digital <strong>Ed25519 (Edwards-curve Digital Signature)</strong> dengan pengkodean alamat <strong>Base58</strong>.</li>
+</ul><h3 class="sub-title">4.2 Sandi Simetris AES-256-GCM</h3>
+<p>Kunci privat alamat deposit dienkripsi di level memori sebelum menyentuh storage database:</p>
+<p>$$\text{Ciphertext} = \mathbf{AES\text{-}256\text{-}GCM}(\text{PlaintextKey}, \mathbf{K}_{\text{master}}, \mathbf{IV}_{12\text{-byte}})$$</p>
+<ul><li><strong>Panjang Kunci Master ($\mathbf{K}_{\text{master}}$):</strong> 256 bit (32 byte) derivasi rahasia master platform.</li>
+</ul><p><em> <strong>Inisialisasi Vektor (IV / Nonce):</strong> 12 byte bilangan acak kriptografis kripto (`crypto/rand`) yang di-</em>generate<em> unik per invoice (mencegah serangan replay dan </em>known-plaintext attack*).</p>
+<ul><li><strong>Tag Otentikasi (Auth Tag):</strong> 16 byte (128 bit) tag integritas Galois/Counter Mode. Jika satu bit ciphertext di database dimanipulasi, dekripsi otomatis melempar error otentikasi.</li>
+</ul><h3 class="sub-title">4.3 Kredensial API At-Rest</h3>
+<ul><li>API Key disimpan dalam bentuk hash kriptografis <strong>SHA-256</strong> searah (`api_key_hash`).</li>
+</ul><p><em> Kolom `api_key_prefix` menyimpan 12 karakter depan untuk </em>indexed lookup*, sedangkan pencocokan akhir divalidasi terhadap hash SHA-256. Jika database bocor, penyerang tidak dapat merekonstruksi API key asli.</p>
+<h3 class="sub-title">4.4 Webhook HMAC-SHA256</h3>
+<p>Setiap callback HTTP ke toko online merchant disertai header tanda tangan kriptografis:</p>
+<p>$$\text{Signature} = \mathbf{HMAC\text{-}SHA256}(\text{RawPayloadJSON}, \mathbf{S}_{\text{merchant}})$$</p>
+<p>Verifikasi pada backend merchant wajib menggunakan pembandingan waktu konstan (<em>constant-time comparison</em>) untuk memitigasi <em>timing attacks</em>.</p>
+<hr class="divider" />
+<h2 class="section-title">5. Multi-Chain Watcher Engine & Anti-Reorg Matrix</h2>
+<h3 class="sub-title">5.1 Mekanisme Pemindaian On-Chain (Targeted Polling)</h3>
+<p>Background watcher memindai transaksi masuk secara asinkron tanpa membebani node RPC publik:</p>
+<p><em> <strong>EVM Watcher (BSC & Polygon):</strong> Menggunakan `eth_getLogs` dengan filter topic alamat 32-byte zero-padded (`topics: [TRANSFER_TOPIC, nil, activeAddressTopics]`). Pendekatan ini membatasi log transfer hanya pada alamat deposit yang sedang aktif, mencegah </em>10,000 log overflow error* pada RPC publik.</p>
+<p><em> <strong>TRON Watcher:</strong> Mengintegrasikan pemindaian event TRC-20 via TronGrid API dengan manajemen sewa energi harian (</em>energy delegation*), memangkas biaya gas operasional sweeping platform hingga 80%.</p>
+<ul><li><strong>Solana Watcher:</strong> Memindai transfer token SPL via JSON-RPC `getSignaturesForAddress` dan `getTransaction` dengan commitment level `confirmed`.</li>
+</ul><h3 class="sub-title">5.2 Block Confirmation Lag Depth Matrix</h3>
+<p>Untuk mencegah serangan <em>blockchain reorg</em> dan <em>double-spending</em>, status invoice tidak langsung diubah menjadi `PAID` pada blok pertama, melainkan mengikuti matriks konfirmasi kedalaman blok berikut:</p>
+<div class="table-wrapper"><table>
+<thead><tr><th>Jaringan Blockchain</th><th>Standar Token</th><th>Block Time</th><th>Konfirmasi Blok Minimum</th><th>Waktu Tunggu Finalitas</th></tr></thead>
+<tbody><tr><td><strong>BNB Smart Chain (BSC)</strong></td><td>BEP-20</td><td>~3.0 detik</td><td><strong>3 Blok</strong></td><td>~9.0 detik</td></tr>
+<tr><td><strong>Polygon PoS</strong></td><td>ERC-20</td><td>~2.1 detik</td><td><strong>15 Blok</strong></td><td>~31.5 detik</td></tr>
+<tr><td><strong>TRON Network</strong></td><td>TRC-20</td><td>~3.0 detik</td><td><strong>19 Konfirmasi</strong></td><td>~57.0 detik</td></tr>
+<tr><td><strong>Solana</strong></td><td>SPL Token</td><td>~400 ms</td><td><strong>32 Slot (Finalized)</strong></td><td>~12.8 detik</td></tr>
+</tbody></table></div>
+
+<h3 class="sub-title">5.3 Invoice Finite State Machine (FSM)</h3>
+<pre class="code-block"><code>mermaid
+<p>stateDiagram-v2</p>
+<p>[*] --&gt; PENDING : Invoice Dibuat</p>
+<p>PENDING --&gt; DETECTED : Transaksi Masuk Ditemukan On-Chain</p>
+<p>PENDING --&gt; EXPIRED : Batas Waktu 30 Menit Habis</p>
+<p>DETECTED --&gt; PAID : Kedalaman Blok Konfirmasi Tercapai & Lunas</p>
+<p>DETECTED --&gt; UNDERPAID : Nominal Masuk &lt; Tagihan (Di Luar Toleransi)</p>
+<p>DETECTED --&gt; EXPIRED : Reorg Terdeteksi / Transaksi Dibatalkan</p>
+<p>PAID --&gt; [*] : Auto-Swept ke Cold Wallet & Webhook Terkirim</p>
+<p>UNDERPAID --&gt; [*] : Notifikasi Kurang Bayar Dikirim ke Toko</p>
+<p>EXPIRED --&gt; [*] : Alamat Deposit Dinonaktifkan</p>
+<p></code></pre></p>
+<hr class="divider" />
+<h2 class="section-title">6. Concurrency Control, Distributed Lock & Idempotency</h2>
+<h3 class="sub-title">6.1 Mutex & Distributed Lock Management</h3>
+<p>Untuk mencegah <em>race condition</em> pada saat penyapuan dana (<em>auto-sweeper</em>), sistem menerapkan penguncian terdistribusi:</p>
+<ul><li>Kunci penguncian berformat `lock:sweep:invoice:<invoice_id>`.</li>
+</ul><p><em> Menggunakan waktu sewa (</em>TTL lease<em>) 30 detik dengan rilis otomatis (</em>defer release*).</p>
+<ul><li>Jika dua event konfirmasi blok datang bersamaan untuk invoice yang sama, goroutine kedua gagal mendapatkan lock dan langsung keluar secara idempoten.</li>
+</ul><h3 class="sub-title">6.2 Idempotency Webhook & Delivery Guarantee</h3>
+<ul><li>Setiap pengiriman webhook menyertakan header `X-13C-Delivery-ID` dan `Idempotency-Key` bernilai UUID unik.</li>
+</ul><p><em> Dispatcher menerapkan pola </em>Exponential Backoff Retry* (hingga 5 kali percobaan) dengan interval $2^n \times 1\text{ detik}$.</p>
+<p><em> Jika endpoint merchant sedang down, webhook delivery ditandai `FAILED` di database dan dapat dipicu ulang melalui tombol </em>Manual Replay* di portal merchant.</p>
+<hr class="divider" />
+<h2 class="section-title">7. Security Architecture & STRIDE Threat Modeling</h2>
+<div class="table-wrapper"><table>
+<thead><tr><th>Ancaman (STRIDE)</th><th>Skenario Risiko</th><th>Mitigasi Arsitektur 13C Gateway</th></tr></thead>
+<tbody><tr><td><strong>Spoofing</strong></td><td>Penyerang memalsukan notifikasi webhook status lunas ke toko merchant.</td><td>Tanda tangan digital <strong>HMAC-SHA256</strong> wajib diverifikasi oleh backend toko menggunakan kunci rahasia yang hanya diketahui merchant.</td></tr>
+<tr><td><strong>Tampering</strong></td><td>Kunci privat deposit di database diubah atau dimanipulasi oleh pihak tak berwenang.</td><td>Kunci privat dienkripsi dengan <strong>AES-256-GCM</strong> dengan otentikasi tag 128-bit; perubahan 1 bit membatalkan dekripsi.</td></tr>
+<tr><td><strong>Repudiation</strong></td><td>Merchant menyangkal telah mengubah alamat Cold Wallet payout.</td><td>Audit log persisten mencatat riwayat mutasi profil beserta timestamp, IP asal, dan user-agent.</td></tr>
+<tr><td><strong>Information Disclosure</strong></td><td>Database dump bocor ke publik.</td><td>Zero plaintext API keys (disimpan sebagai hash SHA-256), zero plaintext private keys (dienkripsi AES-256-GCM).</td></tr>
+<tr><td><strong>Denial of Service</strong></td><td>Flooding request pembuatan invoice untuk menghabiskan memori server.</td><td>Rate limiting bertingkat (15 req/menit untuk auth, 60 req/menit untuk invoice publik) dan koneksi pool terbatas.</td></tr>
+<tr><td><strong>Elevation of Privilege</strong></td><td>Merchant memanggil endpoint manajemen database atau sweeping manual.</td><td>Isolasi otentikasi middleware terpisah: rute admin diwajibkan menyertakan header `X-Admin-Key` dengan verifikasi master secret.</td></tr>
+<tr><td><strong>SSRF (Server-Side Request Forgery)</strong></td><td>Merchant mendaftarkan Webhook URL ke IP lokal server (127.0.0.1 atau 169.254.169.254) untuk mencuri metadata cloud.</td><td>Webhook dispatcher memvalidasi URL terhadap daftar hitam IP privat (RFC 1918), IP loopback, dan <em>cloud metadata endpoints</em>.</td></tr>
+</tbody></table></div>
+
+<hr class="divider" />
+<h2 class="section-title">8. DevOps, Deployment Topology & Disaster Recovery</h2>
+<h3 class="sub-title">8.1 Docker Multi-Stage Containerization</h3>
+<p>Sistem dikemas menggunakan multi-stage Docker build untuk menghasilkan artefak biner distroless berukuran minimal tanpa dependensi build compiler di image produksi:</p>
+<ul><li><strong>Ukuran Image Go Backend:</strong> ~28 MB (berbasis Alpine Linux dengan sertifikat CA resmi).</li>
+<li><strong>Eksekusi Non-Root:</strong> Kontainer berjalan di bawah user UID 10001 (bukan root) untuk memitigasi risiko eskalasi kontainer.</li>
+</ul><h3 class="sub-title">8.2 Topologi Docker Compose Produksi</h3>
+<pre class="code-block"><code>yaml
+<p>version: '3.8'</p>
+<p>services:</p>
+<p>gateway-core:</p>
+<p>image: 13c-gateway-core:latest</p>
+<p>restart: always</p>
+<p>environment:</p>
+<p>- APP_ENV=production</p>
+<p>- DB_DRIVER=postgres</p>
+<p>- DATABASE_URL=postgres://user:pass@postgres-db:5432/13c_prod?sslmode=disable</p>
+<p>ports:</p>
+<p>- "8080:8080"</p>
+<p>depends_on:</p>
+<p>- postgres-db</p>
+<p>postgres-db:</p>
+<p>image: postgres:16-alpine</p>
+<p>restart: always</p>
+<p>volumes:</p>
+<p>- pgdata:/var/lib/postgresql/data</p>
+<p>environment:</p>
+<p>- POSTGRES_DB=13c_prod</p>
+<p>- POSTGRES_USER=user</p>
+<p>- POSTGRES_PASSWORD=secure_pass</p>
+<p>merchant-dashboard:</p>
+<p>image: 13c-dashboard:latest</p>
+<p>restart: always</p>
+<p>ports:</p>
+<p>- "3001:3000"</p>
+<p>volumes:</p>
+<p>pgdata:</p>
+<p></code></pre></p>
+<h3 class="sub-title">8.3 Disaster Recovery, RPO & RTO</h3>
+<ul><li><strong>Recovery Point Objective (RPO):</strong> < 1 menit menggunakan PostgreSQL Continuous Archiving / WAL Streaming.</li>
+<li><strong>Recovery Time Objective (RTO):</strong> < 5 menit untuk restart kontainer otomatis via Docker orchestrator.</li>
+</ul><p><em> <strong>Automated Data Pruning:</strong> Pekerja latar belakang (</em>Pruner Worker*) membersihkan invoice kedaluwarsa secara berkala setiap 24 jam dengan batas retensi 30 hari untuk menjaga performa indeks B-Tree database.</p>
+</body>
+</html>

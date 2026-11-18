@@ -73,11 +73,10 @@ export function PlatformMetricsCard({ metrics }: Props) {
           <button
             type="button"
             onClick={() => setCircuitBreaker(!circuitBreaker)}
-            className={`w-full py-2 px-3 rounded-xl text-xs font-semibold transition-colors flex items-center justify-center gap-2 ${
-              circuitBreaker
+            className={`w-full py-2 px-3 rounded-xl text-xs font-semibold transition-colors flex items-center justify-center gap-2 ${circuitBreaker
                 ? "bg-rose-500 text-white hover:bg-rose-600"
                 : "bg-zinc-800 text-zinc-300 hover:bg-zinc-700 border border-zinc-700"
-            }`}
+              }`}
           >
             <span className={`w-2 h-2 rounded-full ${circuitBreaker ? "bg-white" : "bg-emerald-400"}`} />
             <span>{circuitBreaker ? "Gateway Paused" : "Gateway Active"}</span>
