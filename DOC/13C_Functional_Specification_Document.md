@@ -20,7 +20,7 @@ Memberikan kedaulatan finansial penuh bagi pelaku bisnis digital dan toko online
 | :--- | :--- | :--- |
 | **Merchant Owner** | Pemilik Toko Online | Registrasi akun, pendaftaran alamat Cold Wallet payout, konfigurasi aturan pembebanan gas (*fee payer*), pengelolaan API key, dan monitoring buku besar keuangan (*financial ledger*). |
 | **Buyer / Customer** | Pelanggan Toko | Memilih koin & jaringan pembayaran (BSC, Polygon, TRON, Solana) pada halaman checkout widget, mentransfer dana sesuai nominal tagihan, dan menerima konfirmasi status lunas. |
-| **Super Admin / DevOps** | Pengelola Platform | Memantau kesehatan node RPC blockchain, mengontrol cadangan gas native Hot Wallet, mengeksekusi penyapuan darurat (*manual sweeper*), memelihara basis data, dan mengaktifkan *circuit breaker*. |
+| **Super Admin / Platform Owner** | Pemilik Infrastruktur (Pembeli Sistem) | Memegang hak kepemilikan komersial penuh (*White-Label Sovereign Owner*), memantau kesehatan node RPC blockchain, mengontrol cadangan gas native Hot Wallet, mengeksekusi penyapuan darurat (*manual sweeper*), memelihara basis data, dan mengonfigurasi aturan fee platform tanpa perantara vendor. |
 | **System Daemon** | Background Workers | Memindai log transaksi on-chain (*Watcher*), menyapu dana ke dompet merchant (*Sweeper*), mengirimkan webhook bertanda tangan HMAC ke toko, dan memangkas data kedaluwarsa (*Pruner*). |
 
 ---
@@ -59,6 +59,7 @@ flowchart TD
 6. Buku besar keuangan (*Financial Ledger*) dengan kemampuan ekspor data akuntansi ke format CSV.
 7. Portal Merchant dan Super Admin berbasis Next.js App Router dengan arsitektur sidebar persisten dan indikator status database riil.
 8. Manajemen multi-toko (*Multi-Store per Merchant*) yang memungkinkan 1 entitas merchant mengelola banyak cabang toko digital dengan API key dan payout address terpisah.
+9. Model Distribusi Mandiri (*White-Label Sovereign Ownership*): Sistem diserahkan dalam bentuk *source code* utuh yang siap dideploy secara mandiri di infrastruktur privat pembeli dengan kedaulatan data penuh tanpa dependensi server lisensi pihak ketiga (*Zero-Phone-Home*).
 
 ### 4.2 Out-of-Scope Capabilities
 1. Konversi instan kripto ke mata uang fiat (IDR/USD bank transfer) di dalam platform (diserahkan kepada pertukaran kripto terlisensi).

@@ -473,17 +473,22 @@ Sistem 13C mendukung mode penyelesaian dana ganda per merchant:
 
 ---
 
-## BAB 8: SISTEM LISENSI KRIPTOGRAFIS ED25519 & REMOTE KILL-SWITCH
+## BAB 8: MODEL KEPEMILIKAN MANDIRI (WHITE-LABEL SOVEREIGNTY & ZERO-PHONE-HOME)
 
-### 8.1 Verifikasi Kunci Asimetris Ed25519 (Offline Signature)
-* **Master Developer Public Key**: Kunci publik 32-byte milik developer tertanam secara permanen pada biner Go backend (`internal/license`).
-* **Format Token Lisensi**: Token terdiri dari `<PayloadBase64>.<SignatureBase64>` yang hanya dapat dihasilkan menggunakan Kunci Privat milik Developer.
-* Tanpa token lisensi valid yang ditandatangani developer, seluruh API gateway menolak pemrosesan transaksi dengan HTTP 402 (*License Required*).
+### 8.1 Jaminan Nol Telemetri (Zero-Phone-Home Guarantee)
+* **100% Otonom & Mandiri**: Gateway dirancang untuk beroperasi secara mandiri di infrastruktur privat pembeli tanpa perlu terhubung ke server lisensi eksternal mana pun.
+* **Nol Panggilan Keluar Tersembunyi**: Sistem bebas dari panggilan telemetri pelacak (*tracking telemetry*), *phone-home ping*, maupun ketergantungan API pihak ketiga di luar node RPC blockchain resmi yang dikonfigurasi oleh pemilik platform.
+* **Kesiapan Jaringan Terisolasi (Air-Gapped Ready)**: Backend dapat dijalankan di lingkungan intranet atau Virtual Private Cloud (VPC) privat yang memiliki akses internet terbatas hanya ke node blockchain dan webhook merchant.
 
-### 8.2 Remote Heartbeat Daemon & Instant Kill-Switch Controller (Vercel Hosted)
-* **Aplikasi Controller Mandiri (`license-server/`)**: Disediakan aplikasi Next.js mandiri yang siap di-deploy secara instan ke akun **Vercel** pribadi developer.
-* **Mekanisme Heartbeat**: Setiap 6 jam, backend gateway melakukan ping terenkripsi ke endpoint verifikasi Vercel (`/api/verify`).
-* **Kill-Switch Seketika**: Jika klien melanggar perjanjian atau belum menyelesaikan pembayaran, developer dapat menekan tombol **"Kill Switch"** di dashboard Vercel. Pada ping berikutnya, sistem klien langsung terkunci secara permanen hingga developer menekan **"Restore"**.
+### 8.2 Kedaulatan Master Secret & Kunci Privat (Self-Sovereignty)
+* **Kedaulatan Kriptografis Penuh**: Pemilik platform memegang kendali mutlak atas seluruh rahasia sistem (`MASTER_SECRET_KEY`, `JWT_SECRET`, dan master database credential). Tidak ada pihak luar yang memegang kunci enkripsi cadangan (*zero vendor backdoor*).
+* **Nol Remote Kill-Switch**: Sistem bebas dari mekanisme penonaktifan jarak jauh (*no remote kill-switch*). Pembeli memiliki hak komersial seumur hidup (*perpetual ownership*) untuk menjalankan dan memodifikasi perangkat lunak tanpa risiko dimatikan sepihak oleh vendor.
+* **Isolasi Database & Kredensial**: Seluruh API key merchant disimpan sebagai hash SHA-256 searah dan kunci privat alamat deposit dienkripsi di level database dengan sandi AES-256-GCM.
+
+### 8.3 Kemudahan White-Labeling & Rebranding
+* **Kustomisasi Identitas Visual**: Pembeli dapat dengan bebas mengganti nama brand, logo, favicon, warna tema, dan teks antarmuka pada Merchant Dashboard, Super Admin Portal, dan Checkout Widget.
+* **Domain Mandiri (Custom Domain)**: Sistem mendukung penamaan domain terpisah (misal: `pay.perusahaan.com` untuk widget checkout, `portal.perusahaan.com` untuk merchant, dan `admin.perusahaan.com` untuk konsol pengelola).
+* **Konfigurasi Fee Fleksibel**: Admin platform berhak menentukan dan mengubah persentase Fee Gateway (%) sesuai model bisnis internal tanpa potongan royalti ke pihak mana pun.
 
 ---
 

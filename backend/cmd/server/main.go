@@ -17,7 +17,6 @@ import (
 	"13c-gateway/internal/crypto"
 	"13c-gateway/internal/domain"
 	"13c-gateway/internal/handler"
-	"13c-gateway/internal/license"
 	"13c-gateway/internal/middleware"
 	"13c-gateway/internal/payout"
 	"13c-gateway/internal/repository"
@@ -44,14 +43,10 @@ func main() {
 	// Seed default merchant for instant testing if table is empty
 	seedDefaultMerchant(db)
 
-	// Initialize License Engine & Remote Kill-Switch
+	// Initialize Watcher Context & Sovereign License Handler (White-Label / Jual Putus)
 	watcherCtx, cancelWatchers := context.WithCancel(context.Background())
-	licenseMgr := license.GetManager()
-	if err := licenseMgr.VerifyAndActivate(cfg.LicenseKey, cfg.LicenseServerURL); err != nil {
-		log.Printf("[LICENSE WARN] Gateway starting in UNLICENSED mode: %v", err)
-	}
-	licenseMgr.StartHeartbeatDaemon(watcherCtx)
-	licenseHandler := handler.NewLicenseHandler(cfg.LicenseServerURL)
+	licenseHandler := handler.NewLicenseHandler()
+	log.Println("[INFO] 13C Gateway running in White-Label Sovereign Mode (Perpetual / Jual Putus). Zero remote telemetry.")
 
 	// Initialize Repositories
 	merchantRepo := repository.NewMerchantRepository(db)

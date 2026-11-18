@@ -14,7 +14,7 @@
 | **Tier 1: Root Admin** | DevOps & Platform Owner | Super Admin Portal (`:3002`) | Master Key + 2FA TOTP | Prune DB, Force Sweep, Approval Withdraw, Telemetri Hot Wallet |
 | **Tier 2: Merchant** | Pemilik Toko / Bisnis | Merchant Dashboard (`:3001`) | Email + Password (Bcrypt) + 2FA | API Keys, Webhook Replay, Payment Links, Saldo Escrow |
 | **Tier 3: Tester** | QA, Pembeli, Integrator | Sandbox Simulator (`:3000`) | Header API Key / Public SSE | Simulasi Checkout, Payment Simulator, Verifikasi Real-time SSE |
-| **Tier 4: Sentinel** | Engine Core Gateway | Background Worker & Go CLI | JWT RSA Signed License Key | DRM Licensing, Heartbeat Server, 72-Hour Offline Grace |
+| **Tier 4: Sovereign Core** | Engine Core Gateway | Background Worker & Go CLI | Master Secrets & Air-Gapped Config | White-Label Sovereign Mode, Zero Telemetry, Perpetual Commercial Operation |
 
 ---
 
@@ -86,18 +86,16 @@ Simulator interaktif untuk pengujian alur pembayaran oleh tim QA, tester, maupun
 
 ---
 
-## 5. Kredensial Sentinel Licensing & DRM Guard (Tier 4)
+## 5. Model Kedaulatan Mandiri & Kredensial Sistem (Tier 4)
 
-Konfigurasi lisensi enterprise yang tertanam pada backend gateway core:
+Sistem beroperasi dalam mode **White-Label Sovereign (Jual Putus)** tanpa dependensi server lisensi eksternal:
 
-* **License Key (JWT RSA Signed)**:
-  ```text
-  eyJsaWNlbnNlX2lkIjoiMTNDLUxJQy1hNzBlNjg3MS00ZDBkLTQ2MmMtOWNlMy1mOTEzOGU3ZTM3MGMiLCJsaWNlbnNlZSI6IkNhcHRhaW4gQ2xpZW50IiwiZG9tYWluIjoiKiIsInRpZXIiOiJFTlRFUlBSSVNFIiwiaXNzdWVkX2F0IjoiMjAyNi0xMS0xM1QxMDo0NzoxOS45NzZaIiwiZXhwaXJlc19hdCI6IjIwMjctMTEtMTNUMTA6NDc6MTkuOTc3WiIsImhlYXJ0YmVhdF91cmwiOiJodHRwczovLzEzYy1saWNlbnNlLXNlcnZlci52ZXJjZWwuYXBwL2FwaS92ZXJpZnkifQ.l-5h5r5BGSPjngqNNCesB0VmeyXpw-LR9esH7lOwBQwiS3rEAP3QLRN_h6tSM0NFjgbaJUnsy0GhQTgYaYM4Cg
-  ```
-* **Tier Lisensi**: `ENTERPRISE`
-* **Domain Berlisensi**: `*` *(Wildcard: Bebas dijalankan di localhost, IP VPS, maupun custom domain)*
-* **Remote Heartbeat Endpoint**: `https://13c-license-server.vercel.app/api/verify`
-* **Batas Toleransi Offline (Offline Grace Period)**: `72 Jam`
+* **Model Distribusi**: `White-Label Sovereign / Perpetual Ownership (Jual Putus)`
+* **Status Operasional**: `PERPETUAL_ENTERPRISE (Unrestricted)`
+* **Domain Berlisensi**: `*` *(Wildcard: Bebas dijalankan di server lokal, intranet, VPS privat, maupun cloud)*
+* **Telemetri & Phone-Home**: `DISABLED (Zero Outbound Telemetry)`
+* **Offline Grace Period**: `UNLIMITED (Nol Risiko Penonaktifan Jarak Jauh)`
+* **Hak Pengoperasian**: Hak komersial seumur hidup tanpa kewajiban perpanjangan biaya royalti atau sewa lisensi.
 
 ---
 

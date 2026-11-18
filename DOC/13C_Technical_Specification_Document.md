@@ -13,6 +13,7 @@
 1. **Zero-Custody Guarantee:** Gateway tidak pernah menyimpan atau menahan likuiditas merchant. Kunci privat alamat deposit sementara hanya berumur pendek (*ephemeral*) dan langsung dihapus logikanya setelah proses penyapuan selesai.
 2. **1 Invoice = 1 Ephemeral Address:** Setiap tagihan memiliki pasangan kunci kriptografis tersendiri, menghilangkan kebutuhan Memo/Tag dan mencegah tabrakan deposit antar pelanggan.
 3. **Cryptographic Defense-in-Depth:** Kunci privat dienkripsi at-rest menggunakan **AES-256-GCM**, kredensial API disimpan sebagai hash searah **SHA-256**, dan webhook diotentikasi via **HMAC-SHA256**.
+4. **White-Label Sovereign Ownership:** Arsitektur mandiri (*Zero-Phone-Home*) yang memberikan hak kepemilikan komersial penuh kepada pembeli untuk mengoperasikan platform di server privat tanpa ketergantungan lisensi eksternal atau risiko *remote shutdown*.
 
 ---
 
@@ -282,6 +283,7 @@ Untuk mencegah *race condition* pada saat penyapuan dana (*auto-sweeper*), siste
 | **Denial of Service** | Flooding request pembuatan invoice untuk menghabiskan memori server. | Rate limiting bertingkat (15 req/menit untuk auth, 60 req/menit untuk invoice publik) dan koneksi pool terbatas. |
 | **Elevation of Privilege** | Merchant memanggil endpoint manajemen database atau sweeping manual. | Isolasi otentikasi middleware terpisah: rute admin diwajibkan menyertakan header `X-Admin-Key` dengan verifikasi master secret. |
 | **SSRF (Server-Side Request Forgery)** | Merchant mendaftarkan Webhook URL ke IP lokal server (127.0.0.1 atau 169.254.169.254) untuk mencuri metadata cloud. | Webhook dispatcher memvalidasi URL terhadap daftar hitam IP privat (RFC 1918), IP loopback, dan *cloud metadata endpoints*. |
+| **Vendor Lock-in & Backdoor** | Server gateway dimatikan sepihak atau data transaksi dibocorkan ke server vendor. | **Zero-Phone-Home Architecture**: Gateway beroperasi 100% otonom di server privat pembeli tanpa panggilan telemetri dan tanpa remote kill-switch vendor. |
 
 ---
 
