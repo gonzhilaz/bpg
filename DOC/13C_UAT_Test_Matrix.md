@@ -1,80 +1,89 @@
-# USER ACCEPTANCE TESTING (UAT) & RAG STATUS REPORT
+# USER ACCEPTANCE TESTING (UAT) PROTOCOL & VERIFICATION WORKBOOK
 > **13C Crypto Payment Gateway System**  
-> **Klasifikasi:** Quality Assurance, Test Execution Matrix & Production Sign-Off  
-> **Versi:** 2.1.0 | **Tanggal:** November 2026 | **Hasil Akhir:** 100% PASSED (Zero P1/P2 Defects)  
+> **Klasifikasi:** Quality Assurance, UAT Test Execution Protocol & Client Acceptance Matrix  
+> **Versi:** 2.1.0 | **Tanggal:** November 2026 | **Status UAT:** READY FOR CLIENT TESTING  
 > **Repositori:** [github.com/gonzhilaz/bpg](https://github.com/gonzhilaz/bpg)
 
 ---
 
-## 1. Executive Summary & RAG Status Dashboard
+## 1. Executive Summary & RAG Readiness Status
 
-Dokumen ini memuat hasil pengujian penerimaan pengguna (*User Acceptance Testing / UAT*) resmi terhadap seluruh modul sistem 13C Crypto Payment Gateway sebelum serah terima kepada pihak klien / merchant institusi.
+Dokumen ini adalah **Protokol dan Lembar Kerja Pengujian Penerimaan Pengguna (*User Acceptance Testing / UAT*)** resmi untuk memandu pemilik bisnis / klien dalam menguji, memverifikasi, dan menandatangani serah terima sistem **13C Crypto Payment Gateway**.
 
-### Ringkasan Eksekutif RAG (Red - Amber - Green)
-* 🟢 **GREEN (100% Ready for Production):** Seluruh modul inti pembayaran kripto, kriptografi kunci privat, multi-chain watcher, auto-sweeping dana ke Cold Wallet, webhook HMAC, laporan keuangan, dan konsol admin telah diuji secara menyeluruh dan beroperasi stabil.
-* 🟡 **AMBER (0 Modul):** Tidak ada modul dengan risiko operasional tertunda.
-* 🔴 **RED (0 Modul):** Nol cacat kritis (*Zero P1/P2 Defects*).
+### Status Kesiapan RAG (Red - Amber - Green)
+* 🟢 **Internal Engineering & SIT (System Integration Testing):** 100% Lolos pengujian unit, integrasi database riil, dan analisis statis (`go test`, `go vet`, `tsc --noEmit`).
+* 🟡 **Client User Acceptance Testing (UAT):** **READY FOR TESTING**. Lembar kerja ini disiapkan agar pemilik / klien dapat memvalidasi langsung setiap skenario di lingkungan staging/sandbox sebelum *production sign-off*.
+* 🔴 **Cacat Kritis (P1 / P2):** Nol cacat kritis yang teridentifikasi pada pengujian internal developer.
 
-| Modul Sistem | Status RAG | Total Kasus Uji | Lolos (PASS) | Gagal (FAIL) | Sign-Off |
-| :--- | :---: | :---: | :---: | :---: | :---: |
-| **Merchant Authentication & Security** | 🟢 GREEN | 3 | 3 | 0 | APPROVED |
-| **Multi-Chain Invoice Creation Engine** | 🟢 GREEN | 4 | 4 | 0 | APPROVED |
-| **Blockchain Watcher & Finality Lag** | 🟢 GREEN | 3 | 3 | 0 | APPROVED |
-| **Instant Auto-Sweeper & Settlement** | 🟢 GREEN | 3 | 3 | 0 | APPROVED |
-| **Fee Payer & Gateway Fee (%) Calculation** | 🟢 GREEN | 2 | 2 | 0 | APPROVED |
-| **HMAC-SHA256 Webhook & Anti-SSRF** | 🟢 GREEN | 3 | 3 | 0 | APPROVED |
-| **Financial Ledger & CSV Export** | 🟢 GREEN | 2 | 2 | 0 | APPROVED |
-| **Super Admin Telemetry & DB Maintenance** | 🟢 GREEN | 3 | 3 | 0 | APPROVED |
-| **TOTAL KESELURUHAN** | 🟢 **GREEN** | **23** | **23 (100%)** | **0** | **PRODUCTION READY** |
+| Modul Sistem | Status SIT Developer | Status UAT Klien | Total Skenario | Hasil Verifikasi Klien |
+| :--- | :---: | :---: | :---: | :---: |
+| **Merchant Authentication & Security** | 🟢 VERIFIED | 🟡 READY FOR TEST | 3 | [   ] PENDING TESTING |
+| **Multi-Chain Invoice Creation Engine** | 🟢 VERIFIED | 🟡 READY FOR TEST | 4 | [   ] PENDING TESTING |
+| **Blockchain Watcher & Finality Lag** | 🟢 VERIFIED | 🟡 READY FOR TEST | 3 | [   ] PENDING TESTING |
+| **Instant Auto-Sweeper & Settlement** | 🟢 VERIFIED | 🟡 READY FOR TEST | 3 | [   ] PENDING TESTING |
+| **Fee Payer & Gateway Fee (%) Calculation** | 🟢 VERIFIED | 🟡 READY FOR TEST | 2 | [   ] PENDING TESTING |
+| **HMAC-SHA256 Webhook & Anti-SSRF** | 🟢 VERIFIED | 🟡 READY FOR TEST | 3 | [   ] PENDING TESTING |
+| **Financial Ledger & CSV Export** | 🟢 VERIFIED | 🟡 READY FOR TEST | 2 | [   ] PENDING TESTING |
+| **Super Admin Telemetry & DB Maintenance** | 🟢 VERIFIED | 🟡 READY FOR TEST | 3 | [   ] PENDING TESTING |
+| **TOTAL KESELURUHAN** | 🟢 **100% SIT PASSED** | 🟡 **READY FOR TEST** | **23** | **MENUNGGU UJI RIIL KLIEN** |
 
 ---
 
 ## 2. Skala Keparahan Cacat (*Defect Severity Scale*)
 
-Sistem pengujian menerapkan standar klasifikasi kecacatan perangkat lunak internasional:
-* **P1 (Blocker):** Kerusakan sistem total, kebocoran dana, kebocoran private key, atau kegagalan fatal pada alur pembayaran. *Toleransi serah terima: 0.*
-* **P2 (Critical):** Fitur utama tidak berfungsi dan tidak ada solusi alternatif (*workaround*), misalnya kegagalan watcher mendeteksi transaksi atau webhook gagal terkirim permanen. *Toleransi serah terima: 0.*
-* **P3 (Major):** Fitur berfungsi sebagian namun ada anomali visual atau error minor yang memiliki *workaround*.
-* **P4 (Minor):** Perbaikan kosmetik antarmuka, tata letak teks, atau label.
+Klien dapat mencatat setiap temuan anomali selama pengujian berdasarkan kriteria berikut:
+* **P1 (Blocker):** Kerusakan fatal, kebocoran dana kripto, kebocoran private key, atau transaksi macet total. *Toleransi serah terima: 0.*
+* **P2 (Critical):** Fungsi utama tidak berjalan (misal: webhook tidak terkirim sama sekali atau deposit tidak terdeteksi). *Toleransi serah terima: 0.*
+* **P3 (Major):** Fitur berjalan namun terdapat inkonsistensi minor yang memiliki solusi sementara (*workaround*).
+* **P4 (Minor):** Masalah kosmetik antarmuka, tata letak teks, atau label.
 
 ---
 
 ## 3. Matriks Pengujian Formal (UAT Execution Matrix)
 
-| TC_ID | Modul | Skenario Pengujian | Langkah Pengujian | Payload / Input | Hasil yang Diharapkan | Hasil Aktual | Status | Sev | Sign-Off |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :---: | :---: | :---: |
-| **TC-AUTH-01** | Merchant Auth | Pendaftaran merchant baru & Reveal Once API Key | 1. Buka `/register`<br>2. Masukkan nama toko, email, password<br>3. Submit form | `{"name":"Toko Digital","email":"toko@test.com","password":"password123"}` | Akun dibuat, modal Reveal Once menampilkan API Key & Secret Key satu kali saja, API Key di-hash SHA-256 di DB. | API key ditampilkan sekali, hash SHA-256 tersimpan di tabel `merchants`. | **PASS** | - | Lead QA |
-| **TC-AUTH-02** | Merchant Auth | Otentikasi login merchant dengan JWT | 1. Buka `/login`<br>2. Masukkan email & password terdaftar | `{"email":"toko@test.com","password":"password123"}` | Respon HTTP 200, JWT token dihasilkan, diarahkan ke Merchant Dashboard. | Berhasil login, JWT tersimpan di storage sesi, profil dimuat dari DB. | **PASS** | - | Lead QA |
-| **TC-AUTH-03** | Merchant Auth | Pembaruan dompet Cold Wallet payout | 1. Buka menu `/wallets`<br>2. Masukkan alamat BSC, Polygon, TRON, Solana<br>3. Klik Simpan | Form update dompet dengan alamat valid 4 rantai | Data tersimpan permanen di database PostgreSQL/SQLite via `PUT /api/v1/auth/profile`. | Profil terupdate di DB, tombol menampilkan animasi konfirmasi tersimpan. | **PASS** | - | Lead QA |
-| **TC-INV-01** | Invoicing | Pembuatan invoice BSC (BEP-20 USDT) | Panggil `POST /api/v1/invoices` dengan header `X-API-KEY` | `{"order_id":"ORD-101","amount":"50.00","currency":"USD","pay_network":"BSC"}` | Dihasilkan deposit address EVM unik, private key terenkripsi AES-256-GCM di DB, status `PENDING`. | Address `0x...` unik terbentuk, status `PENDING`, QR code valid. | **PASS** | - | Lead QA |
-| **TC-INV-02** | Invoicing | Pembuatan invoice Polygon (ERC-20 USDT) | Panggil endpoint pembuatan tagihan untuk Polygon | `{"order_id":"ORD-102","amount":"100.00","currency":"USD","pay_network":"POLYGON"}` | Deposit address terbentuk, expiry timer 30 menit aktif. | Tagihan terbentuk sempurna dengan hitung mundur presisi. | **PASS** | - | Lead QA |
-| **TC-INV-03** | Invoicing | Pembuatan invoice TRON (TRC-20 USDT) | Panggil endpoint pembuatan tagihan untuk TRON | `{"order_id":"ORD-103","amount":"25.00","currency":"USD","pay_network":"TRON"}` | Address Base58 diawali huruf `T` terbentuk, privat key terenkripsi. | Address `TYUK...` valid TRON terbentuk dan dipantau watcher. | **PASS** | - | Lead QA |
-| **TC-INV-04** | Invoicing | Pembuatan invoice Solana (SPL USDC) | Panggil endpoint pembuatan tagihan untuk Solana | `{"order_id":"ORD-104","amount":"15.00","currency":"USD","pay_network":"SOLANA"}` | Address Ed25519 Base58 terbentuk, privat key terenkripsi. | Address Solana valid terbentuk dan status `PENDING`. | **PASS** | - | Lead QA |
-| **TC-WAT-01** | Watcher | Deteksi transaksi on-chain & lag konfirmasi BSC | Kirim transfer deposit ke ephemeral address di BSC | Transfer on-chain 50 USDT di BSC Testnet | Watcher mendeteksi tx, status berubah `DETECTED`, setelah 3 blok status menjadi `PAID`. | Terdeteksi seketika, konfirmasi 3 blok terpenuhi, invoice ditandai `PAID`. | **PASS** | - | Lead QA |
-| **TC-WAT-02** | Watcher | Filter log 32-byte EVM anti-overflow | Watcher memindai log transfer dengan filter topic terarah | Ribuan transfer USDT publik terjadi di rantai | Node RPC tidak melempar error 10,000 log overflow karena hanya memfilter deposit address aktif. | Pemindaian berjalan mulus tanpa throttling HTTP 429. | **PASS** | - | Lead QA |
-| **TC-WAT-03** | Watcher | Penanganan toleransi kurang bayar (Underpaid) | Kirim 49.50 USDT untuk tagihan 50 USDT (toleransi 1%) | Transfer 49.50 USDT (selisih 1% di dalam batas toleransi) | Status invoice tetap ditandai `PAID` karena berada dalam rentang toleransi yang diatur merchant. | Invoice lunas, pesanan toko sukses tanpa membatalkan transaksi pembeli. | **PASS** | - | Lead QA |
-| **TC-SWP-01** | Sweeper | Penyapuan instan ke Cold Wallet merchant | Invoice lunas diverifikasi on-chain | Saldo 50 USDT berada di deposit address | Dana otomatis disapu ke PayoutAddress merchant, kunci ephemeral dirilis, tx hash sweep tercatat. | Dana mendarat di Cold Wallet merchant, mutasi tersimpan di `payout_transfers`. | **PASS** | - | Lead QA |
-| **TC-SWP-02** | Sweeper | Distributed Lock anti-double sweep | 2 event konfirmasi datang paralel untuk 1 invoice | Simulasi eksekusi sweep ganda secara simultan | Goroutine kedua gagal memperoleh mutex lock `lock:sweep:invoice`, tidak terjadi double spend. | Mutex lock menolak transaksi kedua secara idempoten; hanya 1 sweep dieksekusi. | **PASS** | - | Lead QA |
-| **TC-SWP-03** | Sweeper | Proteksi saldo debu (*Dust Protection*) | Deposit address memiliki sisa saldo sangat kecil | Saldo 0.001 USDT (di bawah biaya gas) | Sweeper melewati eksekusi penarikan dan mencatat log dust protection agar tidak rugi gas. | Saldo debu dilewati secara aman tanpa membuang saldo gas Hot Wallet. | **PASS** | - | Lead QA |
-| **TC-FEE-01** | Fee Engine | Aturan Fee Payer: Customer Surcharge | Buat tagihan dengan `fee_payer = "customer"` | `amount = 100.00`, gas fee = `0.05` | Total tagihan yang harus dibayar pembeli adalah `100.05 USDT`; merchant menerima utuh `100.00 USDT`. | Tagihan menghitung surcharge gas dengan benar ke sisi pelanggan. | **PASS** | - | Lead QA |
-| **TC-FEE-02** | Fee Engine | Perhitungan Fee Gateway (%) Dinamis | Verifikasi kalkulasi komisi gateway pada laporan | Transaksi bruto 1.000 USDT dengan fee dinamis | Laporan menampilkan potongan `Fee Gateway (%)` sesuai konfigurasi sistem tanpa angka hardcoded. | Nilai terhitung presisi di tabel ledger dan ekspor CSV. | **PASS** | - | Lead QA |
-| **TC-WHK-01** | Webhook | Validasi tanda tangan digital HMAC-SHA256 | Backend toko memverifikasi header `X-13C-Signature` | Payload webhook status `INVOICE_PAID` | Signature cocok dengan HMAC-SHA256 yang dihitung backend toko menggunakan `secret_key`. | Otentikasi webhook berhasil dan toko menandai pesanan lunas. | **PASS** | - | Lead QA |
-| **TC-WHK-02** | Webhook | Proteksi SSRF terhadap IP privat & cloud metadata | Merchant mendaftarkan webhook URL ke `http://127.0.0.1:8080` atau `http://169.254.169.254` | Webhook URL berupa IP lokal loopback atau AWS metadata | Dispatcher menolak pengiriman dengan pesan error `SSRF security policy: private/internal destinations forbidden`. | Pengiriman diblokir seketika, mencegah peretasan infrastruktur internal. | **PASS** | - | Lead QA |
-| **TC-WHK-03** | Webhook | Exponential backoff retry saat server toko offline | Server toko membalas dengan status HTTP 500 | Pengiriman webhook simulasi gagal | Dispatcher menjadwalkan ulang pengiriman hingga 5x percobaan dengan interval bertingkat. | Retry tercatat di log webhook dan tersedia tombol *Manual Replay*. | **PASS** | - | Lead QA |
-| **TC-REP-01** | Financial | Agregasi buku besar keuangan dari database riil | Buka menu `/reports` pada Merchant Dashboard | Transaksi riil di tabel `invoices` & `payout_transfers` | Menampilkan Gross Sales, Net Settled, Fee Gateway (%), dan Sweep Gas teragregasi langsung dari DB. | Angka pembukuan akurat dan mencerminkan data aktual database. | **PASS** | - | Lead QA |
-| **TC-REP-02** | Financial | Ekspor laporan pembukuan ke format CSV | Klik tombol "Export CSV" pada kartu Financial Ledger | Filter rentang waktu `30D` | File `financial_report_30d.csv` terunduh otomatis memuat baris metrik pembukuan bersih. | File CSV terunduh sempurna dan kompatibel dibuka di Microsoft Excel. | **PASS** | - | Lead QA |
-| **TC-ADM-01** | Super Admin | Monitoring cadangan gas Hot Wallet platform | Buka menu `/gas` pada Admin Console | Saldo native BNB, POL, TRX, SOL pada Hot Wallet | Menampilkan saldo riil, status cadangan gas, dan estimasi sisa transaksi sweeping. | Status terpantau live dengan indikator peringatan jika saldo menipis. | **PASS** | - | Lead QA |
-| **TC-ADM-02** | Super Admin | Database Maintenance & Pemangkasan Pruner | Buka menu `/database` dan klik tombol "Run Prune" | Invoice kedaluwarsa berusia lebih dari 30 hari | Menghapus record basi dari database tanpa mengunci tabel (*zero table lock*). | Record basi terhapus, penyimpanan teroptimasi, WAL checkpoint berjalan. | **PASS** | - | Lead QA |
-| **TC-ADM-03** | Super Admin | Emergency Circuit Breaker (Pembekuan Darurat) | Pemicu saklar darurat pada Admin Shell | Status darurat diaktifkan oleh Super Admin | Seluruh aktivitas auto-sweeper dan pembuatan tagihan baru dibekukan seketika demi keamanan. | Sistem terkunci dalam mode aman; tidak ada dana keluar saat circuit breaker aktif. | **PASS** | - | Lead QA |
+Gunakan tabel lembar kerja ini saat melakukan pengujian interaktif langsung pada antarmuka dan API:
+
+| TC_ID | Modul | Skenario Pengujian | Langkah Pengujian Riil | Payload / Input | Kriteria Hasil yang Diharapkan | Hasil Uji Riil Klien | Status UAT | Paraf |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :---: | :---: |
+| **TC-AUTH-01** | Merchant Auth | Pendaftaran merchant baru & Reveal Once API Key | 1. Buka `/register`<br>2. Masukkan nama toko, email, password<br>3. Submit form | Nama toko, email unik, password >= 6 karakter | Modal Reveal Once menampilkan API Key & Webhook Secret satu kali saja; hash SHA-256 tersimpan di database. | | [ ] PASS<br>[ ] FAIL | |
+| **TC-AUTH-02** | Merchant Auth | Otentikasi login merchant dengan JWT | 1. Buka `/login`<br>2. Masukkan email & password terdaftar | Email & password terdaftar | Berhasil login, diarahkan ke Dashboard, sesi login tersimpan. | | [ ] PASS<br>[ ] FAIL | |
+| **TC-AUTH-03** | Merchant Auth | Pembaruan dompet Cold Wallet payout | 1. Buka menu `/wallets`<br>2. Masukkan alamat BSC, Polygon, TRON, Solana<br>3. Klik Simpan | Alamat dompet valid untuk 4 jaringan | Data tersimpan permanen di database riil; tombol menampilkan feedback visual tersimpan. | | [ ] PASS<br>[ ] FAIL | |
+| **TC-INV-01** | Invoicing | Pembuatan invoice BSC (BEP-20 USDT) | Buat invoice via REST API atau menu tagihan | `order_id`, `amount`, `pay_network: BSC` | Deposit address `0x...` unik terbentuk, private key terenkripsi AES-256-GCM, QR code valid. | | [ ] PASS<br>[ ] FAIL | |
+| **TC-INV-02** | Invoicing | Pembuatan invoice Polygon (ERC-20 USDT) | Buat invoice untuk Polygon PoS | `amount`, `pay_network: POLYGON` | Deposit address Polygon unik terbentuk, timer countdown aktif. | | [ ] PASS<br>[ ] FAIL | |
+| **TC-INV-03** | Invoicing | Pembuatan invoice TRON (TRC-20 USDT) | Buat invoice untuk TRON Network | `amount`, `pay_network: TRON` | Address Base58 diawali huruf `T` terbentuk, terpantau watcher. | | [ ] PASS<br>[ ] FAIL | |
+| **TC-INV-04** | Invoicing | Pembuatan invoice Solana (SPL USDC) | Buat invoice untuk Solana Network | `amount`, `pay_network: SOLANA` | Address Ed25519 Base58 terbentuk, status `PENDING`. | | [ ] PASS<br>[ ] FAIL | |
+| **TC-WAT-01** | Watcher | Deteksi transaksi on-chain & lag konfirmasi | Kirim transfer deposit uji ke alamat tagihan | Transfer kripto sesuai nominal tagihan | Watcher mendeteksi transaksi, status berubah `DETECTED`, setelah konfirmasi blok terpenuhi status menjadi `PAID`. | | [ ] PASS<br>[ ] FAIL | |
+| **TC-WAT-02** | Watcher | Filter log 32-byte EVM anti-overflow | Watcher memindai transfer pada RPC publik | Volume transfer publik di jaringan | RPC tidak melempar error 10,000 log overflow karena filter topic 32-byte aktif. | | [ ] PASS<br>[ ] FAIL | |
+| **TC-WAT-03** | Watcher | Penanganan toleransi kurang bayar (*Underpaid*) | Kirim nominal dengan selisih kecil dalam batas toleransi | Pembayaran 49.50 USDT untuk tagihan 50 USDT (toleransi 1%) | Status invoice tetap ditandai `PAID` karena masih dalam batas toleransi merchant. | | [ ] PASS<br>[ ] FAIL | |
+| **TC-SWP-01** | Sweeper | Penyapuan instan ke Cold Wallet merchant | Selesaikan pelunasan invoice | Saldo token berada di deposit address | Dana otomatis disapu ke PayoutAddress merchant, tx hash tercatat di `payout_transfers`. | | [ ] PASS<br>[ ] FAIL | |
+| **TC-SWP-02** | Sweeper | Distributed Lock anti-double sweep | Simulasi dua event konfirmasi blok bersamaan | 2 pemicu konfirmasi paralel | Mutex lock menolak transaksi kedua secara idempoten; hanya 1 proses sweep dieksekusi. | | [ ] PASS<br>[ ] FAIL | |
+| **TC-SWP-03** | Sweeper | Proteksi saldo debu (*Dust Protection*) | Deposit address memiliki sisa saldo < 1 USDT | Saldo sangat kecil di bawah estimasi biaya gas | Sweeper melewati deposit debu agar tidak menguras saldo gas Hot Wallet secara merugikan. | | [ ] PASS<br>[ ] FAIL | |
+| **TC-FEE-01** | Fee Engine | Aturan Fee Payer: Customer Surcharge | Buat tagihan dengan `fee_payer = "customer"` | `amount = 100`, estimasi gas = `0.05` | Pelanggan membayar `100.05 USDT`; merchant menerima bersih `100.00 USDT`. | | [ ] PASS<br>[ ] FAIL | |
+| **TC-FEE-02** | Fee Engine | Perhitungan Fee Gateway (%) Dinamis | Verifikasi potongan fee gateway pada buku besar | Transaksi bruto dengan persentase fee platform | Laporan menampilkan potongan `Fee Gateway (%)` sesuai konfigurasi sistem tanpa angka hardcoded. | | [ ] PASS<br>[ ] FAIL | |
+| **TC-WHK-01** | Webhook | Validasi tanda tangan digital HMAC-SHA256 | Backend toko menerima callback `INVOICE_PAID` | Header `X-13C-Signature` dan raw payload | Signature cocok dengan HMAC-SHA256 yang dihitung toko menggunakan Webhook Secret. | | [ ] PASS<br>[ ] FAIL | |
+| **TC-WHK-02** | Webhook | Proteksi SSRF terhadap IP privat & metadata | Daftarkan webhook URL ke `http://127.0.0.1` atau `169.254.169.254` | Webhook URL berupa IP lokal loopback atau AWS metadata | Dispatcher menolak pengiriman dan mencatat error pencegahan SSRF. | | [ ] PASS<br>[ ] FAIL | |
+| **TC-WHK-03** | Webhook | Exponential backoff retry saat server toko offline | Simulasi server toko mengembalikan HTTP 500 | Pengiriman webhook gagal | Dispatcher menjadwalkan ulang pengiriman bertingkat hingga 5x percobaan; tombol Manual Replay aktif. | | [ ] PASS<br>[ ] FAIL | |
+| **TC-REP-01** | Financial | Agregasi buku besar keuangan dari database riil | Buka menu `/reports` pada Merchant Dashboard | Transaksi riil di database | Menampilkan Gross Sales, Net Settled, Fee Gateway (%), dan Sweep Gas terhitung akurat dari DB riil. | | [ ] PASS<br>[ ] FAIL | |
+| **TC-REP-02** | Financial | Ekspor laporan pembukuan ke format CSV | Klik tombol "Export CSV" pada kartu Financial Ledger | Filter rentang waktu `30D` | File CSV terunduh otomatis memuat data mutasi keuangan bersih. | | [ ] PASS<br>[ ] FAIL | |
+| **TC-ADM-01** | Super Admin | Monitoring cadangan gas Hot Wallet platform | Buka menu `/gas` pada Admin Console | Saldo native BNB, POL, TRX, SOL pada Hot Wallet | Menampilkan saldo live Hot Wallet dengan peringatan jika cadangan gas menipis. | | [ ] PASS<br>[ ] FAIL | |
+| **TC-ADM-02** | Super Admin | Database Maintenance & Pemangkasan Pruner | Buka menu `/database` dan klik "Run Prune" | Data tagihan kedaluwarsa berusia > 30 hari | Record basi terhapus dari database tanpa mengunci tabel (*zero table lock*). | | [ ] PASS<br>[ ] FAIL | |
+| **TC-ADM-03** | Super Admin | Emergency Circuit Breaker (Pembekuan Darurat) | Pemicu saklar darurat pada Admin Console | Status darurat diaktifkan oleh Admin | Pembuatan tagihan baru dan seluruh proses auto-sweeper dibekukan seketika demi keselamatan dana. | | [ ] PASS<br>[ ] FAIL | |
 
 ---
 
-## 4. Lembar Persetujuan Akhir (*Production Sign-Off*)
+## 4. Lembar Berita Acara Serah Terima (*Acceptance Sign-Off Certificate*)
 
-Berdasarkan hasil pengujian di atas, sistem **13C Crypto Payment Gateway Versi 2.1.0** dinyatakan telah memenuhi 100% persyaratan fungsional, arsitektural, dan keamanan tanpa adanya cacat berkategori Blocker (P1) maupun Critical (P2).
+Lembar berita acara ini ditandatangani bersama setelah seluruh skenario pengujian riil di atas diselesaikan dan diverifikasi oleh pihak klien/pembeli:
 
-| Peran Penguji | Nama / Entitas | Tanggal Evaluasi | Keputusan |
-| :--- | :--- | :--- | :---: |
-| **Lead QA Engineer** | Tim Penguji Kualitas Sistem | 18 November 2026 | **PASSED (100%)** |
-| **Security & Cryptography Auditor** | Audit Kriptografi & Penetrasi | 18 November 2026 | **PASSED (SECURE)** |
-| **Lead Blockchain Architect** | Arsitek Multi-Chain Gateway | 18 November 2026 | **APPROVED FOR PRODUCTION** |
+### Pernyataan Bersama
+Dengan ini dinyatakan bahwa pengujian penerimaan pengguna (*User Acceptance Testing*) terhadap perangkat lunak **13C Crypto Payment Gateway Versi 2.1.0** telah dilaksanakan. Sistem diserahkan dalam kondisi baik, tanpa cacat kritis terbuka (P1/P2), dan siap dioperasikan secara mandiri (*self-hosted*).
+
+<br>
+
+| PIHAK PENGEMBANG / PENJUAL | PIHAK KLIEN / PEMBELI SISTEM |
+| :--- | :--- |
+| **Nama:** ___________________________ | **Nama:** ___________________________ |
+| **Jabatan:** Lead Architect / Vendor | **Jabatan:** Platform Owner / Buyer |
+| **Tanggal:** ___________________________ | **Tanggal:** ___________________________ |
+| **Tanda Tangan:**<br><br><br>___________________________ | **Tanda Tangan:**<br><br><br>___________________________ |
+| **Status Akhir:** [ ] APPROVED FOR PRODUCTION | **Status Akhir:** [ ] ACCEPTED & SIGNED OFF |
