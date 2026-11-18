@@ -43,10 +43,8 @@ func main() {
 	// Seed default merchant for instant testing if table is empty
 	seedDefaultMerchant(db)
 
-	// Initialize Watcher Context & Sovereign License Handler (White-Label / Jual Putus)
+	// Initialize Watcher Context
 	watcherCtx, cancelWatchers := context.WithCancel(context.Background())
-	licenseHandler := handler.NewLicenseHandler()
-	log.Println("[INFO] 13C Gateway running in White-Label Sovereign Mode (Perpetual / Jual Putus). Zero remote telemetry.")
 
 	// Initialize Repositories
 	merchantRepo := repository.NewMerchantRepository(db)
@@ -101,7 +99,7 @@ func main() {
 
 	// Setup Router
 	r := gin.New()
-	r.Use(gin.Logger(), gin.Recovery(), middleware.CORSMiddleware(), middleware.LicenseEnforcement())
+	r.Use(gin.Logger(), gin.Recovery(), middleware.CORSMiddleware())
 
 	// Rate Limiting Middlewares (Anti-Brute Force & Anti-DDoS)
 	authRateLimiter := middleware.RateLimit(15, 15, time.Minute)
@@ -122,10 +120,6 @@ func main() {
 	// API Routes
 	v1 := r.Group("/api/v1")
 	{
-		// System Licensing & Activation
-		v1.GET("/license/status", licenseHandler.GetStatus)
-		v1.POST("/license/activate", licenseHandler.Activate)
-
 		// Authentication (Self-service merchant onboarding & login)
 		authRoutes := v1.Group("/auth")
 		{

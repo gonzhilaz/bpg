@@ -115,7 +115,7 @@ Infrastruktur payment gateway berbasis cryptocurrency untuk toko online / mercha
 3. **Penyapuan Instan:** Likuiditas langsung masuk ke Cold Wallet pribadi merchant.
 4. **SDK & API Lengkap:** Dokumentasi REST API, Checkout Widget, dan Webhook Handler yang mudah dipasang.
 5. **Transparansi Biaya:** Model biaya persentase fleksibel (Fee Gateway %) atau 0% untuk instalasi mandiri.
-6. **Model Jual Putus (Sovereign Ownership):** Hak kepemilikan komersial 100% atas source code & database tanpa biaya langganan bulanan (*zero SaaS fee*) dan bebas dari ketergantungan server lisensi eksternal (*Zero-Phone-Home*).
+6. **Model Jual Putus (Sovereign Ownership):** Hak kepemilikan komersial 100% atas source code & database tanpa biaya langganan bulanan (*zero SaaS fee*), tanpa sistem lisensi, tanpa token aktivasi, dan bebas dari panggilan ke server vendor (*Zero-Phone-Home*).
 
 ### Hal yang Perlu Diperhatikan
 * **Audit Keamanan Mandiri:** Lakukan peninjauan keamanan berkala terhadap konfigurasi server dan Cold Wallet Anda.

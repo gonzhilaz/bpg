@@ -476,7 +476,7 @@ Sistem 13C mendukung mode penyelesaian dana ganda per merchant:
 ## BAB 8: MODEL KEPEMILIKAN MANDIRI (WHITE-LABEL SOVEREIGNTY & ZERO-PHONE-HOME)
 
 ### 8.1 Jaminan Nol Telemetri (Zero-Phone-Home Guarantee)
-* **100% Otonom & Mandiri**: Gateway dirancang untuk beroperasi secara mandiri di infrastruktur privat pembeli tanpa perlu terhubung ke server lisensi eksternal mana pun.
+* **100% Otonom & Mandiri**: Gateway beroperasi secara mandiri di infrastruktur privat pembeli tanpa sistem lisensi, tanpa token aktivasi, dan tanpa verifikasi eksternal apa pun. Sistem langsung aktif dan siap memproses transaksi begitu server dijalankan.
 * **Nol Panggilan Keluar Tersembunyi**: Sistem bebas dari panggilan telemetri pelacak (*tracking telemetry*), *phone-home ping*, maupun ketergantungan API pihak ketiga di luar node RPC blockchain resmi yang dikonfigurasi oleh pemilik platform.
 * **Kesiapan Jaringan Terisolasi (Air-Gapped Ready)**: Backend dapat dijalankan di lingkungan intranet atau Virtual Private Cloud (VPC) privat yang memiliki akses internet terbatas hanya ke node blockchain dan webhook merchant.
 

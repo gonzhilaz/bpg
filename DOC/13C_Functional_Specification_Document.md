@@ -59,7 +59,7 @@ flowchart TD
 6. Buku besar keuangan (*Financial Ledger*) dengan kemampuan ekspor data akuntansi ke format CSV.
 7. Portal Merchant dan Super Admin berbasis Next.js App Router dengan arsitektur sidebar persisten dan indikator status database riil.
 8. Manajemen multi-toko (*Multi-Store per Merchant*) yang memungkinkan 1 entitas merchant mengelola banyak cabang toko digital dengan API key dan payout address terpisah.
-9. Model Distribusi Mandiri (*White-Label Sovereign Ownership*): Sistem diserahkan dalam bentuk *source code* utuh yang siap dideploy secara mandiri di infrastruktur privat pembeli dengan kedaulatan data penuh tanpa dependensi server lisensi pihak ketiga (*Zero-Phone-Home*).
+9. Model Distribusi Mandiri (*White-Label Sovereign Ownership*): Sistem diserahkan dalam bentuk *source code* utuh yang siap dideploy secara mandiri di infrastruktur privat pembeli dengan kedaulatan data penuh tanpa metode lisensi, tanpa token aktivasi, dan tanpa panggilan ke server vendor (*Zero-Phone-Home*).
 
 ### 4.2 Out-of-Scope Capabilities
 1. Konversi instan kripto ke mata uang fiat (IDR/USD bank transfer) di dalam platform (diserahkan kepada pertukaran kripto terlisensi).

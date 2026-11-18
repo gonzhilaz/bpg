@@ -13,7 +13,7 @@
 1. **Zero-Custody Guarantee:** Gateway tidak pernah menyimpan atau menahan likuiditas merchant. Kunci privat alamat deposit sementara hanya berumur pendek (*ephemeral*) dan langsung dihapus logikanya setelah proses penyapuan selesai.
 2. **1 Invoice = 1 Ephemeral Address:** Setiap tagihan memiliki pasangan kunci kriptografis tersendiri, menghilangkan kebutuhan Memo/Tag dan mencegah tabrakan deposit antar pelanggan.
 3. **Cryptographic Defense-in-Depth:** Kunci privat dienkripsi at-rest menggunakan **AES-256-GCM**, kredensial API disimpan sebagai hash searah **SHA-256**, dan webhook diotentikasi via **HMAC-SHA256**.
-4. **White-Label Sovereign Ownership:** Arsitektur mandiri (*Zero-Phone-Home*) yang memberikan hak kepemilikan komersial penuh kepada pembeli untuk mengoperasikan platform di server privat tanpa ketergantungan lisensi eksternal atau risiko *remote shutdown*.
+4. **White-Label Sovereign Ownership:** Arsitektur mandiri (*Zero-Phone-Home*) yang memberikan hak kepemilikan komersial penuh kepada pembeli untuk mengoperasikan platform di server privat tanpa metode lisensi, tanpa token aktivasi, dan tanpa risiko *remote shutdown*.
 
 ---
 
