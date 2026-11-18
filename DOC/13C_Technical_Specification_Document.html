@@ -1,19 +1,23 @@
 <!DOCTYPE html>
-<html lang="id">
-<head>
+<html lang="id"><head>
   <meta charset="UTF-8">
   <title>13C Payment Gateway - Technical Specification Document (TSD)</title>
+  <script src="mermaid.min.js"></script>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'default',
+      securityLevel: 'loose',
+      flowchart: { useMaxWidth: true, htmlLabels: true, curve: 'basis' }
+    });
+  </script>
   <style>
     @page {
       size: A4;
       margin: 16mm 14mm 18mm 14mm;
-      @bottom-right {
-        content: counter(page);
-      }
+      @bottom-right { content: counter(page); }
     }
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
       color: #0f172a;
@@ -62,13 +66,8 @@
       page-break-after: avoid;
       break-after: avoid;
     }
-    p {
-      margin: 6px 0;
-      text-align: justify;
-    }
-    strong {
-      color: #0f172a;
-    }
+    p { margin: 6px 0; text-align: justify; }
+    strong { color: #0f172a; }
     ul, ol {
       margin: 6px 0 10px 18px;
       padding: 0;
@@ -99,6 +98,27 @@
       break-inside: avoid;
       border: 1px solid #1e293b;
     }
+    .mermaid-diagram {
+      margin: 14px 0;
+      padding: 12px 10px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      text-align: center;
+      page-break-inside: avoid;
+      break-inside: avoid;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+    .mermaid {
+      display: flex;
+      justify-content: center;
+      margin: 0 auto;
+    }
+    .mermaid svg {
+      max-width: 95% !important;
+      height: auto !important;
+      max-height: 480px;
+    }
     .table-wrapper {
       margin: 12px 0;
       page-break-inside: avoid;
@@ -119,14 +139,8 @@
       page-break-inside: avoid;
       break-inside: avoid;
     }
-    th {
-      background: #f1f5f9;
-      font-weight: 700;
-      color: #0f172a;
-    }
-    tr:nth-child(even) {
-      background: #f8fafc;
-    }
+    th { background: #f1f5f9; font-weight: 700; color: #0f172a; }
+    tr:nth-child(even) { background: #f8fafc; }
     blockquote {
       border-left: 3.5px solid #0284c7;
       background: #f0f9ff;
@@ -162,181 +176,37 @@
 <body>
   <h1 class="doc-title">TECHNICAL SPECIFICATION DOCUMENT (TSD)</h1>
 <blockquote><strong>13C Non-Custodial Multi-Chain Crypto Payment Gateway</strong>  </blockquote>
-<blockquote><strong>Klasifikasi:</strong> Enterprise Architecture & Technical Specification Blueprint  </blockquote>
+<blockquote><strong>Klasifikasi:</strong> Enterprise Architecture &amp; Technical Specification Blueprint  </blockquote>
 <blockquote><strong>Versi:</strong> 2.1.0 | <strong>Tanggal:</strong> November 2026 | <strong>Status:</strong> Production-Ready  </blockquote>
 <blockquote><strong>Repositori:</strong> [github.com/gonzhilaz/bpg](https://github.com/gonzhilaz/bpg)</blockquote>
-<hr class="divider" />
-<h2 class="section-title">1. Executive Summary & Architectural Scope</h2>
-<p>13C Crypto Payment Gateway adalah infrastruktur pemrosesan pembayaran cryptocurrency berskala enterprise yang mengimplementasikan arsitektur <strong>Non-Custodial Instant Forwarding</strong>. Sistem ini memungkinkan toko online dan merchant e-commerce menerima pembayaran stablecoin (USDT & USDC) lintas 4 jaringan blockchain terpopuler (BSC, Polygon, TRON, dan Solana) dengan kepastian dana langsung disapu (<em>swept</em>) ke Cold Storage pribadi milik merchant tanpa pengendapan dana di pihak ketiga.</p>
+<hr class="divider">
+<h2 class="section-title">1. Executive Summary &amp; Architectural Scope</h2>
+<p>13C Crypto Payment Gateway adalah infrastruktur pemrosesan pembayaran cryptocurrency berskala enterprise yang mengimplementasikan arsitektur <strong>Non-Custodial Instant Forwarding</strong>. Sistem ini memungkinkan toko online dan merchant e-commerce menerima pembayaran stablecoin (USDT &amp; USDC) lintas 4 jaringan blockchain terpopuler (BSC, Polygon, TRON, dan Solana) dengan kepastian dana langsung disapu (<em>swept</em>) ke Cold Storage pribadi milik merchant tanpa pengendapan dana di pihak ketiga.</p>
 <h3 class="sub-title">Core Architectural Axioms</h3>
 <ul><li><strong>Zero-Custody Guarantee:</strong> Gateway tidak pernah menyimpan atau menahan likuiditas merchant. Kunci privat alamat deposit sementara hanya berumur pendek (<em>ephemeral</em>) dan langsung dihapus logikanya setelah proses penyapuan selesai.</li>
 <li><strong>1 Invoice = 1 Ephemeral Address:</strong> Setiap tagihan memiliki pasangan kunci kriptografis tersendiri, menghilangkan kebutuhan Memo/Tag dan mencegah tabrakan deposit antar pelanggan.</li>
 <li><strong>Cryptographic Defense-in-Depth:</strong> Kunci privat dienkripsi at-rest menggunakan <strong>AES-256-GCM</strong>, kredensial API disimpan sebagai hash searah <strong>SHA-256</strong>, dan webhook diotentikasi via <strong>HMAC-SHA256</strong>.</li>
-</ul><hr class="divider" />
+</ul><hr class="divider">
 <h2 class="section-title">2. C4 Architecture Model</h2>
 <h3 class="sub-title">2.1 Level 1: System Context Diagram</h3>
-<pre class="code-block"><code>mermaid
-<p>flowchart TD</p>
-<p>Customer["Pelanggan Toko (Customer)"]</p>
-<p>Merchant["Merchant / Toko Online"]</p>
-<p>Admin["Super Admin & DevOps"]</p>
-<p>subgraph System["13C Payment Gateway System"]</p>
-<p>CoreAPI["13C Core API Engine (Go)"]</p>
-<p>Dash["Merchant Portal (Next.js)"]</p>
-<p>AdminPortal["Admin Console (Next.js)"]</p>
-<p>end</p>
-<p>Blockchains["4 Blockchain Networks (BSC, Polygon, TRON, Solana)"]</p>
-<p>ColdWallet["Merchant Cold Storage (Ledger/Trezor/Safe)"]</p>
-<p>StoreBackend["Merchant Store Backend / Webhook Receiver"]</p>
-<p>Customer --&gt;|"Bayar USDT/USDC ke Deposit Address"| Blockchains</p>
-<p>Merchant --&gt;|"Kelola Akun, Cold Wallet & API Keys"| Dash</p>
-<p>Dash --&gt;|"REST API (JWT)"| CoreAPI</p>
-<p>Admin --&gt;|"Monitoring Hot Wallet & DB Maintenance"| AdminPortal</p>
-<p>AdminPortal --&gt;|"Admin REST API (Master Secret)"| CoreAPI</p>
-<p>CoreAPI --&gt;|"Scan Block & Event Logs"| Blockchains</p>
-<p>CoreAPI --&gt;|"Sweep Dana Otomatis"| ColdWallet</p>
-<p>CoreAPI --&gt;|"Notifikasi Transaksi (HMAC-SHA256)"| StoreBackend</p>
-<p></code></pre></p>
+<div class="mermaid-diagram"><div class="mermaid" data-processed="true"><div id="dmermaid-1794968608799" style="font-family: &quot;trebuchet ms&quot;, verdana, arial, sans-serif;"><svg id="mermaid-1794968608799" width="100%" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 2412 512" style="max-width: 512px;" role="graphics-document document" aria-roledescription="error"><style>#mermaid-1794968608799{font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:16px;fill:#333;}#mermaid-1794968608799 .error-icon{fill:#552222;}#mermaid-1794968608799 .error-text{fill:#552222;stroke:#552222;}#mermaid-1794968608799 .edge-thickness-normal{stroke-width:2px;}#mermaid-1794968608799 .edge-thickness-thick{stroke-width:3.5px;}#mermaid-1794968608799 .edge-pattern-solid{stroke-dasharray:0;}#mermaid-1794968608799 .edge-pattern-dashed{stroke-dasharray:3;}#mermaid-1794968608799 .edge-pattern-dotted{stroke-dasharray:2;}#mermaid-1794968608799 .marker{fill:#333333;stroke:#333333;}#mermaid-1794968608799 .marker.cross{stroke:#333333;}#mermaid-1794968608799 svg{font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:16px;}#mermaid-1794968608799 :root{--mermaid-font-family:"trebuchet ms",verdana,arial,sans-serif;}</style><g></g><g><path class="error-icon" d="m411.313,123.313c6.25-6.25 6.25-16.375 0-22.625s-16.375-6.25-22.625,0l-32,32-9.375,9.375-20.688-20.688c-12.484-12.5-32.766-12.5-45.25,0l-16,16c-1.261,1.261-2.304,2.648-3.31,4.051-21.739-8.561-45.324-13.426-70.065-13.426-105.867,0-192,86.133-192,192s86.133,192 192,192 192-86.133 192-192c0-24.741-4.864-48.327-13.426-70.065 1.402-1.007 2.79-2.049 4.051-3.31l16-16c12.5-12.492 12.5-32.758 0-45.25l-20.688-20.688 9.375-9.375 32.001-31.999zm-219.313,100.687c-52.938,0-96,43.063-96,96 0,8.836-7.164,16-16,16s-16-7.164-16-16c0-70.578 57.422-128 128-128 8.836,0 16,7.164 16,16s-7.164,16-16,16z"></path><path class="error-icon" d="m459.02,148.98c-6.25-6.25-16.375-6.25-22.625,0s-6.25,16.375 0,22.625l16,16c3.125,3.125 7.219,4.688 11.313,4.688 4.094,0 8.188-1.563 11.313-4.688 6.25-6.25 6.25-16.375 0-22.625l-16.001-16z"></path><path class="error-icon" d="m340.395,75.605c3.125,3.125 7.219,4.688 11.313,4.688 4.094,0 8.188-1.563 11.313-4.688 6.25-6.25 6.25-16.375 0-22.625l-16-16c-6.25-6.25-16.375-6.25-22.625,0s-6.25,16.375 0,22.625l15.999,16z"></path><path class="error-icon" d="m400,64c8.844,0 16-7.164 16-16v-32c0-8.836-7.156-16-16-16-8.844,0-16,7.164-16,16v32c0,8.836 7.156,16 16,16z"></path><path class="error-icon" d="m496,96.586h-32c-8.844,0-16,7.164-16,16 0,8.836 7.156,16 16,16h32c8.844,0 16-7.164 16-16 0-8.836-7.156-16-16-16z"></path><path class="error-icon" d="m436.98,75.605c3.125,3.125 7.219,4.688 11.313,4.688 4.094,0 8.188-1.563 11.313-4.688l32-32c6.25-6.25 6.25-16.375 0-22.625s-16.375-6.25-22.625,0l-32,32c-6.251,6.25-6.251,16.375-0.001,22.625z"></path><text class="error-text" x="1440" y="250" font-size="150px" style="text-anchor: middle;">Syntax error in text</text><text class="error-text" x="1250" y="400" font-size="100px" style="text-anchor: middle;">mermaid version 10.9.8</text></g></svg></div></div></div><p></p>
 <h3 class="sub-title">2.2 Level 2: Container Topology Diagram</h3>
-<pre class="code-block"><code>mermaid
-<p>flowchart LR</p>
-<p>subgraph ClientLayer["Frontend Client Tier"]</p>
-<p>UI_Dash["Merchant Dashboard\n(Next.js App Router :3001)"]</p>
-<p>UI_Admin["Admin Telemetry Console\n(Next.js App Router :3002)"]</p>
-<p>UI_Widget["Checkout Widget / Sandbox\n(Next.js :3000)"]</p>
-<p>end</p>
-<p>subgraph AppTier["Application Core Tier (Go Engine :8080)"]</p>
-<p>GinRouter["Gin HTTP Router & Middlewares\n(CORS, RateLimiter, JWT/APIKey Auth)"]</p>
-<p>InvoiceSvc["Invoice & Pricing Service"]</p>
-<p>PayoutEngine["Payout & Sweeper Engine"]</p>
-<p>WebhookDisp["Webhook Dispatcher\n(SSRF Guard & Retry Backoff)"]</p>
-<p>WatcherMgr["Watcher Daemon Manager"]</p>
-<p>PrunerWorker["Automated DB Pruner Daemon"]</p>
-<p>end</p>
-<p>subgraph DataTier["Data & Security Storage Tier"]</p>
-<p>DB[(PostgreSQL / SQLite WAL Engine)]</p>
-<p>LockMgr["In-Memory / Distributed Mutex Lock"]</p>
-<p>KMS["AES-256-GCM Cryptographic Vault"]</p>
-<p>end</p>
-<p>UI_Dash --&gt;|"HTTP / REST"| GinRouter</p>
-<p>UI_Admin --&gt;|"HTTP / REST"| GinRouter</p>
-<p>UI_Widget --&gt;|"HTTP / SSE"| GinRouter</p>
-<p>GinRouter --&gt; InvoiceSvc</p>
-<p>GinRouter --&gt; PayoutEngine</p>
-<p>InvoiceSvc --&gt; KMS</p>
-<p>InvoiceSvc --&gt; DB</p>
-<p>PayoutEngine --&gt; LockMgr</p>
-<p>PayoutEngine --&gt; DB</p>
-<p>WatcherMgr --&gt; DB</p>
-<p>WatcherMgr --&gt; PayoutEngine</p>
-<p>WatcherMgr --&gt; WebhookDisp</p>
-<p>PrunerWorker --&gt; DB</p>
-<p></code></pre></p>
-<hr class="divider" />
-<h2 class="section-title">3. Database Architecture & Relational Data Dictionary</h2>
+<div class="mermaid-diagram"><div class="mermaid" data-processed="true"><div id="dmermaid-1794968608809" style="font-family: &quot;trebuchet ms&quot;, verdana, arial, sans-serif;"><svg id="mermaid-1794968608809" width="100%" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 2412 512" style="max-width: 512px;" role="graphics-document document" aria-roledescription="error"><style>#mermaid-1794968608809{font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:16px;fill:#333;}#mermaid-1794968608809 .error-icon{fill:#552222;}#mermaid-1794968608809 .error-text{fill:#552222;stroke:#552222;}#mermaid-1794968608809 .edge-thickness-normal{stroke-width:2px;}#mermaid-1794968608809 .edge-thickness-thick{stroke-width:3.5px;}#mermaid-1794968608809 .edge-pattern-solid{stroke-dasharray:0;}#mermaid-1794968608809 .edge-pattern-dashed{stroke-dasharray:3;}#mermaid-1794968608809 .edge-pattern-dotted{stroke-dasharray:2;}#mermaid-1794968608809 .marker{fill:#333333;stroke:#333333;}#mermaid-1794968608809 .marker.cross{stroke:#333333;}#mermaid-1794968608809 svg{font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:16px;}#mermaid-1794968608809 :root{--mermaid-font-family:"trebuchet ms",verdana,arial,sans-serif;}</style><g></g><g><path class="error-icon" d="m411.313,123.313c6.25-6.25 6.25-16.375 0-22.625s-16.375-6.25-22.625,0l-32,32-9.375,9.375-20.688-20.688c-12.484-12.5-32.766-12.5-45.25,0l-16,16c-1.261,1.261-2.304,2.648-3.31,4.051-21.739-8.561-45.324-13.426-70.065-13.426-105.867,0-192,86.133-192,192s86.133,192 192,192 192-86.133 192-192c0-24.741-4.864-48.327-13.426-70.065 1.402-1.007 2.79-2.049 4.051-3.31l16-16c12.5-12.492 12.5-32.758 0-45.25l-20.688-20.688 9.375-9.375 32.001-31.999zm-219.313,100.687c-52.938,0-96,43.063-96,96 0,8.836-7.164,16-16,16s-16-7.164-16-16c0-70.578 57.422-128 128-128 8.836,0 16,7.164 16,16s-7.164,16-16,16z"></path><path class="error-icon" d="m459.02,148.98c-6.25-6.25-16.375-6.25-22.625,0s-6.25,16.375 0,22.625l16,16c3.125,3.125 7.219,4.688 11.313,4.688 4.094,0 8.188-1.563 11.313-4.688 6.25-6.25 6.25-16.375 0-22.625l-16.001-16z"></path><path class="error-icon" d="m340.395,75.605c3.125,3.125 7.219,4.688 11.313,4.688 4.094,0 8.188-1.563 11.313-4.688 6.25-6.25 6.25-16.375 0-22.625l-16-16c-6.25-6.25-16.375-6.25-22.625,0s-6.25,16.375 0,22.625l15.999,16z"></path><path class="error-icon" d="m400,64c8.844,0 16-7.164 16-16v-32c0-8.836-7.156-16-16-16-8.844,0-16,7.164-16,16v32c0,8.836 7.156,16 16,16z"></path><path class="error-icon" d="m496,96.586h-32c-8.844,0-16,7.164-16,16 0,8.836 7.156,16 16,16h32c8.844,0 16-7.164 16-16 0-8.836-7.156-16-16-16z"></path><path class="error-icon" d="m436.98,75.605c3.125,3.125 7.219,4.688 11.313,4.688 4.094,0 8.188-1.563 11.313-4.688l32-32c6.25-6.25 6.25-16.375 0-22.625s-16.375-6.25-22.625,0l-32,32c-6.251,6.25-6.251,16.375-0.001,22.625z"></path><text class="error-text" x="1440" y="250" font-size="150px" style="text-anchor: middle;">Syntax error in text</text><text class="error-text" x="1250" y="400" font-size="100px" style="text-anchor: middle;">mermaid version 10.9.8</text></g></svg></div></div></div><p></p>
+<hr class="divider">
+<h2 class="section-title">3. Database Architecture &amp; Relational Data Dictionary</h2>
 <h3 class="sub-title">3.1 Entity-Relationship Diagram (ERD)</h3>
-<pre class="code-block"><code>mermaid
-<p>erDiagram</p>
-<p>MERCHANT ||--o{ INVOICE : generates</p>
-<p>MERCHANT ||--o{ PAYMENT_LINK : creates</p>
-<p>MERCHANT ||--o{ WITHDRAWAL_REQUEST : submits</p>
-<p>INVOICE ||--o{ BLOCKCHAIN_TRANSACTION : records</p>
-<p>INVOICE ||--o{ PAYOUT_TRANSFER : triggers</p>
-<p>MERCHANT {</p>
-<p>uuid id PK</p>
-<p>string email UK</p>
-<p>string password_hash</p>
-<p>string name</p>
-<p>string role</p>
-<p>string status</p>
-<p>string api_key UK</p>
-<p>string api_key_hash "index"</p>
-<p>string api_key_prefix</p>
-<p>string secret_key</p>
-<p>string payout_address_bsc</p>
-<p>string payout_address_polygon</p>
-<p>string payout_address_tron</p>
-<p>string payout_address_solana</p>
-<p>boolean auto_payout_enabled</p>
-<p>string fee_payer</p>
-<p>numeric underpaid_tolerance</p>
-<p>numeric balance_usd</p>
-<p>text webhook_url</p>
-<p>boolean two_factor_enabled</p>
-<p>timestamptz created_at</p>
-<p>}</p>
-<p>INVOICE {</p>
-<p>uuid id PK</p>
-<p>uuid merchant_id FK "index"</p>
-<p>string order_id "index"</p>
-<p>numeric amount_requested</p>
-<p>string currency_requested</p>
-<p>string pay_currency</p>
-<p>string pay_network "composite index"</p>
-<p>numeric pay_amount</p>
-<p>numeric received_amount</p>
-<p>string status "composite index"</p>
-<p>string deposit_address "unique index"</p>
-<p>text encrypted_priv_key</p>
-<p>text callback_url</p>
-<p>string payout_address</p>
-<p>timestamptz expires_at "composite index"</p>
-<p>timestamptz paid_at</p>
-<p>timestamptz created_at</p>
-<p>}</p>
-<p>BLOCKCHAIN_TRANSACTION {</p>
-<p>uuid id PK</p>
-<p>uuid invoice_id FK "index"</p>
-<p>string tx_hash "unique index"</p>
-<p>string network</p>
-<p>string from_address</p>
-<p>string to_address</p>
-<p>numeric amount</p>
-<p>string token_symbol</p>
-<p>uint64 block_number</p>
-<p>uint64 confirmations</p>
-<p>string status</p>
-<p>timestamptz detected_at</p>
-<p>}</p>
-<p>PAYOUT_TRANSFER {</p>
-<p>uuid id PK</p>
-<p>uuid invoice_id FK "index"</p>
-<p>uuid merchant_id FK</p>
-<p>string network</p>
-<p>string tx_hash "unique index"</p>
-<p>string from_address</p>
-<p>string to_address</p>
-<p>numeric amount</p>
-<p>numeric fee_paid</p>
-<p>string status</p>
-<p>timestamptz created_at</p>
-<p>}</p>
-<p>PAYMENT_LINK {</p>
-<p>uuid id PK</p>
-<p>uuid merchant_id FK "index"</p>
-<p>string slug "unique index"</p>
-<p>string title</p>
-<p>text description</p>
-<p>numeric amount</p>
-<p>string currency</p>
-<p>string pay_network</p>
-<p>boolean is_active</p>
-<p>numeric total_collected</p>
-<p>int payment_count</p>
-<p>timestamptz created_at</p>
-<p>}</p>
-<p></code></pre></p>
-<h3 class="sub-title">3.2 Indexing Strategy & Concurrency Tuning</h3>
+<div class="mermaid-diagram"><div class="mermaid" data-processed="true"><div id="dmermaid-1794968608811" style="font-family: &quot;trebuchet ms&quot;, verdana, arial, sans-serif;"><svg id="mermaid-1794968608811" width="100%" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 2412 512" style="max-width: 512px;" role="graphics-document document" aria-roledescription="error"><style>#mermaid-1794968608811{font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:16px;fill:#333;}#mermaid-1794968608811 .error-icon{fill:#552222;}#mermaid-1794968608811 .error-text{fill:#552222;stroke:#552222;}#mermaid-1794968608811 .edge-thickness-normal{stroke-width:2px;}#mermaid-1794968608811 .edge-thickness-thick{stroke-width:3.5px;}#mermaid-1794968608811 .edge-pattern-solid{stroke-dasharray:0;}#mermaid-1794968608811 .edge-pattern-dashed{stroke-dasharray:3;}#mermaid-1794968608811 .edge-pattern-dotted{stroke-dasharray:2;}#mermaid-1794968608811 .marker{fill:#333333;stroke:#333333;}#mermaid-1794968608811 .marker.cross{stroke:#333333;}#mermaid-1794968608811 svg{font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:16px;}#mermaid-1794968608811 :root{--mermaid-font-family:"trebuchet ms",verdana,arial,sans-serif;}</style><g></g><g><path class="error-icon" d="m411.313,123.313c6.25-6.25 6.25-16.375 0-22.625s-16.375-6.25-22.625,0l-32,32-9.375,9.375-20.688-20.688c-12.484-12.5-32.766-12.5-45.25,0l-16,16c-1.261,1.261-2.304,2.648-3.31,4.051-21.739-8.561-45.324-13.426-70.065-13.426-105.867,0-192,86.133-192,192s86.133,192 192,192 192-86.133 192-192c0-24.741-4.864-48.327-13.426-70.065 1.402-1.007 2.79-2.049 4.051-3.31l16-16c12.5-12.492 12.5-32.758 0-45.25l-20.688-20.688 9.375-9.375 32.001-31.999zm-219.313,100.687c-52.938,0-96,43.063-96,96 0,8.836-7.164,16-16,16s-16-7.164-16-16c0-70.578 57.422-128 128-128 8.836,0 16,7.164 16,16s-7.164,16-16,16z"></path><path class="error-icon" d="m459.02,148.98c-6.25-6.25-16.375-6.25-22.625,0s-6.25,16.375 0,22.625l16,16c3.125,3.125 7.219,4.688 11.313,4.688 4.094,0 8.188-1.563 11.313-4.688 6.25-6.25 6.25-16.375 0-22.625l-16.001-16z"></path><path class="error-icon" d="m340.395,75.605c3.125,3.125 7.219,4.688 11.313,4.688 4.094,0 8.188-1.563 11.313-4.688 6.25-6.25 6.25-16.375 0-22.625l-16-16c-6.25-6.25-16.375-6.25-22.625,0s-6.25,16.375 0,22.625l15.999,16z"></path><path class="error-icon" d="m400,64c8.844,0 16-7.164 16-16v-32c0-8.836-7.156-16-16-16-8.844,0-16,7.164-16,16v32c0,8.836 7.156,16 16,16z"></path><path class="error-icon" d="m496,96.586h-32c-8.844,0-16,7.164-16,16 0,8.836 7.156,16 16,16h32c8.844,0 16-7.164 16-16 0-8.836-7.156-16-16-16z"></path><path class="error-icon" d="m436.98,75.605c3.125,3.125 7.219,4.688 11.313,4.688 4.094,0 8.188-1.563 11.313-4.688l32-32c6.25-6.25 6.25-16.375 0-22.625s-16.375-6.25-22.625,0l-32,32c-6.251,6.25-6.251,16.375-0.001,22.625z"></path><text class="error-text" x="1440" y="250" font-size="150px" style="text-anchor: middle;">Syntax error in text</text><text class="error-text" x="1250" y="400" font-size="100px" style="text-anchor: middle;">mermaid version 10.9.8</text></g></svg></div></div></div><p></p>
+<h3 class="sub-title">3.2 Indexing Strategy &amp; Concurrency Tuning</h3>
 <p><em> <strong>Composite Index `idx_invoices_watcher`:</strong> Terpasang pada kolom `(pay_network, status, expires_at)`. Memungkinkan background watcher memindai ribuan tagihan aktif dalam kompleksitas waktu <strong>O(log N)</strong> tanpa </em>full table scan*.</p>
 <ul><li><strong>Composite Index `idx_merchant_created`:</strong> Terpasang pada `(merchant_id, created_at)` untuk eksekusi paginasi dashboard instan.</li>
 <li><strong>Database Connection Pooling:</strong></li>
 <li><strong>PostgreSQL:</strong> `MaxOpenConns = 100`, `MaxIdleConns = 10`, `ConnMaxLifetime = 1 Hour`.</li>
 <li><strong>SQLite WAL Mode:</strong> Diaktifkan `PRAGMA journal_mode=WAL;`, `PRAGMA busy_timeout=5000;`, dan `PRAGMA synchronous=NORMAL;` untuk menjamin nol kegagalan lock saat multi-goroutine paralel membaca dan menulis data.</li>
-</ul><hr class="divider" />
-<h2 class="section-title">4. Cryptographic Protocols & Key Management System (KMS)</h2>
+</ul><hr class="divider">
+<h2 class="section-title">4. Cryptographic Protocols &amp; Key Management System (KMS)</h2>
 <h3 class="sub-title">4.1 Ephemeral Keypair Lifecycle</h3>
 <p>Untuk setiap invoice yang dibuat, sistem mengeksekusi pembangkitan kunci kriptografis dinamis:</p>
-<ul><li><strong>EVM Networks (BSC & Polygon) & TRON:</strong> Menggunakan kurva eliptis <strong>ECDSA secp256k1</strong>. Alamat TRON diturunkan dari <em>uncompressed public key</em> (Keccak-256, ambil 20-byte terakhir, prefix byte `0x41`, dan dienkode ke <strong>Base58Check</strong>).</li>
+<ul><li><strong>EVM Networks (BSC &amp; Polygon) &amp; TRON:</strong> Menggunakan kurva eliptis <strong>ECDSA secp256k1</strong>. Alamat TRON diturunkan dari <em>uncompressed public key</em> (Keccak-256, ambil 20-byte terakhir, prefix byte `0x41`, dan dienkode ke <strong>Base58Check</strong>).</li>
 <li><strong>Solana Network:</strong> Menggunakan algoritma tanda tangan digital <strong>Ed25519 (Edwards-curve Digital Signature)</strong> dengan pengkodean alamat <strong>Base58</strong>.</li>
 </ul><h3 class="sub-title">4.2 Sandi Simetris AES-256-GCM</h3>
 <p>Kunci privat alamat deposit dienkripsi di level memori sebelum menyentuh storage database:</p>
@@ -351,11 +221,11 @@
 <p>Setiap callback HTTP ke toko online merchant disertai header tanda tangan kriptografis:</p>
 <p>$$\text{Signature} = \mathbf{HMAC\text{-}SHA256}(\text{RawPayloadJSON}, \mathbf{S}_{\text{merchant}})$$</p>
 <p>Verifikasi pada backend merchant wajib menggunakan pembandingan waktu konstan (<em>constant-time comparison</em>) untuk memitigasi <em>timing attacks</em>.</p>
-<hr class="divider" />
-<h2 class="section-title">5. Multi-Chain Watcher Engine & Anti-Reorg Matrix</h2>
+<hr class="divider">
+<h2 class="section-title">5. Multi-Chain Watcher Engine &amp; Anti-Reorg Matrix</h2>
 <h3 class="sub-title">5.1 Mekanisme Pemindaian On-Chain (Targeted Polling)</h3>
 <p>Background watcher memindai transaksi masuk secara asinkron tanpa membebani node RPC publik:</p>
-<p><em> <strong>EVM Watcher (BSC & Polygon):</strong> Menggunakan `eth_getLogs` dengan filter topic alamat 32-byte zero-padded (`topics: [TRANSFER_TOPIC, nil, activeAddressTopics]`). Pendekatan ini membatasi log transfer hanya pada alamat deposit yang sedang aktif, mencegah </em>10,000 log overflow error* pada RPC publik.</p>
+<p><em> <strong>EVM Watcher (BSC &amp; Polygon):</strong> Menggunakan `eth_getLogs` dengan filter topic alamat 32-byte zero-padded (`topics: [TRANSFER_TOPIC, nil, activeAddressTopics]`). Pendekatan ini membatasi log transfer hanya pada alamat deposit yang sedang aktif, mencegah </em>10,000 log overflow error* pada RPC publik.</p>
 <p><em> <strong>TRON Watcher:</strong> Mengintegrasikan pemindaian event TRC-20 via TronGrid API dengan manajemen sewa energi harian (</em>energy delegation*), memangkas biaya gas operasional sweeping platform hingga 80%.</p>
 <ul><li><strong>Solana Watcher:</strong> Memindai transfer token SPL via JSON-RPC `getSignaturesForAddress` dan `getTransaction` dengan commitment level `confirmed`.</li>
 </ul><h3 class="sub-title">5.2 Block Confirmation Lag Depth Matrix</h3>
@@ -369,31 +239,20 @@
 </tbody></table></div>
 
 <h3 class="sub-title">5.3 Invoice Finite State Machine (FSM)</h3>
-<pre class="code-block"><code>mermaid
-<p>stateDiagram-v2</p>
-<p>[*] --&gt; PENDING : Invoice Dibuat</p>
-<p>PENDING --&gt; DETECTED : Transaksi Masuk Ditemukan On-Chain</p>
-<p>PENDING --&gt; EXPIRED : Batas Waktu 30 Menit Habis</p>
-<p>DETECTED --&gt; PAID : Kedalaman Blok Konfirmasi Tercapai & Lunas</p>
-<p>DETECTED --&gt; UNDERPAID : Nominal Masuk &lt; Tagihan (Di Luar Toleransi)</p>
-<p>DETECTED --&gt; EXPIRED : Reorg Terdeteksi / Transaksi Dibatalkan</p>
-<p>PAID --&gt; [*] : Auto-Swept ke Cold Wallet & Webhook Terkirim</p>
-<p>UNDERPAID --&gt; [*] : Notifikasi Kurang Bayar Dikirim ke Toko</p>
-<p>EXPIRED --&gt; [*] : Alamat Deposit Dinonaktifkan</p>
-<p></code></pre></p>
-<hr class="divider" />
-<h2 class="section-title">6. Concurrency Control, Distributed Lock & Idempotency</h2>
-<h3 class="sub-title">6.1 Mutex & Distributed Lock Management</h3>
+<div class="mermaid-diagram"><div class="mermaid" data-processed="true"><div id="dmermaid-1794968608812" style="font-family: &quot;trebuchet ms&quot;, verdana, arial, sans-serif;"><svg id="mermaid-1794968608812" width="100%" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 2412 512" style="max-width: 512px;" role="graphics-document document" aria-roledescription="error"><style>#mermaid-1794968608812{font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:16px;fill:#333;}#mermaid-1794968608812 .error-icon{fill:#552222;}#mermaid-1794968608812 .error-text{fill:#552222;stroke:#552222;}#mermaid-1794968608812 .edge-thickness-normal{stroke-width:2px;}#mermaid-1794968608812 .edge-thickness-thick{stroke-width:3.5px;}#mermaid-1794968608812 .edge-pattern-solid{stroke-dasharray:0;}#mermaid-1794968608812 .edge-pattern-dashed{stroke-dasharray:3;}#mermaid-1794968608812 .edge-pattern-dotted{stroke-dasharray:2;}#mermaid-1794968608812 .marker{fill:#333333;stroke:#333333;}#mermaid-1794968608812 .marker.cross{stroke:#333333;}#mermaid-1794968608812 svg{font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:16px;}#mermaid-1794968608812 :root{--mermaid-font-family:"trebuchet ms",verdana,arial,sans-serif;}</style><g></g><g><path class="error-icon" d="m411.313,123.313c6.25-6.25 6.25-16.375 0-22.625s-16.375-6.25-22.625,0l-32,32-9.375,9.375-20.688-20.688c-12.484-12.5-32.766-12.5-45.25,0l-16,16c-1.261,1.261-2.304,2.648-3.31,4.051-21.739-8.561-45.324-13.426-70.065-13.426-105.867,0-192,86.133-192,192s86.133,192 192,192 192-86.133 192-192c0-24.741-4.864-48.327-13.426-70.065 1.402-1.007 2.79-2.049 4.051-3.31l16-16c12.5-12.492 12.5-32.758 0-45.25l-20.688-20.688 9.375-9.375 32.001-31.999zm-219.313,100.687c-52.938,0-96,43.063-96,96 0,8.836-7.164,16-16,16s-16-7.164-16-16c0-70.578 57.422-128 128-128 8.836,0 16,7.164 16,16s-7.164,16-16,16z"></path><path class="error-icon" d="m459.02,148.98c-6.25-6.25-16.375-6.25-22.625,0s-6.25,16.375 0,22.625l16,16c3.125,3.125 7.219,4.688 11.313,4.688 4.094,0 8.188-1.563 11.313-4.688 6.25-6.25 6.25-16.375 0-22.625l-16.001-16z"></path><path class="error-icon" d="m340.395,75.605c3.125,3.125 7.219,4.688 11.313,4.688 4.094,0 8.188-1.563 11.313-4.688 6.25-6.25 6.25-16.375 0-22.625l-16-16c-6.25-6.25-16.375-6.25-22.625,0s-6.25,16.375 0,22.625l15.999,16z"></path><path class="error-icon" d="m400,64c8.844,0 16-7.164 16-16v-32c0-8.836-7.156-16-16-16-8.844,0-16,7.164-16,16v32c0,8.836 7.156,16 16,16z"></path><path class="error-icon" d="m496,96.586h-32c-8.844,0-16,7.164-16,16 0,8.836 7.156,16 16,16h32c8.844,0 16-7.164 16-16 0-8.836-7.156-16-16-16z"></path><path class="error-icon" d="m436.98,75.605c3.125,3.125 7.219,4.688 11.313,4.688 4.094,0 8.188-1.563 11.313-4.688l32-32c6.25-6.25 6.25-16.375 0-22.625s-16.375-6.25-22.625,0l-32,32c-6.251,6.25-6.251,16.375-0.001,22.625z"></path><text class="error-text" x="1440" y="250" font-size="150px" style="text-anchor: middle;">Syntax error in text</text><text class="error-text" x="1250" y="400" font-size="100px" style="text-anchor: middle;">mermaid version 10.9.8</text></g></svg></div></div></div><p></p>
+<hr class="divider">
+<h2 class="section-title">6. Concurrency Control, Distributed Lock &amp; Idempotency</h2>
+<h3 class="sub-title">6.1 Mutex &amp; Distributed Lock Management</h3>
 <p>Untuk mencegah <em>race condition</em> pada saat penyapuan dana (<em>auto-sweeper</em>), sistem menerapkan penguncian terdistribusi:</p>
-<ul><li>Kunci penguncian berformat `lock:sweep:invoice:<invoice_id>`.</li>
+<ul><li>Kunci penguncian berformat `lock:sweep:invoice:<invoice_id>`.</invoice_id></li>
 </ul><p><em> Menggunakan waktu sewa (</em>TTL lease<em>) 30 detik dengan rilis otomatis (</em>defer release*).</p>
 <ul><li>Jika dua event konfirmasi blok datang bersamaan untuk invoice yang sama, goroutine kedua gagal mendapatkan lock dan langsung keluar secara idempoten.</li>
-</ul><h3 class="sub-title">6.2 Idempotency Webhook & Delivery Guarantee</h3>
+</ul><h3 class="sub-title">6.2 Idempotency Webhook &amp; Delivery Guarantee</h3>
 <ul><li>Setiap pengiriman webhook menyertakan header `X-13C-Delivery-ID` dan `Idempotency-Key` bernilai UUID unik.</li>
 </ul><p><em> Dispatcher menerapkan pola </em>Exponential Backoff Retry* (hingga 5 kali percobaan) dengan interval $2^n \times 1\text{ detik}$.</p>
 <p><em> Jika endpoint merchant sedang down, webhook delivery ditandai `FAILED` di database dan dapat dipicu ulang melalui tombol </em>Manual Replay* di portal merchant.</p>
-<hr class="divider" />
-<h2 class="section-title">7. Security Architecture & STRIDE Threat Modeling</h2>
+<hr class="divider">
+<h2 class="section-title">7. Security Architecture &amp; STRIDE Threat Modeling</h2>
 <div class="table-wrapper"><table>
 <thead><tr><th>Ancaman (STRIDE)</th><th>Skenario Risiko</th><th>Mitigasi Arsitektur 13C Gateway</th></tr></thead>
 <tbody><tr><td><strong>Spoofing</strong></td><td>Penyerang memalsukan notifikasi webhook status lunas ke toko merchant.</td><td>Tanda tangan digital <strong>HMAC-SHA256</strong> wajib diverifikasi oleh backend toko menggunakan kunci rahasia yang hanya diketahui merchant.</td></tr>
@@ -405,8 +264,8 @@
 <tr><td><strong>SSRF (Server-Side Request Forgery)</strong></td><td>Merchant mendaftarkan Webhook URL ke IP lokal server (127.0.0.1 atau 169.254.169.254) untuk mencuri metadata cloud.</td><td>Webhook dispatcher memvalidasi URL terhadap daftar hitam IP privat (RFC 1918), IP loopback, dan <em>cloud metadata endpoints</em>.</td></tr>
 </tbody></table></div>
 
-<hr class="divider" />
-<h2 class="section-title">8. DevOps, Deployment Topology & Disaster Recovery</h2>
+<hr class="divider">
+<h2 class="section-title">8. DevOps, Deployment Topology &amp; Disaster Recovery</h2>
 <h3 class="sub-title">8.1 Docker Multi-Stage Containerization</h3>
 <p>Sistem dikemas menggunakan multi-stage Docker build untuk menghasilkan artefak biner distroless berukuran minimal tanpa dependensi build compiler di image produksi:</p>
 <ul><li><strong>Ukuran Image Go Backend:</strong> ~28 MB (berbasis Alpine Linux dengan sertifikat CA resmi).</li>
@@ -442,10 +301,10 @@
 <p>- "3001:3000"</p>
 <p>volumes:</p>
 <p>pgdata:</p>
-<p></code></pre></p>
-<h3 class="sub-title">8.3 Disaster Recovery, RPO & RTO</h3>
-<ul><li><strong>Recovery Point Objective (RPO):</strong> < 1 menit menggunakan PostgreSQL Continuous Archiving / WAL Streaming.</li>
-<li><strong>Recovery Time Objective (RTO):</strong> < 5 menit untuk restart kontainer otomatis via Docker orchestrator.</li>
+</code><p><code></code></p></pre><p></p>
+<h3 class="sub-title">8.3 Disaster Recovery, RPO &amp; RTO</h3>
+<ul><li><strong>Recovery Point Objective (RPO):</strong> &lt; 1 menit menggunakan PostgreSQL Continuous Archiving / WAL Streaming.</li>
+<li><strong>Recovery Time Objective (RTO):</strong> &lt; 5 menit untuk restart kontainer otomatis via Docker orchestrator.</li>
 </ul><p><em> <strong>Automated Data Pruning:</strong> Pekerja latar belakang (</em>Pruner Worker*) membersihkan invoice kedaluwarsa secara berkala setiap 24 jam dengan batas retensi 30 hari untuk menjaga performa indeks B-Tree database.</p>
-</body>
-</html>
+
+</body></html>

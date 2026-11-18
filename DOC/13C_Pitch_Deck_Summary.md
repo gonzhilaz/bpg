@@ -83,12 +83,12 @@ Infrastruktur payment gateway berbasis cryptocurrency untuk toko online / mercha
 ---
 
 ## 9. Struktur Biaya Transparan
-* **Biaya Gateway:** **0,4%** dari nilai transaksi (kompetitif dan transparan).
+* **Biaya Gateway:** **Fee Gateway (%)** dinamis dapat diatur oleh Admin (transparan & kompetitif).
 * **Opsi Self-Hosted Enterprise:** **0% Biaya Gateway** jika di-deploy penuh di server privat milik merchant sendiri.
 * **Komponen Laporan Keuangan:**
   - **Gross Sales:** Total nominal transaksi bruto yang dibayar pelanggan.
   - **Net Settled:** Dana bersih yang diterima di dompet merchant.
-  - **Platform Fee:** Biaya layanan gateway (0,4%).
+  - **Platform Fee:** Biaya layanan gateway (Fee Gateway % dinamis).
   - **Sweep Gas:** Biaya riil jaringan blockchain untuk transaksi penarikan ke Cold Wallet.
 
 ---
@@ -114,7 +114,7 @@ Infrastruktur payment gateway berbasis cryptocurrency untuk toko online / mercha
 2. **Alamat Unik Per Invoice:** Pelacakan setoran otomatis tanpa dependensi pada Memo/Tag.
 3. **Penyapuan Instan:** Likuiditas langsung masuk ke Cold Wallet pribadi merchant.
 4. **SDK & API Lengkap:** Dokumentasi REST API, Checkout Widget, dan Webhook Handler yang mudah dipasang.
-5. **Transparansi Biaya:** Model biaya flat 0,4% atau 0% untuk instalasi mandiri.
+5. **Transparansi Biaya:** Model biaya persentase fleksibel (Fee Gateway %) atau 0% untuk instalasi mandiri.
 
 ### Hal yang Perlu Diperhatikan
 * **Audit Keamanan Mandiri:** Lakukan peninjauan keamanan berkala terhadap konfigurasi server dan Cold Wallet Anda.

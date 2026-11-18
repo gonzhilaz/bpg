@@ -1,19 +1,23 @@
 <!DOCTYPE html>
-<html lang="id">
-<head>
+<html lang="id"><head>
   <meta charset="UTF-8">
   <title>13C Payment Gateway - Functional Specification Document (FSD)</title>
+  <script src="mermaid.min.js"></script>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'default',
+      securityLevel: 'loose',
+      flowchart: { useMaxWidth: true, htmlLabels: true, curve: 'basis' }
+    });
+  </script>
   <style>
     @page {
       size: A4;
       margin: 16mm 14mm 18mm 14mm;
-      @bottom-right {
-        content: counter(page);
-      }
+      @bottom-right { content: counter(page); }
     }
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
       color: #0f172a;
@@ -62,13 +66,8 @@
       page-break-after: avoid;
       break-after: avoid;
     }
-    p {
-      margin: 6px 0;
-      text-align: justify;
-    }
-    strong {
-      color: #0f172a;
-    }
+    p { margin: 6px 0; text-align: justify; }
+    strong { color: #0f172a; }
     ul, ol {
       margin: 6px 0 10px 18px;
       padding: 0;
@@ -99,6 +98,27 @@
       break-inside: avoid;
       border: 1px solid #1e293b;
     }
+    .mermaid-diagram {
+      margin: 14px 0;
+      padding: 12px 10px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      text-align: center;
+      page-break-inside: avoid;
+      break-inside: avoid;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+    .mermaid {
+      display: flex;
+      justify-content: center;
+      margin: 0 auto;
+    }
+    .mermaid svg {
+      max-width: 95% !important;
+      height: auto !important;
+      max-height: 480px;
+    }
     .table-wrapper {
       margin: 12px 0;
       page-break-inside: avoid;
@@ -119,14 +139,8 @@
       page-break-inside: avoid;
       break-inside: avoid;
     }
-    th {
-      background: #f1f5f9;
-      font-weight: 700;
-      color: #0f172a;
-    }
-    tr:nth-child(even) {
-      background: #f8fafc;
-    }
+    th { background: #f1f5f9; font-weight: 700; color: #0f172a; }
+    tr:nth-child(even) { background: #f8fafc; }
     blockquote {
       border-left: 3.5px solid #0284c7;
       background: #f0f9ff;
@@ -162,47 +176,31 @@
 <body>
   <h1 class="doc-title">FUNCTIONAL SPECIFICATION DOCUMENT (FSD)</h1>
 <blockquote><strong>13C Crypto Payment Gateway System</strong>  </blockquote>
-<blockquote><strong>Klasifikasi:</strong> Business Architecture & Functional Requirements Specification  </blockquote>
+<blockquote><strong>Klasifikasi:</strong> Business Architecture &amp; Functional Requirements Specification  </blockquote>
 <blockquote><strong>Versi:</strong> 2.1.0 | <strong>Tanggal:</strong> November 2026 | <strong>Status:</strong> Approved for Production  </blockquote>
 <blockquote><strong>Repositori:</strong> [github.com/gonzhilaz/bpg](https://github.com/gonzhilaz/bpg)</blockquote>
-<hr class="divider" />
-<h2 class="section-title">1. Executive Summary & Product Vision</h2>
+<hr class="divider">
+<h2 class="section-title">1. Executive Summary &amp; Product Vision</h2>
 <p>Dokumen Spesifikasi Fungsional (<em>Functional Specification Document / FSD</em>) ini mendefinisikan seluruh kapabilitas bisnis, interaksi pengguna, aturan validasi, alur proses transaksi, dan batasan operasional dari <strong>13C Crypto Payment Gateway</strong>.</p>
 <h3 class="sub-title">Visi Produk</h3>
-<p>Memberikan kedaulatan finansial penuh bagi pelaku bisnis digital dan toko online dalam menerima pembayaran mata uang kripto (USDT & USDC) melalui arsitektur non-custodial tanpa risiko pembekuan sepihak (<em>fund freezing</em>), dengan biaya pemrosesan rendah dan penyapuan instan ke dompet Cold Storage pribadi.</p>
-<hr class="divider" />
-<h2 class="section-title">2. Stakeholder Matrix & User Personas</h2>
+<p>Memberikan kedaulatan finansial penuh bagi pelaku bisnis digital dan toko online dalam menerima pembayaran mata uang kripto (USDT &amp; USDC) melalui arsitektur non-custodial tanpa risiko pembekuan sepihak (<em>fund freezing</em>), dengan biaya pemrosesan rendah dan penyapuan instan ke dompet Cold Storage pribadi.</p>
+<hr class="divider">
+<h2 class="section-title">2. Stakeholder Matrix &amp; User Personas</h2>
 <div class="table-wrapper"><table>
-<thead><tr><th>Role</th><th>Aktor</th><th>Tanggung Jawab & Interaksi Utama</th></tr></thead>
+<thead><tr><th>Role</th><th>Aktor</th><th>Tanggung Jawab &amp; Interaksi Utama</th></tr></thead>
 <tbody><tr><td><strong>Merchant Owner</strong></td><td>Pemilik Toko Online</td><td>Registrasi akun, pendaftaran alamat Cold Wallet payout, konfigurasi aturan pembebanan gas (<em>fee payer</em>), pengelolaan API key, dan monitoring buku besar keuangan (<em>financial ledger</em>).</td></tr>
-<tr><td><strong>Buyer / Customer</strong></td><td>Pelanggan Toko</td><td>Memilih koin & jaringan pembayaran (BSC, Polygon, TRON, Solana) pada halaman checkout widget, mentransfer dana sesuai nominal tagihan, dan menerima konfirmasi status lunas.</td></tr>
+<tr><td><strong>Buyer / Customer</strong></td><td>Pelanggan Toko</td><td>Memilih koin &amp; jaringan pembayaran (BSC, Polygon, TRON, Solana) pada halaman checkout widget, mentransfer dana sesuai nominal tagihan, dan menerima konfirmasi status lunas.</td></tr>
 <tr><td><strong>Super Admin / DevOps</strong></td><td>Pengelola Platform</td><td>Memantau kesehatan node RPC blockchain, mengontrol cadangan gas native Hot Wallet, mengeksekusi penyapuan darurat (<em>manual sweeper</em>), memelihara basis data, dan mengaktifkan <em>circuit breaker</em>.</td></tr>
 <tr><td><strong>System Daemon</strong></td><td>Background Workers</td><td>Memindai log transaksi on-chain (<em>Watcher</em>), menyapu dana ke dompet merchant (<em>Sweeper</em>), mengirimkan webhook bertanda tangan HMAC ke toko, dan memangkas data kedaluwarsa (<em>Pruner</em>).</td></tr>
 </tbody></table></div>
 
-<hr class="divider" />
+<hr class="divider">
 <h2 class="section-title">3. AS-IS vs TO-BE Process Workflows</h2>
-<pre class="code-block"><code>mermaid
-<p>flowchart TD</p>
-<p>subgraph AS_IS["AS-IS: Payment Gateway Kripto Sentralistik Konvensional"]</p>
-<p>A1["Pelanggan Bayar Kripto"] --&gt; A2["Dana Masuk ke Rekening Penampung Gateway"]</p>
-<p>A2 --&gt; A3["Saldo Mengendap di Dompet Pihak Ketiga (Custodial)"]</p>
-<p>A3 --&gt; A4["Merchant Mengajukan Penarikan (Withdrawal Request)"]</p>
-<p>A4 --&gt; A5["Review Manual Admin & Potongan Biaya Ganda (2% - 5%)"]</p>
-<p>A5 --&gt; A6["Dana Cair Setelah 24 - 72 Jam (Risiko Akun Dibekukan)"]</p>
-<p>end</p>
-<p>subgraph TO_BE["TO-BE: 13C Non-Custodial Multi-Chain Gateway"]</p>
-<p>B1["Pelanggan Bayar Kripto"] --&gt; B2["Dana Masuk ke Ephemeral Invoice Address"]</p>
-<p>B2 --&gt; B3["Watcher Memverifikasi Kedalaman Blok On-Chain"]</p>
-<p>B3 --&gt; B4["Auto-Sweeper Langsung Meneruskan Dana ke Cold Wallet Merchant"]</p>
-<p>B4 --&gt; B5["Webhook HMAC-SHA256 Terkirim Instan ke Backend Toko"]</p>
-<p>B5 --&gt; B6["Selesai dalam Hitungan Detik (Zero Custody, Fee Gateway %)"]</p>
-<p>end</p>
-<p></code></pre></p>
-<hr class="divider" />
+<div class="mermaid-diagram"><div class="mermaid" data-processed="true"><div id="dmermaid-1794968610222" style="font-family: &quot;trebuchet ms&quot;, verdana, arial, sans-serif;"><svg id="mermaid-1794968610222" width="100%" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 2412 512" style="max-width: 512px;" role="graphics-document document" aria-roledescription="error"><style>#mermaid-1794968610222{font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:16px;fill:#333;}#mermaid-1794968610222 .error-icon{fill:#552222;}#mermaid-1794968610222 .error-text{fill:#552222;stroke:#552222;}#mermaid-1794968610222 .edge-thickness-normal{stroke-width:2px;}#mermaid-1794968610222 .edge-thickness-thick{stroke-width:3.5px;}#mermaid-1794968610222 .edge-pattern-solid{stroke-dasharray:0;}#mermaid-1794968610222 .edge-pattern-dashed{stroke-dasharray:3;}#mermaid-1794968610222 .edge-pattern-dotted{stroke-dasharray:2;}#mermaid-1794968610222 .marker{fill:#333333;stroke:#333333;}#mermaid-1794968610222 .marker.cross{stroke:#333333;}#mermaid-1794968610222 svg{font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:16px;}#mermaid-1794968610222 :root{--mermaid-font-family:"trebuchet ms",verdana,arial,sans-serif;}</style><g></g><g><path class="error-icon" d="m411.313,123.313c6.25-6.25 6.25-16.375 0-22.625s-16.375-6.25-22.625,0l-32,32-9.375,9.375-20.688-20.688c-12.484-12.5-32.766-12.5-45.25,0l-16,16c-1.261,1.261-2.304,2.648-3.31,4.051-21.739-8.561-45.324-13.426-70.065-13.426-105.867,0-192,86.133-192,192s86.133,192 192,192 192-86.133 192-192c0-24.741-4.864-48.327-13.426-70.065 1.402-1.007 2.79-2.049 4.051-3.31l16-16c12.5-12.492 12.5-32.758 0-45.25l-20.688-20.688 9.375-9.375 32.001-31.999zm-219.313,100.687c-52.938,0-96,43.063-96,96 0,8.836-7.164,16-16,16s-16-7.164-16-16c0-70.578 57.422-128 128-128 8.836,0 16,7.164 16,16s-7.164,16-16,16z"></path><path class="error-icon" d="m459.02,148.98c-6.25-6.25-16.375-6.25-22.625,0s-6.25,16.375 0,22.625l16,16c3.125,3.125 7.219,4.688 11.313,4.688 4.094,0 8.188-1.563 11.313-4.688 6.25-6.25 6.25-16.375 0-22.625l-16.001-16z"></path><path class="error-icon" d="m340.395,75.605c3.125,3.125 7.219,4.688 11.313,4.688 4.094,0 8.188-1.563 11.313-4.688 6.25-6.25 6.25-16.375 0-22.625l-16-16c-6.25-6.25-16.375-6.25-22.625,0s-6.25,16.375 0,22.625l15.999,16z"></path><path class="error-icon" d="m400,64c8.844,0 16-7.164 16-16v-32c0-8.836-7.156-16-16-16-8.844,0-16,7.164-16,16v32c0,8.836 7.156,16 16,16z"></path><path class="error-icon" d="m496,96.586h-32c-8.844,0-16,7.164-16,16 0,8.836 7.156,16 16,16h32c8.844,0 16-7.164 16-16 0-8.836-7.156-16-16-16z"></path><path class="error-icon" d="m436.98,75.605c3.125,3.125 7.219,4.688 11.313,4.688 4.094,0 8.188-1.563 11.313-4.688l32-32c6.25-6.25 6.25-16.375 0-22.625s-16.375-6.25-22.625,0l-32,32c-6.251,6.25-6.251,16.375-0.001,22.625z"></path><text class="error-text" x="1440" y="250" font-size="150px" style="text-anchor: middle;">Syntax error in text</text><text class="error-text" x="1250" y="400" font-size="100px" style="text-anchor: middle;">mermaid version 10.9.8</text></g></svg></div></div></div><p></p>
+<hr class="divider">
 <h2 class="section-title">4. Scope of the System</h2>
 <h3 class="sub-title">4.1 In-Scope Capabilities</h3>
-<ul><li>Penerimaan setoran stablecoin USDT & USDC pada 4 jaringan blockchain: BSC (BEP-20), Polygon (ERC-20), TRON (TRC-20), dan Solana (SPL Token).</li>
+<ul><li>Penerimaan setoran stablecoin USDT &amp; USDC pada 4 jaringan blockchain: BSC (BEP-20), Polygon (ERC-20), TRON (TRC-20), dan Solana (SPL Token).</li>
 <li>Pembangkitan pasangan kunci unik per invoice (<em>1 Invoice = 1 Ephemeral Deposit Address</em>) tanpa ketergantungan pada Memo/Tag.</li>
 <li>Otomatisasi penyapuan likuiditas (<em>instant sweeping</em>) ke alamat Cold Wallet merchant.</li>
 <li>Pemilihan penanggung biaya gas jaringan (<em>Customer Surcharge</em> vs <em>Merchant Absorbed</em>).</li>
@@ -214,9 +212,9 @@
 <ul><li>Konversi instan kripto ke mata uang fiat (IDR/USD bank transfer) di dalam platform (diserahkan kepada pertukaran kripto terlisensi).</li>
 <li>Pemrosesan kartu kredit tradisional / transfer bank konvensional.</li>
 <li>Penyimpanan saldo fiat atau kustodian aset kripto jangka panjang.</li>
-</ul><hr class="divider" />
+</ul><hr class="divider">
 <h2 class="section-title">5. Detailed Functional Requirements (FR)</h2>
-<h3 class="sub-title">FR-001: Pendaftaran Merchant & Protokol <em>Reveal Once</em> Kredensial</h3>
+<h3 class="sub-title">FR-001: Pendaftaran Merchant &amp; Protokol <em>Reveal Once</em> Kredensial</h3>
 <ul><li><strong>Deskripsi:</strong> Pengguna dapat mendaftarkan akun toko baru dengan memasukkan nama bisnis, email, dan password.</li>
 <li><strong>Prekondisi:</strong> Email belum pernah terdaftar sebelumnya di sistem.</li>
 <li><strong>Alur Utama:</strong></li>
@@ -253,7 +251,7 @@
 <li>Mentransfer seluruh saldo USDT/USDC ke `PayoutAddress` milik merchant.</li>
 <li>Merekam riwayat mutasi ke tabel `payout_transfers`.</li>
 <li>Merilis <em>distributed lock</em> dan menghapus kunci privat dari memori kerja.</li>
-</ul><h3 class="sub-title">FR-005: Notifikasi Webhook Terotentikasi & Anti-SSRF</h3>
+</ul><h3 class="sub-title">FR-005: Notifikasi Webhook Terotentikasi &amp; Anti-SSRF</h3>
 <ul><li><strong>Deskripsi:</strong> Mengirimkan callback status pembayaran ke backend toko online merchant.</li>
 <li><strong>Alur Utama:</strong></li>
 <li>Sistem memvalidasi URL webhook merchant terhadap daftar hitam SSRF (pemblokiran IP privat RFC 1918, loopback 127.0.0.1, dan cloud metadata).</li>
@@ -261,7 +259,7 @@
 <li>Menghitung tanda tangan digital <strong>HMAC-SHA256</strong> menggunakan `secret_key` merchant dan menyematkannya pada header `X-13C-Signature`.</li>
 <li>Mengirimkan HTTP POST ke endpoint merchant dengan timeout 10 detik.</li>
 <li>Jika respon selain HTTP 2xx, sistem menjadwalkan pengiriman ulang hingga 5 kali dengan <em>exponential backoff</em>.</li>
-</ul><h3 class="sub-title">FR-006: Pengaturan Dompet Payout & Biaya Gas (Wallets & Gas Config)</h3>
+</ul><h3 class="sub-title">FR-006: Pengaturan Dompet Payout &amp; Biaya Gas (Wallets &amp; Gas Config)</h3>
 <ul><li><strong>Deskripsi:</strong> Merchant dapat memperbarui alamat dompet tujuan penerimaan dana di 4 jaringan blockchain.</li>
 <li><strong>Validasi:</strong> Alamat EVM wajib berformat hex 42 karakter (`0x...`), alamat TRON wajib berformat Base58 diawali huruf `T` (34 karakter), dan alamat Solana berformat Base58 (32-44 karakter). Perubahan tersimpan permanen di tabel `merchants`.</li>
 </ul><h3 class="sub-title">FR-007: Laporan Buku Besar Keuangan (<em>Financial Ledger</em>)</h3>
@@ -275,24 +273,24 @@
 </ul><h3 class="sub-title">FR-008: Fitur Multi-Toko (<em>Multi-Store Management</em>)</h3>
 <ul><li><strong>Deskripsi:</strong> Merchant dapat mengelola beberapa toko/cabang/proyek digital di bawah satu akun organisasi.</li>
 </ul><p><em> <strong>Alur:</strong> Merchant dapat beralih antar toko melalui </em>Store Switcher*, di mana setiap toko memiliki nama, webhook URL, dan pasangan alamat penampung Cold Wallet mandiri.</p>
-<h3 class="sub-title">FR-009: Konsol Super Admin & Manajemen Cadangan Gas</h3>
+<h3 class="sub-title">FR-009: Konsol Super Admin &amp; Manajemen Cadangan Gas</h3>
 <ul><li><strong>Deskripsi:</strong> Super admin memantau cadangan native gas pada Hot Wallet platform (BNB, POL, TRX, SOL) dengan sistem peringatan otomatis jika saldo berada di bawah batas ambang aman sweeping.</li>
 </ul><h3 class="sub-title">FR-010: Emergency Circuit Breaker (Pembekuan Darurat)</h3>
 <ul><li><strong>Deskripsi:</strong> Saklar darurat bagi super admin untuk menghentikan seluruh aktivitas auto-sweeping dan pembuatan invoice seketika jika terdeteksi anomali keamanan pada node blockchain.</li>
-</ul><hr class="divider" />
+</ul><hr class="divider">
 <h2 class="section-title">6. Non-Functional Requirements (NFR)</h2>
-<h3 class="sub-title">6.1 Performance & Latency</h3>
+<h3 class="sub-title">6.1 Performance &amp; Latency</h3>
 <ul><li><strong>API Response Time:</strong> Pembangkitan invoice dan pembacaan profil wajib diselesaikan dalam waktu kurang dari <strong>150 milidetik</strong> pada beban kerja 95th percentile (P95).</li>
 <li><strong>Throughput:</strong> Mampu memproses minimal <strong>1.000 request/detik</strong> secara konkuren dengan kolam koneksi basis data optimal.</li>
-</ul><h3 class="sub-title">6.2 Security & Compliance</h3>
+</ul><h3 class="sub-title">6.2 Security &amp; Compliance</h3>
 <ul><li><strong>Zero Plaintext Sensitive Data:</strong> Kunci privat dan API key wajib dienkripsi/dihash secara kriptografis at-rest.</li>
 <li><strong>Anti-SSRF Enforcement:</strong> Webhook dispatcher tidak boleh dapat digunakan untuk memindai jaringan lokal hosting.</li>
 <li><strong>Defense-in-Depth:</strong> Perlindungan rate limiting ketat pada rute publik untuk mencegah eksploitasi denial-of-service.</li>
-</ul><h3 class="sub-title">6.3 Reliability & Availability</h3>
+</ul><h3 class="sub-title">6.3 Reliability &amp; Availability</h3>
 <ul><li><strong>High Availability (HA):</strong> Ketersediaan sistem minimum <strong>99.9% uptime</strong> per bulan.</li>
 </ul><p><em> <strong>Zero Double-Spending:</strong> Penegakan kedalaman blok konfirmasi minimum dan </em>distributed lock* menjamin tidak pernah terjadi penyapuan ganda atau klaim pesanan palsu.</p>
-<hr class="divider" />
-<h2 class="section-title">7. Business Exceptions & Edge Cases Handling</h2>
+<hr class="divider">
+<h2 class="section-title">7. Business Exceptions &amp; Edge Cases Handling</h2>
 <div class="table-wrapper"><table>
 <thead><tr><th>Kasus Khusus</th><th>Skenario Bisnis</th><th>Penanganan Sistem 13C</th></tr></thead>
 <tbody><tr><td><strong>Kurang Bayar (Underpaid)</strong></td><td>Pelanggan mentransfer 48 USDT untuk tagihan 50 USDT karena salah memperhitungkan biaya transfer exchange.</td><td>Jika selisih berada dalam `UnderpaidTolerance` (misal 5%), tagihan tetap ditandai `PAID`. Jika melebihi batas, status menjadi `UNDERPAID`, webhook notifikasi dikirim ke merchant, dan dana tidak disapu sebelum dikonfirmasi merchant.</td></tr>
@@ -301,5 +299,5 @@
 <tr><td><strong>Deposit Terlambat</strong></td><td>Pelanggan mentransfer dana setelah invoice dinyatakan kedaluwarsa.</td><td>Sistem menyediakan fasilitas <em>Grace Period</em> (15 menit). Jika lewat grace period, transaksi masuk tetap dicatat di tabel audit dan admin/merchant dapat memicu penyapuan dana secara manual via <em>Manual Sweeper</em>.</td></tr>
 </tbody></table></div>
 
-</body>
-</html>
+
+</body></html>

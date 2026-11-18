@@ -51,12 +51,12 @@
 
 Dengan arsitektur **Non-Custodial Instant Forwarding**, sistem 13C tidak pernah mengendapkan saldo merchant di akun perantara. Setiap pembayaran yang diverifikasi on-chain langsung disapu (*swept*) ke **Cold Wallet Pribadi Merchant** yang aman.
 
-```
-[Pembeli] ──────> [Alamat Tagihan Ephemeral] ──────> [Cold Wallet Merchant]
-                         │
-                         ▼
-             [Indexer Node Memindai Event]
-             [Webhook HMAC Dikirim ke Toko]
+```mermaid
+flowchart LR
+    Buyer["Pembeli (USDT / USDC)"] -->|"Bayar ke Deposit Address"| Ephemeral["Alamat Tagihan Ephemeral"]
+    Ephemeral -->|"Auto-Sweeper Instan"| ColdWallet["Cold Wallet Pribadi Merchant"]
+    Ephemeral -.->|"Deteksi On-Chain"| Indexer["Watcher Daemon Memindai Log"]
+    Indexer -.->|"Callback Terverifikasi"| Webhook["Webhook HMAC Dikirim ke Toko"]
 ```
 
 ### 1.2 Multi-Chain Network Matrix
@@ -107,7 +107,7 @@ Merchant Portal dipecah menjadi beberapa rute terdedikasi:
 * **`/wallets` (Wallets & Gas Policy)**: Konfigurasi alamat cold wallet tujuan settlement, toggle auto-payout, dan pemilih kebijakan penanggung gas (Fee Payer).
 * **`/api-keys` (API Credentials)**: Kredensial API Key publik, Secret Key HMAC-SHA256, modal Reveal Once, dan cuplikan kode integrasi cURL / Node.js.
 * **`/webhooks` (Webhook Logs)**: Konfigurasi callback URL, log pengiriman notifikasi HTTP POST, inspeksi status code (200 OK), dan tombol Test Ping.
-* **`/reports` (Financial Ledger)**: Buku besar akuntansi pembukuan, akumulasi pendapatan bruto, potongan fee gateway (0.4%), biaya gas, dan tombol ekspor CSV.
+* **`/reports` (Financial Ledger)**: Buku besar akuntansi pembukuan, akumulasi pendapatan bruto, potongan fee gateway (dinamis / %), biaya gas, dan tombol ekspor CSV.
 
 ### 2.3 Manajemen Tagihan Pelanggan (`/invoices`)
 Pada halaman **Invoices & Orders**:
@@ -138,7 +138,7 @@ Pada halaman **Wallets & Gas Policy**:
 Kartu **Financial Ledger** menyediakan data audit pembukuan yang transparan:
 * **Gross Sales**: Total akumulasi volume penjualan kotor.
 * **Net Settled**: Total dana bersih yang telah sukses mendarat di Cold Wallet Anda.
-* **Fee (0.4%)**: Akumulasi potongan biaya pemrosesan gateway.
+* **Fee Gateway (%)**: Akumulasi potongan biaya pemrosesan gateway (dapat dikonfigurasi dinamis oleh Admin).
 * **Sweep Gas**: Estimasi biaya gas jaringan yang dikeluarkan untuk sweeping on-chain.
 * **Filter Rentang Waktu**: Pilih `7D` (7 hari terakhir), `30D` (30 hari terakhir), atau `ALL` (sepanjang waktu).
 * **Ekspor CSV**: Klik tombol **Export CSV** untuk mengunduh laporan pembukuan langsung ke komputer Anda dalam format spreadsheet.
@@ -316,7 +316,7 @@ Portal ini dirancang untuk DevOps dan Operator Gateway dengan arsitektur **Persi
 * **`/gas-liquidity` (Gas Liquidity & Sweeper Engine)**: Pemantauan saldo gas hot wallet 4 jaringan, mitigasi low gas, dan mesin pemicu penyapuan manual.
 * **`/watchers` (Multi-Chain Watchers)**: Monitoring latensi RPC node, tinggi blok (*block height*), dan status pemindaian blok tanpa smart contract.
 * **`/database` (Database Engine & Storage)**: Pemantauan koneksi pool PostgreSQL/SQLite, statistik baris data, dan tombol pembersihan (*prune*) invoice kedaluwarsa.
-* **`/finance` (Financial Revenue Ledger)**: Audit pendapatan biaya platform 0.4%, subsidi gas, margin bersih gateway, dan ekspor CSV.
+* **`/finance` (Financial Revenue Ledger)**: Audit pendapatan biaya platform (Fee Gateway %), subsidi gas, margin bersih gateway, dan ekspor CSV.
 * **`/settings` (Platform Settings)**: Pengaturan persentase komisi, buffer gas transaksi, dan mode pemeliharaan (*maintenance*).
 
 ### 5.2 Tata Kelola Akun Merchant (`/merchants`)

@@ -1,19 +1,23 @@
 <!DOCTYPE html>
-<html lang="id">
-<head>
+<html lang="id"><head>
   <meta charset="UTF-8">
   <title>13C Payment Gateway - Panduan Operasional Resmi</title>
+  <script src="mermaid.min.js"></script>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'default',
+      securityLevel: 'loose',
+      flowchart: { useMaxWidth: true, htmlLabels: true, curve: 'basis' }
+    });
+  </script>
   <style>
     @page {
       size: A4;
       margin: 16mm 14mm 18mm 14mm;
-      @bottom-right {
-        content: counter(page);
-      }
+      @bottom-right { content: counter(page); }
     }
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
       color: #0f172a;
@@ -62,13 +66,8 @@
       page-break-after: avoid;
       break-after: avoid;
     }
-    p {
-      margin: 6px 0;
-      text-align: justify;
-    }
-    strong {
-      color: #0f172a;
-    }
+    p { margin: 6px 0; text-align: justify; }
+    strong { color: #0f172a; }
     ul, ol {
       margin: 6px 0 10px 18px;
       padding: 0;
@@ -99,6 +98,27 @@
       break-inside: avoid;
       border: 1px solid #1e293b;
     }
+    .mermaid-diagram {
+      margin: 14px 0;
+      padding: 12px 10px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      text-align: center;
+      page-break-inside: avoid;
+      break-inside: avoid;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+    .mermaid {
+      display: flex;
+      justify-content: center;
+      margin: 0 auto;
+    }
+    .mermaid svg {
+      max-width: 95% !important;
+      height: auto !important;
+      max-height: 480px;
+    }
     .table-wrapper {
       margin: 12px 0;
       page-break-inside: avoid;
@@ -119,14 +139,8 @@
       page-break-inside: avoid;
       break-inside: avoid;
     }
-    th {
-      background: #f1f5f9;
-      font-weight: 700;
-      color: #0f172a;
-    }
-    tr:nth-child(even) {
-      background: #f8fafc;
-    }
+    th { background: #f1f5f9; font-weight: 700; color: #0f172a; }
+    tr:nth-child(even) { background: #f8fafc; }
     blockquote {
       border-left: 3.5px solid #0284c7;
       background: #f0f9ff;
@@ -160,60 +174,54 @@
   </style>
 </head>
 <body>
-  <h1 class="doc-title">Panduan Operasional & Dokumentasi Resmi 13C Crypto Payment Gateway</h1>
+  <h1 class="doc-title">Panduan Operasional &amp; Dokumentasi Resmi 13C Crypto Payment Gateway</h1>
 <p><strong>Versi</strong>: 1.6.0</p>
 <p><strong>Tanggal</strong>: November 2026</p>
-<p><strong>Klasifikasi</strong>: User Manual, Technical Specification & Integration Guide</p>
+<p><strong>Klasifikasi</strong>: User Manual, Technical Specification &amp; Integration Guide</p>
 <p><strong>Repositori</strong>: [https://github.com/gonzhilaz/bpg.git](https://github.com/gonzhilaz/bpg.git)</p>
-<hr class="divider" />
+<hr class="divider">
 <h2 class="section-title">DAFTAR ISI</h2>
-<ul><li><strong>Bab 1: Gambaran Umum & Spesifikasi Arsitektur</strong></li>
-<li>1.1 Prinsip Non-Custodial & Kedaulatan Dana</li>
+<ul><li><strong>Bab 1: Gambaran Umum &amp; Spesifikasi Arsitektur</strong></li>
+<li>1.1 Prinsip Non-Custodial &amp; Kedaulatan Dana</li>
 <li>1.2 Multi-Chain Network Matrix (BSC, Polygon, TRON, Solana)</li>
 <li>1.3 Siklus Tagihan 1 Invoice = 1 Dedicated Ephemeral Address</li>
-<li>1.4 Protokol Keamanan & API Key Hashing At-Rest</li>
+<li>1.4 Protokol Keamanan &amp; API Key Hashing At-Rest</li>
 <li><strong>Bab 2: Panduan Pengguna Merchant Portal</strong></li>
-</ul><p><em> 2.1 Pendaftaran Akun & Protokol </em>Reveal Once* API Key</p>
-<ul><li>2.2 Autentikasi & Navigasi Dashboard</li>
-<li>2.3 Konfigurasi Cold Wallet Payout & Auto-Forwarding</li>
+</ul><p><em> 2.1 Pendaftaran Akun &amp; Protokol </em>Reveal Once* API Key</p>
+<ul><li>2.2 Autentikasi &amp; Navigasi Dashboard</li>
+<li>2.3 Konfigurasi Cold Wallet Payout &amp; Auto-Forwarding</li>
 </ul><p><em> 2.4 Pengaturan </em>Fee Payer* (Customer Surcharge vs. Merchant Absorbed)</p>
-<ul><li>2.5 Pemantauan Laporan Keuangan (Financial Ledger) & Ekspor CSV</li>
-<li>2.6 Monitoring Riwayat Tagihan & Webhook Callback Logs</li>
-<li>2.7 Antarmuka Modern: Filter Dropdown Ringkas, Tema Kontras Tinggi & Dukungan Bilingual</li>
+<ul><li>2.5 Pemantauan Laporan Keuangan (Financial Ledger) &amp; Ekspor CSV</li>
+<li>2.6 Monitoring Riwayat Tagihan &amp; Webhook Callback Logs</li>
+<li>2.7 Antarmuka Modern: Filter Dropdown Ringkas, Tema Kontras Tinggi &amp; Dukungan Bilingual</li>
 <li><strong>Bab 3: Tutorial Integrasi Toko Online (Merchant Integration)</strong></li>
 <li>3.1 Pembuatan Tagihan via REST API (cURL, Node.js, PHP, Python)</li>
 <li>3.2 Menampilkan Checkout Widget ke Pelanggan</li>
-<li>3.3 Penanganan & Validasi Tanda Tangan Kriptografis Webhook (HMAC-SHA256)</li>
-<li><strong>Bab 4: Panduan Pengujian Sandbox & Jaringan Testnet</strong></li>
+<li>3.3 Penanganan &amp; Validasi Tanda Tangan Kriptografis Webhook (HMAC-SHA256)</li>
+<li><strong>Bab 4: Panduan Pengujian Sandbox &amp; Jaringan Testnet</strong></li>
 <li>4.1 Menggunakan Sandbox Simulator Bawaan</li>
 <li>4.2 Pengujian Transaksi On-Chain Menggunakan Faucet Testnet Resmi</li>
-<li><strong>Bab 5: Panduan DevOps & Super Admin Portal</strong></li>
+<li><strong>Bab 5: Panduan DevOps &amp; Super Admin Portal</strong></li>
 <li>5.1 Dashboard Monitoring Operasional Platform</li>
-<li>5.2 Manajemen Cadangan Gas Hot Wallet & Alert Otomatis</li>
+<li>5.2 Manajemen Cadangan Gas Hot Wallet &amp; Alert Otomatis</li>
 </ul><p><em> 5.3 Prosedur Penyapuan Dana Manual (</em>Manual Sweeper*)</p>
-<ul><li>5.4 Pemeliharaan Database (Pool Connection & Pruning Expired Records)</li>
+<ul><li>5.4 Pemeliharaan Database (Pool Connection &amp; Pruning Expired Records)</li>
 <li>5.5 Emergency Circuit Breaker (Prosedur Darurat Pembekuan Payout)</li>
 <li>5.6 Deployment Mandiri di Server VPS Menggunakan Docker Compose</li>
-<li>5.7 Resolusi Dinamis Endpoint (Zero Hardcoded Localhost & Cloud Ready)</li>
-</ul><hr class="divider" />
-<h2 class="section-title">BAB 1: GAMBARAN UMUM & SPESIFIKASI ARSITEKTUR</h2>
-<h3 class="sub-title">1.1 Prinsip Non-Custodial & Kedaulatan Dana</h3>
+<li>5.7 Resolusi Dinamis Endpoint (Zero Hardcoded Localhost &amp; Cloud Ready)</li>
+</ul><hr class="divider">
+<h2 class="section-title">BAB 1: GAMBARAN UMUM &amp; SPESIFIKASI ARSITEKTUR</h2>
+<h3 class="sub-title">1.1 Prinsip Non-Custodial &amp; Kedaulatan Dana</h3>
 <p>13C Crypto Payment Gateway dirancang untuk memecahkan kelemahan terbesar payment gateway sentralistik konvensional, yaitu risiko pembekuan dana sepihak (<em>fund freezing</em>) dan biaya perantara ganda.</p>
 <p>Dengan arsitektur <strong>Non-Custodial Instant Forwarding</strong>, sistem 13C tidak pernah mengendapkan saldo merchant di akun perantara. Setiap pembayaran yang diverifikasi on-chain langsung disapu (<em>swept</em>) ke <strong>Cold Wallet Pribadi Merchant</strong> yang aman.</p>
-<pre class="code-block"><code>
-<p>[Pembeli] ──────&gt; [Alamat Tagihan Ephemeral] ──────&gt; [Cold Wallet Merchant]</p>
-<p>│</p>
-<p>▼</p>
-<p>[Indexer Node Memindai Event]</p>
-<p>[Webhook HMAC Dikirim ke Toko]</p>
-<p></code></pre></p>
+<div class="mermaid-diagram"><div class="mermaid" data-processed="true"><div id="dmermaid-1794968612757" style="font-family: &quot;trebuchet ms&quot;, verdana, arial, sans-serif;"><svg id="mermaid-1794968612757" width="100%" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 2412 512" style="max-width: 512px;" role="graphics-document document" aria-roledescription="error"><style>#mermaid-1794968612757{font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:16px;fill:#333;}#mermaid-1794968612757 .error-icon{fill:#552222;}#mermaid-1794968612757 .error-text{fill:#552222;stroke:#552222;}#mermaid-1794968612757 .edge-thickness-normal{stroke-width:2px;}#mermaid-1794968612757 .edge-thickness-thick{stroke-width:3.5px;}#mermaid-1794968612757 .edge-pattern-solid{stroke-dasharray:0;}#mermaid-1794968612757 .edge-pattern-dashed{stroke-dasharray:3;}#mermaid-1794968612757 .edge-pattern-dotted{stroke-dasharray:2;}#mermaid-1794968612757 .marker{fill:#333333;stroke:#333333;}#mermaid-1794968612757 .marker.cross{stroke:#333333;}#mermaid-1794968612757 svg{font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:16px;}#mermaid-1794968612757 :root{--mermaid-font-family:"trebuchet ms",verdana,arial,sans-serif;}</style><g></g><g><path class="error-icon" d="m411.313,123.313c6.25-6.25 6.25-16.375 0-22.625s-16.375-6.25-22.625,0l-32,32-9.375,9.375-20.688-20.688c-12.484-12.5-32.766-12.5-45.25,0l-16,16c-1.261,1.261-2.304,2.648-3.31,4.051-21.739-8.561-45.324-13.426-70.065-13.426-105.867,0-192,86.133-192,192s86.133,192 192,192 192-86.133 192-192c0-24.741-4.864-48.327-13.426-70.065 1.402-1.007 2.79-2.049 4.051-3.31l16-16c12.5-12.492 12.5-32.758 0-45.25l-20.688-20.688 9.375-9.375 32.001-31.999zm-219.313,100.687c-52.938,0-96,43.063-96,96 0,8.836-7.164,16-16,16s-16-7.164-16-16c0-70.578 57.422-128 128-128 8.836,0 16,7.164 16,16s-7.164,16-16,16z"></path><path class="error-icon" d="m459.02,148.98c-6.25-6.25-16.375-6.25-22.625,0s-6.25,16.375 0,22.625l16,16c3.125,3.125 7.219,4.688 11.313,4.688 4.094,0 8.188-1.563 11.313-4.688 6.25-6.25 6.25-16.375 0-22.625l-16.001-16z"></path><path class="error-icon" d="m340.395,75.605c3.125,3.125 7.219,4.688 11.313,4.688 4.094,0 8.188-1.563 11.313-4.688 6.25-6.25 6.25-16.375 0-22.625l-16-16c-6.25-6.25-16.375-6.25-22.625,0s-6.25,16.375 0,22.625l15.999,16z"></path><path class="error-icon" d="m400,64c8.844,0 16-7.164 16-16v-32c0-8.836-7.156-16-16-16-8.844,0-16,7.164-16,16v32c0,8.836 7.156,16 16,16z"></path><path class="error-icon" d="m496,96.586h-32c-8.844,0-16,7.164-16,16 0,8.836 7.156,16 16,16h32c8.844,0 16-7.164 16-16 0-8.836-7.156-16-16-16z"></path><path class="error-icon" d="m436.98,75.605c3.125,3.125 7.219,4.688 11.313,4.688 4.094,0 8.188-1.563 11.313-4.688l32-32c6.25-6.25 6.25-16.375 0-22.625s-16.375-6.25-22.625,0l-32,32c-6.251,6.25-6.251,16.375-0.001,22.625z"></path><text class="error-text" x="1440" y="250" font-size="150px" style="text-anchor: middle;">Syntax error in text</text><text class="error-text" x="1250" y="400" font-size="100px" style="text-anchor: middle;">mermaid version 10.9.8</text></g></svg></div></div></div><p></p>
 <h3 class="sub-title">1.2 Multi-Chain Network Matrix</h3>
 <p>Sistem secara <em>native</em> mendukung 4 ekosistem blockchain utama dunia dengan biaya transaksi rendah dan finalitas blok instan:</p>
 <div class="table-wrapper"><table>
 <thead><tr><th>Blockchain</th><th>Standar Token</th><th>Satuan Biaya Gas</th><th>Kecepatan Konfirmasi</th><th>Estimasi Biaya Sweep</th></tr></thead>
 <tbody><tr><td><strong>BSC (BNB Smart Chain)</strong></td><td>BEP-20 (USDT / USDC)</td><td>Gwei (Native BNB)</td><td>~3 Detik</td><td>~$0.05</td></tr>
 <tr><td><strong>Polygon PoS</strong></td><td>ERC-20 (USDT / USDC)</td><td>Gwei (Native POL)</td><td>~2 Detik</td><td>~$0.02</td></tr>
-<tr><td><strong>TRON Network</strong></td><td>TRC-20 (USDT)</td><td>Energy & Bandwidth (TRX)</td><td>~1 Detik</td><td>~$1.20</td></tr>
+<tr><td><strong>TRON Network</strong></td><td>TRC-20 (USDT)</td><td>Energy &amp; Bandwidth (TRX)</td><td>~1 Detik</td><td>~$1.20</td></tr>
 <tr><td><strong>Solana</strong></td><td>SPL Token (USDC / USDT)</td><td>Lamports (Native SOL)</td><td>~400 Milidetik</td><td>~$0.01</td></tr>
 </tbody></table></div>
 
@@ -221,40 +229,40 @@
 <ul><li><strong>Generasi Kunci Kriptografi</strong>: Saat toko memanggil endpoint pembuatan invoice, backend Go membangkitkan pasangan kunci (<em>keypair</em>) baru secara dinamis menggunakan algoritma kriptografi standar industri (ECDSA secp256k1 untuk EVM/TRON dan Ed25519 untuk Solana).</li>
 <li><strong>Enkripsi Kunci Privat</strong>: Kunci privat dari alamat deposit langsung dienkripsi menggunakan sandi militer <strong>AES-256-GCM</strong> sebelum disimpan ke database.</li>
 <li><strong>Masa Berlaku Tagihan</strong>: Tagihan memiliki masa aktif 15–30 menit dengan hitung mundur presisi. Alamat yang kedaluwarsa tanpa pelunasan otomatis dinonaktifkan.</li>
-</ul><hr class="divider" />
+</ul><hr class="divider">
 <h2 class="section-title">BAB 2: PANDUAN PENGGUNA MERCHANT PORTAL</h2>
-<h3 class="sub-title">2.1 Pendaftaran Akun & Protokol Reveal Once API Key</h3>
+<h3 class="sub-title">2.1 Pendaftaran Akun &amp; Protokol Reveal Once API Key</h3>
 <p>Untuk menjadi merchant, kunjungi halaman registrasi di `/register`:</p>
-<div class="img-box"><img src="images/03_merchant_register.png" alt="Registrasi Merchant" /><p class="caption">Registrasi Merchant</p></div>
+<div class="img-box"><img src="images/03_merchant_register.png" alt="Registrasi Merchant"><p class="caption">Registrasi Merchant</p></div>
 <ul><li>Masukkan <strong>Nama Toko / Perusahaan</strong>, <strong>Business Email</strong>, dan <strong>Password</strong> (minimal 6 karakter).</li>
-<li>Klik tombol <strong>Generate API Key & Register</strong>.</li>
+<li>Klik tombol <strong>Generate API Key &amp; Register</strong>.</li>
 <li><strong>PENTING (Protokol Reveal Once)</strong>: Sistem akan menampilkan kartu peringatan khusus yang memuat <strong>Production API Key</strong> dan <strong>Webhook Secret</strong>.</li>
 </ul><p><em> </em>Kunci ini hanya ditampilkan satu kali demi alasan keamanan tingkat tinggi.*</p>
 <p><em> Segera klik tombol salin (</em>copy*) dan simpan di password manager atau file konfigurasi `.env` server toko Anda.</p>
 <ul><li>Di dalam database 13C Gateway, API Key disimpan dalam bentuk hash <strong>SHA-256</strong>, sehingga kunci asli tidak dapat dibaca oleh siapa pun jika database diretas.</li>
-</ul><h3 class="sub-title">2.2 Autentikasi & Arsitektur Multi-Route Sidebar</h3>
+</ul><h3 class="sub-title">2.2 Autentikasi &amp; Arsitektur Multi-Route Sidebar</h3>
 <p>Kunjungi halaman login di `/login`:</p>
-<div class="img-box"><img src="images/02_merchant_login.png" alt="Login Merchant" /><p class="caption">Login Merchant</p></div>
+<div class="img-box"><img src="images/02_merchant_login.png" alt="Login Merchant"><p class="caption">Login Merchant</p></div>
 <ul><li>Masukkan email bisnis dan password yang telah didaftarkan.</li>
 <li>Setelah berhasil masuk, Anda akan diarahkan ke <strong>Merchant Portal</strong> yang dibangun dengan arsitektur enterprise modern berbasis <strong>Persistent Sidebar</strong> dan <strong>Multi-Route Navigation</strong>:</li>
-</ul><div class="img-box"><img src="images/01_merchant_overview.png" alt="Merchant Overview" /><p class="caption">Merchant Overview</p></div>
+</ul><div class="img-box"><img src="images/01_merchant_overview.png" alt="Merchant Overview"><p class="caption">Merchant Overview</p></div>
 <p>Merchant Portal dipecah menjadi beberapa rute terdedikasi:</p>
-<ul><li><strong>`/` (Overview & KPI)</strong>: Menampilkan metrik volume kotor, total settled, pesanan aktif, ringkasan saldo gas, dan 5 invoice terbaru.</li>
-<li><strong>`/invoices` (Invoices & Orders)</strong>: Tabel pencarian tagihan lengkap dengan live filter pencarian, filter jaringan blockchain, dan status order.</li>
-<li><strong>`/payouts` (Payouts & Settlements)</strong>: Riwayat transfer non-custodial ke cold wallet merchant dilengkapi tautan langsung ke explorer blockchain (BscScan, Tronscan, Polygonscan, Solscan).</li>
-<li><strong>`/wallets` (Wallets & Gas Policy)</strong>: Konfigurasi alamat cold wallet tujuan settlement, toggle auto-payout, dan pemilih kebijakan penanggung gas (Fee Payer).</li>
+<ul><li><strong>`/` (Overview &amp; KPI)</strong>: Menampilkan metrik volume kotor, total settled, pesanan aktif, ringkasan saldo gas, dan 5 invoice terbaru.</li>
+<li><strong>`/invoices` (Invoices &amp; Orders)</strong>: Tabel pencarian tagihan lengkap dengan live filter pencarian, filter jaringan blockchain, dan status order.</li>
+<li><strong>`/payouts` (Payouts &amp; Settlements)</strong>: Riwayat transfer non-custodial ke cold wallet merchant dilengkapi tautan langsung ke explorer blockchain (BscScan, Tronscan, Polygonscan, Solscan).</li>
+<li><strong>`/wallets` (Wallets &amp; Gas Policy)</strong>: Konfigurasi alamat cold wallet tujuan settlement, toggle auto-payout, dan pemilih kebijakan penanggung gas (Fee Payer).</li>
 <li><strong>`/api-keys` (API Credentials)</strong>: Kredensial API Key publik, Secret Key HMAC-SHA256, modal Reveal Once, dan cuplikan kode integrasi cURL / Node.js.</li>
 <li><strong>`/webhooks` (Webhook Logs)</strong>: Konfigurasi callback URL, log pengiriman notifikasi HTTP POST, inspeksi status code (200 OK), dan tombol Test Ping.</li>
-<li><strong>`/reports` (Financial Ledger)</strong>: Buku besar akuntansi pembukuan, akumulasi pendapatan bruto, potongan fee gateway (0.4%), biaya gas, dan tombol ekspor CSV.</li>
+<li><strong>`/reports` (Financial Ledger)</strong>: Buku besar akuntansi pembukuan, akumulasi pendapatan bruto, potongan fee gateway (dinamis / %), biaya gas, dan tombol ekspor CSV.</li>
 </ul><h3 class="sub-title">2.3 Manajemen Tagihan Pelanggan (`/invoices`)</h3>
-<p>Pada halaman <strong>Invoices & Orders</strong>:</p>
-<div class="img-box"><img src="images/01_merchant_invoices.png" alt="Merchant Invoices Table" /><p class="caption">Merchant Invoices Table</p></div>
+<p>Pada halaman <strong>Invoices &amp; Orders</strong>:</p>
+<div class="img-box"><img src="images/01_merchant_invoices.png" alt="Merchant Invoices Table"><p class="caption">Merchant Invoices Table</p></div>
 <ul><li><strong>Pencarian Real-Time</strong>: Masukkan nomor Order ID, Invoice ID, atau Deposit Address pada kolom pencarian untuk melacak transaksi secara instan.</li>
-<li><strong>Filter Jaringan & Status</strong>: Gunakan chip navigasi untuk memfilter berdasarkan rantai blockchain (BSC, Polygon, TRON, Solana) dan status (`PAID`, `DETECTED`, `PENDING`, `UNDERPAID`).</li>
+<li><strong>Filter Jaringan &amp; Status</strong>: Gunakan chip navigasi untuk memfilter berdasarkan rantai blockchain (BSC, Polygon, TRON, Solana) dan status (`PAID`, `DETECTED`, `PENDING`, `UNDERPAID`).</li>
 <li><strong>Tri-State Resilience</strong>: Jika tidak ada data yang cocok, sistem menyajikan <em>Empty State</em> informatif lengkap dengan tombol <strong>Reset All Filters</strong>.</li>
-</ul><h3 class="sub-title">2.4 Konfigurasi Cold Wallet Payout & Gas Policy (`/wallets`)</h3>
-<p>Pada halaman <strong>Wallets & Gas Policy</strong>:</p>
-<div class="img-box"><img src="images/01_merchant_wallets.png" alt="Merchant Wallets & Gas Policy" /><p class="caption">Merchant Wallets & Gas Policy</p></div>
+</ul><h3 class="sub-title">2.4 Konfigurasi Cold Wallet Payout &amp; Gas Policy (`/wallets`)</h3>
+<p>Pada halaman <strong>Wallets &amp; Gas Policy</strong>:</p>
+<div class="img-box"><img src="images/01_merchant_wallets.png" alt="Merchant Wallets &amp; Gas Policy"><p class="caption">Merchant Wallets &amp; Gas Policy</p></div>
 <ul><li>Masukkan alamat cold wallet penerima untuk masing-masing jaringan:</li>
 <li><strong>TRON Address</strong>: Alamat Base58 berawalan huruf `T` (misal dompet TronLink, Ledger, atau Binance).</li>
 <li><strong>BSC Address</strong>: Alamat 0x EVM (Trust Wallet, MetaMask, Safe).</li>
@@ -264,32 +272,32 @@
 <li><strong>Pengaturan Fee Payer (Customer Surcharge vs. Merchant Absorbed)</strong>:</li>
 <li><strong>Opsi Customer (Direkomendasikan)</strong>: Biaya gas jaringan ditambahkan ke total invoice tagihan pembeli. Pembeli membayar produk + gas surcharge, merchant menerima nominal bersih 100%.</li>
 <li><strong>Opsi Merchant</strong>: Pembeli membayar nominal pas harga produk, biaya gas penyapuan dipotong dari saldo yang masuk ke cold wallet merchant.</li>
-<li><strong>Live Coin & Gas Matrix</strong>: Pantau harga real-time koin native (BNB, POL, TRX, SOL) serta estimasi biaya transaksi sweeping terkini.</li>
-</ul><h3 class="sub-title">2.5 Pemantauan Laporan Keuangan (Financial Ledger) & Ekspor CSV</h3>
+<li><strong>Live Coin &amp; Gas Matrix</strong>: Pantau harga real-time koin native (BNB, POL, TRX, SOL) serta estimasi biaya transaksi sweeping terkini.</li>
+</ul><h3 class="sub-title">2.5 Pemantauan Laporan Keuangan (Financial Ledger) &amp; Ekspor CSV</h3>
 <p>Kartu <strong>Financial Ledger</strong> menyediakan data audit pembukuan yang transparan:</p>
 <ul><li><strong>Gross Sales</strong>: Total akumulasi volume penjualan kotor.</li>
 <li><strong>Net Settled</strong>: Total dana bersih yang telah sukses mendarat di Cold Wallet Anda.</li>
-<li><strong>Fee (0.4%)</strong>: Akumulasi potongan biaya pemrosesan gateway.</li>
+<li><strong>Fee Gateway (%)</strong>: Akumulasi potongan biaya pemrosesan gateway (dapat dikonfigurasi dinamis oleh Admin).</li>
 <li><strong>Sweep Gas</strong>: Estimasi biaya gas jaringan yang dikeluarkan untuk sweeping on-chain.</li>
 <li><strong>Filter Rentang Waktu</strong>: Pilih `7D` (7 hari terakhir), `30D` (30 hari terakhir), atau `ALL` (sepanjang waktu).</li>
 <li><strong>Ekspor CSV</strong>: Klik tombol <strong>Export CSV</strong> untuk mengunduh laporan pembukuan langsung ke komputer Anda dalam format spreadsheet.</li>
-</ul><h3 class="sub-title">2.6 Monitoring Riwayat Tagihan & Webhook Callback Logs</h3>
+</ul><h3 class="sub-title">2.6 Monitoring Riwayat Tagihan &amp; Webhook Callback Logs</h3>
 <ul><li><strong>Tabel Recent Invoices</strong>: Menampilkan nomor pesanan, nominal kripto, jaringan, deposit address, indikator Fee Payer, dan status terkini (`PENDING`, `DETECTED`, `PAID`, `UNDERPAID`, `EXPIRED`).</li>
 <li><strong>Tabel Settlement Transfers</strong>: Menampilkan bukti tx hash on-chain dari penyapuan dana ke cold wallet Anda.</li>
 <li><strong>Kartu Webhook Delivery Logs</strong>: Menampilkan riwayat pengiriman notifikasi HTTP POST ke server toko Anda lengkap dengan kode HTTP respons (200 OK) dan tanda tangan HMAC.</li>
-</ul><h3 class="sub-title">2.7 Antarmuka Modern: Filter Dropdown Ringkas, Tema Kontras Tinggi & Dukungan Bilingual</h3>
-<ul><li><strong>Filter Dropdown Ringkas (Invoices & Merchants)</strong>:</li>
-<li>Menggantikan chip tombol yang memanjang secara horizontal menjadi komponen `<select>` dropdown yang padat dan hemat ruang.</li>
+</ul><h3 class="sub-title">2.7 Antarmuka Modern: Filter Dropdown Ringkas, Tema Kontras Tinggi &amp; Dukungan Bilingual</h3>
+<ul><li><strong>Filter Dropdown Ringkas (Invoices &amp; Merchants)</strong>:</li>
+<li>Menggantikan chip tombol yang memanjang secara horizontal menjadi komponen `<select>` dropdown yang padat dan hemat ruang.
 <li>Filter Jaringan (`All Networks`, `BSC`, `Polygon`, `TRON`, `Solana`) dan Status (`All Statuses`, `Paid`, `Detected`, `Pending`, `Underpaid`) ditempatkan sejajar dengan kolom pencarian cepat dan tombol Reset otomatis.</li>
-<li><strong>Tema Kontras Tinggi (High-Contrast Light & Dark)</strong>:</li>
+<li><strong>Tema Kontras Tinggi (High-Contrast Light &amp; Dark)</strong>:</li>
 <li><strong>Dark Mode (Default)</strong>: Palet deep carbon `#0B0E14` dan slate `#12161F` dengan aksen neon cyan/emerald untuk kenyamanan visual pengembang.</li>
 <li><strong>Light Mode</strong>: Palet latar belakang putih bersih (`#FFFFFF` dan `#F8FAFC`) dengan kontras teks pekat `#09090B`, garis batas `#E4E4E7`, dan kartu data yang tajam tanpa silau.</li>
 <li><strong>Tombol Pengalih</strong>: Ikon Matahari / Bulan di bilah navigasi atas (Header) dengan penyimpanan status instan di `localStorage`.</li>
-<li><strong>Dukungan Bilingual (English Default & Bahasa Indonesia)</strong>:</li>
+<li><strong>Dukungan Bilingual (English Default &amp; Bahasa Indonesia)</strong>:</li>
 <li>Tersedia tombol selektor bahasa di Header (`EN` | `ID`).</li>
 <li>Bahasa Inggris (`EN`) aktif secara default untuk standar internasional, dan dapat dialihkan ke Bahasa Indonesia (`ID`) dalam satu klik.</li>
 <li>Seluruh label navigasi, status tagihan, tooltip, dan pesan sistem diterjemahkan secara komprehensif.</li>
-</ul><hr class="divider" />
+<hr class="divider">
 <h2 class="section-title">BAB 3: TUTORIAL INTEGRASI TOKO ONLINE (MERCHANT INTEGRATION)</h2>
 <h3 class="sub-title">3.1 Pembuatan Tagihan via REST API</h3>
 <p>Server e-commerce toko Anda cukup memanggil endpoint berikut:</p>
@@ -306,7 +314,7 @@
 <p>"fee_payer": "customer",</p>
 <p>"callback_url": "https://tokosaya.com/api/crypto-webhook"</p>
 <p>}'</p>
-<p></code></pre></p>
+</code><p><code></code></p></pre><p></p>
 <h4 class="sub2-title">Contoh Implementasi Node.js:</h4>
 <pre class="code-block"><code>javascript
 <p>const axios = require('axios');</p>
@@ -326,7 +334,7 @@
 <p>console.log(`Tagihan dibuat: Kirim ${pay_amount} ${pay_currency} ke ${deposit_address}`);</p>
 <p>return id;</p>
 <p>}</p>
-<p></code></pre></p>
+</code><p><code></code></p></pre><p></p>
 <h4 class="sub2-title">Contoh Implementasi PHP:</h4>
 <pre class="code-block"><code>php
 <p>&lt;?php</p>
@@ -351,17 +359,17 @@
 <p>$result = json_decode(curl_exec($ch), true);</p>
 <p>curl_close($ch);</p>
 <p>?&gt;</p>
-<p></code></pre></p>
+</code><p><code></code></p></pre><p></p>
 <h3 class="sub-title">3.2 Menampilkan Checkout Widget ke Pelanggan</h3>
 <p>Setelah invoice dibuat, arahkan pembeli ke halaman checkout atau pasang iframe checkout:</p>
-<div class="img-box"><img src="images/06_checkout_widget.png" alt="Customer Checkout Widget" /><p class="caption">Customer Checkout Widget</p></div>
+<div class="img-box"><img src="images/06_checkout_widget.png" alt="Customer Checkout Widget"><p class="caption">Customer Checkout Widget</p></div>
 <p>Fitur Checkout Widget:</p>
 <ul><li><strong>Dynamic QR Code</strong>: Mendukung pemindaian dari kamera smartphone atau aplikasi Trust Wallet / Binance.</li>
 <li><strong>1-Click Copy</strong>: Menyalin alamat deposit dan nominal presisi dalam 1 kali klik.</li>
 <li><strong>Rincian Transparan</strong>: Menampilkan harga barang asli + surcharge gas jaringan (jika fee_payer adalah customer).</li>
 <li><strong>Hitung Mundur Kedaluwarsa</strong>: Mencegah fluktuasi kurs yang merugikan merchant.</li>
 <li><strong>1-Click Web3 Pay</strong>: Pembeli pengguna MetaMask atau Phantom dapat membayar langsung tanpa mengetik alamat manual.</li>
-</ul><h3 class="sub-title">3.3 Penanganan & Validasi Tanda Tangan Webhook (HMAC-SHA256)</h3>
+</ul><h3 class="sub-title">3.3 Penanganan &amp; Validasi Tanda Tangan Webhook (HMAC-SHA256)</h3>
 <p>Ketika pembayaran pembeli terkonfirmasi di blockchain, 13C Gateway mengirimkan callback HTTP POST ke `callback_url` toko Anda dengan header `X-Signature`.</p>
 <h4 class="sub2-title">Contoh Payload Webhook:</h4>
 <pre class="code-block"><code>json
@@ -374,7 +382,7 @@
 <p>"pay_network": "BSC",</p>
 <p>"received_at": "2026-11-12T16:25:00Z"</p>
 <p>}</p>
-<p></code></pre></p>
+</code><p><code></code></p></pre><p></p>
 <h4 class="sub2-title">Verifikasi Tanda Tangan di Node.js:</h4>
 <pre class="code-block"><code>javascript
 <p>const crypto = require('crypto');</p>
@@ -387,12 +395,12 @@
 <p>.digest('hex');</p>
 <p>return signature === expectedSignature;</p>
 <p>}</p>
-<p></code></pre></p>
-<hr class="divider" />
-<h2 class="section-title">BAB 4: PANDUAN PENGUJIAN SANDBOX & JARINGAN TESTNET</h2>
+</code><p><code></code></p></pre><p></p>
+<hr class="divider">
+<h2 class="section-title">BAB 4: PANDUAN PENGUJIAN SANDBOX &amp; JARINGAN TESTNET</h2>
 <h3 class="sub-title">4.1 Menggunakan Sandbox Simulator Bawaan</h3>
 <p>Kunjungi `/sandbox` untuk menguji alur integrasi tanpa modal uang riil:</p>
-<div class="img-box"><img src="images/05_sandbox_simulator.png" alt="Sandbox Simulator" /><p class="caption">Sandbox Simulator</p></div>
+<div class="img-box"><img src="images/05_sandbox_simulator.png" alt="Sandbox Simulator"><p class="caption">Sandbox Simulator</p></div>
 <ul><li>Isi form simulasi: Order ID, Nominal USD, Pilihan Network (TRON, BSC, Polygon, Solana), dan Fee Payer.</li>
 <li>Klik tombol <strong>Generate Deposit Address</strong>.</li>
 <li>Sistem akan memunculkan detail alamat uji coba dan tombol hijau <strong>Simulate Payment</strong>.</li>
@@ -405,41 +413,41 @@
 <li><strong>BSC Testnet Faucet</strong>: [https://www.bnbchain.org/en/testnet-faucet](https://www.bnbchain.org/en/testnet-faucet)</li>
 <li><strong>Solana Devnet Faucet</strong>: [https://faucet.solana.com](https://faucet.solana.com)</li>
 <li>Lakukan transfer koin testnet ke alamat deposit invoice. Watcher daemon 13C di background akan menangkap transaksi on-chain tersebut secara otomatis.</li>
-</ul><hr class="divider" />
-<h2 class="section-title">BAB 5: PANDUAN DEVOPS & SUPER ADMIN PORTAL</h2>
+</ul><hr class="divider">
+<h2 class="section-title">BAB 5: PANDUAN DEVOPS &amp; SUPER ADMIN PORTAL</h2>
 <h3 class="sub-title">5.1 Arsitektur Multi-Route Super Admin</h3>
 <p>Kunjungi Super Admin Portal di [https://bpg-admin.vercel.app](https://bpg-admin.vercel.app):</p>
-<div class="img-box"><img src="images/04_admin_overview.png" alt="Super Admin Overview" /><p class="caption">Super Admin Overview</p></div>
+<div class="img-box"><img src="images/04_admin_overview.png" alt="Super Admin Overview"><p class="caption">Super Admin Overview</p></div>
 <p>Portal ini dirancang untuk DevOps dan Operator Gateway dengan arsitektur <strong>Persistent Sidebar</strong> dan rute khusus:</p>
 <ul><li><strong>`/` (System Operations)</strong>: Ringkasan metrik kesehatan sistem, volume platform 24 jam, status gas agregat, dan saklar darurat Circuit Breaker.</li>
 </ul><p><em> <strong>`/merchants` (Merchant Governance)</strong>: Direktori pendaftaran merchant, audit volume transaksi, dan aksi penangguhan (</em>Suspend / Activate*).</p>
-<ul><li><strong>`/gas-liquidity` (Gas Liquidity & Sweeper Engine)</strong>: Pemantauan saldo gas hot wallet 4 jaringan, mitigasi low gas, dan mesin pemicu penyapuan manual.</li>
+<ul><li><strong>`/gas-liquidity` (Gas Liquidity &amp; Sweeper Engine)</strong>: Pemantauan saldo gas hot wallet 4 jaringan, mitigasi low gas, dan mesin pemicu penyapuan manual.</li>
 </ul><p><em> <strong>`/watchers` (Multi-Chain Watchers)</strong>: Monitoring latensi RPC node, tinggi blok (</em>block height*), dan status pemindaian blok tanpa smart contract.</p>
-<p><em> <strong>`/database` (Database Engine & Storage)</strong>: Pemantauan koneksi pool PostgreSQL/SQLite, statistik baris data, dan tombol pembersihan (</em>prune*) invoice kedaluwarsa.</p>
-<ul><li><strong>`/finance` (Financial Revenue Ledger)</strong>: Audit pendapatan biaya platform 0.4%, subsidi gas, margin bersih gateway, dan ekspor CSV.</li>
+<p><em> <strong>`/database` (Database Engine &amp; Storage)</strong>: Pemantauan koneksi pool PostgreSQL/SQLite, statistik baris data, dan tombol pembersihan (</em>prune*) invoice kedaluwarsa.</p>
+<ul><li><strong>`/finance` (Financial Revenue Ledger)</strong>: Audit pendapatan biaya platform (Fee Gateway %), subsidi gas, margin bersih gateway, dan ekspor CSV.</li>
 </ul><p><em> <strong>`/settings` (Platform Settings)</strong>: Pengaturan persentase komisi, buffer gas transaksi, dan mode pemeliharaan (</em>maintenance*).</p>
 <h3 class="sub-title">5.2 Tata Kelola Akun Merchant (`/merchants`)</h3>
 <p>Pada halaman <strong>Merchant Governance</strong>:</p>
-<div class="img-box"><img src="images/04_admin_merchants.png" alt="Merchant Directory Governance" /><p class="caption">Merchant Directory Governance</p></div>
-<ul><li><strong>Pencarian & Audit</strong>: Telusuri merchant berdasarkan nama bisnis atau awalan API key.</li>
+<div class="img-box"><img src="images/04_admin_merchants.png" alt="Merchant Directory Governance"><p class="caption">Merchant Directory Governance</p></div>
+<ul><li><strong>Pencarian &amp; Audit</strong>: Telusuri merchant berdasarkan nama bisnis atau awalan API key.</li>
 <li><strong>Filter Status</strong>: Filter daftar berdasarkan merchant `ACTIVE` atau `SUSPENDED`.</li>
 <li><strong>Aksi Kontrol</strong>: Klik tombol <strong>Suspend</strong> untuk memutus otorisasi API key merchant bermasalah seketika, atau <strong>Activate</strong> untuk memulihkan akses.</li>
 <li><strong>Pendaftaran Manual</strong>: Tombol <strong>Add Merchant</strong> memungkinkan DevOps mendaftarkan akun merchant baru secara langsung dari konsol admin.</li>
-</ul><h3 class="sub-title">5.3 Manajemen Cadangan Gas Hot Wallet & Sweeper Engine (`/gas-liquidity`)</h3>
-<p>Pada halaman <strong>Gas Liquidity & Sweeper Engine</strong>:</p>
-<div class="img-box"><img src="images/04_admin_gas.png" alt="Gas Liquidity & Sweeper Engine" /><p class="caption">Gas Liquidity & Sweeper Engine</p></div>
-<ul><li><strong>Hot Wallet Balances</strong>: Pantau saldo koin native operasional: <strong>TRX & Energy Pool (TRON)</strong>, <strong>BNB (BSC)</strong>, <strong>POL (Polygon)</strong>, dan <strong>SOL (Solana)</strong>.</li>
+</ul><h3 class="sub-title">5.3 Manajemen Cadangan Gas Hot Wallet &amp; Sweeper Engine (`/gas-liquidity`)</h3>
+<p>Pada halaman <strong>Gas Liquidity &amp; Sweeper Engine</strong>:</p>
+<div class="img-box"><img src="images/04_admin_gas.png" alt="Gas Liquidity &amp; Sweeper Engine"><p class="caption">Gas Liquidity &amp; Sweeper Engine</p></div>
+<ul><li><strong>Hot Wallet Balances</strong>: Pantau saldo koin native operasional: <strong>TRX &amp; Energy Pool (TRON)</strong>, <strong>BNB (BSC)</strong>, <strong>POL (Polygon)</strong>, dan <strong>SOL (Solana)</strong>.</li>
 <li><strong>Low Gas Alert</strong>: Jika saldo native menipis di bawah ambang batas aman, sistem menampilkan peringatan kuning `Low Gas` di sidebar dan topbar.</li>
 <li><strong>Manual Sweeper Trigger</strong>: Jika ada tagihan yang belum tersapu akibat gangguan jaringan, pilih jaringan pada dropdown dan klik tombol <strong>Trigger Sweep</strong> untuk menyapu transaksi on-chain seketika.</li>
 </ul><h3 class="sub-title">5.4 Pemeliharaan Database Tingkat Administrator (DBA Storage Suite)</h3>
-<p>Pada modul <strong>Database Engine & Storage Maintenance</strong>:</p>
-<p><em> <strong>Live Connection Pool & I/O Telemetry</strong>: Memantau kapasitas pool koneksi aktif, idle, queue, rasio </em>Buffer Cache Hit* (99.85%), dan latensi kueri rata-rata (1.4 ms).</p>
-<p><em> <strong>Table Storage & Bloat Inspector</strong>: Audit terperinci per tabel (`invoices`, `payouts`, `transactions`, `webhook_deliveries`, `audit_logs`) mencakup jumlah baris, ukuran data, ukuran indeks B-Tree, persentase </em>bloat / dead tuples<em>, dan status </em>auto-vacuum*.</p>
-<p><em> <strong>Operasi VACUUM & REINDEX</strong>: Satu klik untuk membersihkan </em>dead tuples<em>, menyusun ulang indeks terfragmentasi, dan memperbarui statistik biaya kueri PostgreSQL tanpa </em>table lock*.</p>
+<p>Pada modul <strong>Database Engine &amp; Storage Maintenance</strong>:</p>
+<p><em> <strong>Live Connection Pool &amp; I/O Telemetry</strong>: Memantau kapasitas pool koneksi aktif, idle, queue, rasio </em>Buffer Cache Hit* (99.85%), dan latensi kueri rata-rata (1.4 ms).</p>
+<p><em> <strong>Table Storage &amp; Bloat Inspector</strong>: Audit terperinci per tabel (`invoices`, `payouts`, `transactions`, `webhook_deliveries`, `audit_logs`) mencakup jumlah baris, ukuran data, ukuran indeks B-Tree, persentase </em>bloat / dead tuples<em>, dan status </em>auto-vacuum*.</p>
+<p><em> <strong>Operasi VACUUM &amp; REINDEX</strong>: Satu klik untuk membersihkan </em>dead tuples<em>, menyusun ulang indeks terfragmentasi, dan memperbarui statistik biaya kueri PostgreSQL tanpa </em>table lock*.</p>
 <p><em> <strong>Mesin Pruning dengan Dry-Run Simulation</strong>: Pilihan retensi data (7, 14, 30, 90 hari) dengan tombol <strong>Simulate Dry-Run</strong> yang menghitung perkiraan baris dan ruang </em>disk* yang akan direklamasi sebelum eksekusi permanen dijalankan.</p>
-<p><em> <strong>Disaster Recovery & Compressed Snapshots (`pg_dump`)</strong>: Pembuatan </em>snapshot point-in-time<em> instan terkompresi dengan validasi </em>checksum* kriptografis SHA-256 dan opsi unduhan langsung.</p>
+<p><em> <strong>Disaster Recovery &amp; Compressed Snapshots (`pg_dump`)</strong>: Pembuatan </em>snapshot point-in-time<em> instan terkompresi dengan validasi </em>checksum* kriptografis SHA-256 dan opsi unduhan langsung.</p>
 <ul><li><strong>Audit Migrasi SQL</strong>: Riwayat eksekusi skrip migrasi skema lengkap dengan durasi eksekusi dalam milidetik dan status integritas skema.</li>
-</ul><h3 class="sub-title">5.5 Emergency Circuit Breaker & Platform Settings</h3>
+</ul><h3 class="sub-title">5.5 Emergency Circuit Breaker &amp; Platform Settings</h3>
 <p>Pada kartu <strong>Platform Overview</strong> dan halaman <strong>Platform Settings</strong> (`/settings`):</p>
 <ul><li><strong>Circuit Breaker</strong>: Sakelar darurat untuk membekukan proses sweeping otomatis jika terjadi gangguan eksternal.</li>
 <li><strong>Underpaid Tolerance Margin (0.00% - 100.00%)</strong>: Ambang batas toleransi pembayaran kurang. Secara default bernilai ketat `0.00%` (exact match). Jika developer/merchant mengonfigurasi toleransi (misalnya 1.00%), transaksi dengan setoran $\ge 99\%$ nilai tagihan akan langsung dianggap lunas (`PAID`).</li>
@@ -457,29 +465,29 @@
 <p>docker compose up -d --build</p>
 <h1 class="doc-title">4. Pantau log operasional indexer blockchain</h1>
 <p>docker compose logs -f backend</p>
-<p></code></pre></p>
-<h3 class="sub-title">5.7 Resolusi Dinamis Endpoint (Zero Hardcoded Localhost & Cloud Ready)</h3>
+</code><p><code></code></p></pre><p></p>
+<h3 class="sub-title">5.7 Resolusi Dinamis Endpoint (Zero Hardcoded Localhost &amp; Cloud Ready)</h3>
 <p>Seluruh modul frontend (`dashboard`, `admin`, `demo-sandbox`) tidak lagi menggunakan URL `localhost` hardcoded. Sistem menggunakan arsitektur `getEnvUrl` yang adaptif:</p>
 <ul><li><strong>Deteksi Lingkungan Otomatis</strong>: Jika dijalankan di mesin lokal (`window.location.hostname === "localhost"`), sistem otomatis terhubung ke port lokal (`:8080`, `:3001`, `:3002`, `:3000`).</li>
 <li><strong>Environment Variable Terpusat</strong>: Saat dideploy di Vercel, VPS, atau domain custom, sistem memprioritaskan variabel lingkungan publik:</li>
-</ul><p>- `NEXT_PUBLIC_API_URL`: URL Backend API & Watcher Engine (contoh: `https://api.domainanda.com`).</p>
+</ul><p>- `NEXT_PUBLIC_API_URL`: URL Backend API &amp; Watcher Engine (contoh: `https://api.domainanda.com`).</p>
 <p>- `NEXT_PUBLIC_MERCHANT_URL`: URL Merchant Portal (contoh: `https://merchant.domainanda.com`).</p>
 <p>- `NEXT_PUBLIC_ADMIN_URL`: URL Super Admin Portal (contoh: `https://admin.domainanda.com`).</p>
 <p>- `NEXT_PUBLIC_SANDBOX_URL`: URL Simulator Sandbox (contoh: `https://sandbox.domainanda.com`).</p>
 <p>- `NEXT_PUBLIC_SWAGGER_URL`: URL Dokumentasi Interaktif Swagger API.</p>
 <ul><li><strong>Fallback Cloud Siap Pakai</strong>: Tanpa konfigurasi variabel sekalipun di lingkungan staging cloud, sistem menyediakan fallback default ke cluster cloud live.</li>
-</ul><hr class="divider" />
+</ul><hr class="divider">
 <p><em>Dokumen manual ini dihasilkan secara otomatis dari spesifikasi arsitektur resmi 13C Crypto Payment Gateway v1.3.</em></p>
-<hr class="divider" />
-<h2 class="section-title">BAB 6: MANAJEMEN DINAMIS RPC, KEAMANAN 2FA & ENKODING API</h2>
+<hr class="divider">
+<h2 class="section-title">BAB 6: MANAJEMEN DINAMIS RPC, KEAMANAN 2FA &amp; ENKODING API</h2>
 <h3 class="sub-title">6.1 Manajemen Dinamis Multi-Chain RPC Node</h3>
 <p>Pada rute Super Admin <strong>`/watchers`</strong>, administrator kini memiliki kontrol penuh untuk mengelola kluster RPC multi-rantai (TRON, BSC, Polygon, Solana, atau rantai EVM kustom):</p>
 <ul><li><strong>Tambah Node Baru (`+ Add RPC Node`)</strong>: Memungkinkan pendaftaran penyedia RPC cadangan (misal QuickNode Dedicated, Alchemy, Infura, atau node privat) dengan memilih jaringan, nama penyedia, dan URL endpoint HTTP/WSS.</li>
 <li><strong>Uji Latensi Real-Time (`Test Ping`)</strong>: Tombol ikon petir mengirim kueri blok tinggi secara langsung untuk mengukur latensi round-trip (ms).</li>
 <li><strong>Penghapusan Node (`Delete`)</strong>: Menghapus penyedia yang tidak stabil atau sering mengalami gangguan tanpa memutus layanan gateway.</li>
 <li><strong>Persistensi Data</strong>: Seluruh node kustom tersimpan secara aman dan sinkron antar-sesi pemantauan.</li>
-</ul><hr class="divider" />
-<h3 class="sub-title">6.2 Autentikasi Ganda (2FA) Super Admin & Merchant Guard</h3>
+</ul><hr class="divider">
+<h3 class="sub-title">6.2 Autentikasi Ganda (2FA) Super Admin &amp; Merchant Guard</h3>
 <p>Untuk mencegah akses tidak sah pada infrastruktur inti pembayaran:</p>
 <ul><li><strong>Root Dev Admin Console</strong>: Rute admin kini diproteksi dengan otentikasi ganda:</li>
 </ul><p>- Validasi <strong>Admin ID</strong> internal (`admin@13cgateway.internal`).</p>
@@ -488,20 +496,20 @@
 <p>- <strong>Proteksi Anti-Brute Force</strong>: Penguncian akun otomatis selama 60 detik jika terjadi 5 kali kegagalan input berturut-turut.</p>
 <ul><li><strong>Merchant Dashboard Guard</strong>: Pengguna yang belum memiliki token sesi valid (`13c_token`) akan dialihkan secara otomatis ke layar masuk (`/login`), mencegah akses langsung ke riwayat faktur atau kunci API.</li>
 <li><strong>Fitur Keluar Sesi Bersih (Sign Out)</strong>: Tombol logout pada sidebar Admin dan Merchant membersihkan seluruh token memori dan storage seketika.</li>
-</ul><hr class="divider" />
-<h3 class="sub-title">6.3 Enkoding & Proteksi Link API via Next.js BFF Reverse Proxy (Anti-Inspection)</h3>
+</ul><hr class="divider">
+<h3 class="sub-title">6.3 Enkoding &amp; Proteksi Link API via Next.js BFF Reverse Proxy (Anti-Inspection)</h3>
 <p>Untuk menjawab tantangan keamanan terhadap inspeksi DevTools peramban oleh pihak luar:</p>
 <ul><li><strong>Penyembunyian Alamat Asli Server</strong>: Klien tidak lagi menghubungi backend Go secara langsung pada port publik. Seluruh lalu lintas dialihkan melalui <strong>Next.js Backend-For-Frontend (BFF)</strong> pada rute `/api/proxy/[...path]`.</li>
 <li><strong>Inspeksi Network DevTools Terproteksi</strong>: Pihak luar yang membuka Network Tab peramban hanya melihat rute proksi internal relatif, bukan IP server VPS, port mikroservis, atau struktur backend internal.</li>
 <li><strong>Header Keamanan Tambahan</strong>: Server proksi menyematkan header anti-sniffing (`X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Cache-Control: no-store`) dan memfilter metadata rentan sebelum merespons peramban.</li>
 <li><strong>Verifikasi Tanda Tangan HMAC Kriptografis</strong>: Walaupun peramban dapat membaca header, penyerang tidak dapat memalsukan permintaan karena setiap transaksi divalidasi dengan tanda tangan HMAC-SHA256 yang membutuhkan kunci rahasia yang tidak pernah diekspos ke publik.</li>
-</ul><hr class="divider" />
-<h3 class="sub-title">6.4 Lokasi Dokumen Rahasia & Kredensial Basis Data di `/doc`</h3>
+</ul><hr class="divider">
+<h3 class="sub-title">6.4 Lokasi Dokumen Rahasia &amp; Kredensial Basis Data di `/doc`</h3>
 <p>Seluruh panduan arsitektur kredensial basis data, parameter string koneksi SSL PostgreSQL, konfigurasi KMS hot wallet, dan template variabel lingkungan produksi kini didokumentasikan secara terpusat pada file:</p>
 <p>👉 <strong>`DOC/SECURITY_AND_CREDENTIALS.md`</strong></p>
 <p>Sesuai standar keamanan industri, file rahasia asli tidak boleh di-commit secara mentah ke repositori publik dan wajib disuntikkan via Secrets Vault pada level infrastruktur VPS/Cloud.</p>
-<hr class="divider" />
-<h3 class="sub-title">6.5 Tata Kelola Merchant Lengkap (Full CRUD Governance & Strict Icon Buttons)</h3>
+<hr class="divider">
+<h3 class="sub-title">6.5 Tata Kelola Merchant Lengkap (Full CRUD Governance &amp; Strict Icon Buttons)</h3>
 <p>Pada portal Super Admin <strong>`/merchants`</strong>, tata kelola merchant kini telah ditingkatkan menjadi CRUD penuh dengan kepatuhan antarmuka modern (Zero labeled text buttons; 100% `IconButton` dengan dark `Tooltip` informatif):</p>
 <ul><li><strong>Tambah Merchant Baru (`+ Add Merchant`)</strong>: Tombol ikon `Plus` di header memicu modal registrasi instan untuk merchant baru.</li>
 <li><strong>Lihat Rincian (`View Details`)</strong>: Ikon `Eye` membuka modal komprehensif menampilkan total volume, jumlah tagihan, prefix kunci API, alamat cold wallet per rantai, status auto-payout, dan URL webhook aktif.</li>
@@ -509,8 +517,8 @@
 <ul><li><strong>Rotasi Kunci API (`Rotate API Key`)</strong>: Ikon `Key` melakukan rotasi kunci API baru secara instan disertai notifikasi reveal-once yang aman.</li>
 <li><strong>Tangguhkan / Aktifkan (`Suspend / Activate`)</strong>: Ikon `Ban` atau `CheckCircle2` mengubah status operasional merchant dalam satu klik.</li>
 <li><strong>Hapus Merchant (`Delete Merchant`)</strong>: Ikon `Trash2` menghapus merchant dari direktori disertai modal konfirmasi pengamanan.</li>
-</ul><hr class="divider" />
-<h3 class="sub-title">6.6 Kluster RPC Dinamis Terintegrasi EXP & Switcher Testnet Sandbox</h3>
+</ul><hr class="divider">
+<h3 class="sub-title">6.6 Kluster RPC Dinamis Terintegrasi EXP &amp; Switcher Testnet Sandbox</h3>
 <p>Untuk mendukung pengujian testnet sandbox tanpa batas dan toleransi kesalahan (<em>fault-tolerance</em>):</p>
 <ul><li><strong>Penyedia RPC Terintegrasi</strong>: Mengintegrasikan node-node cadangan dari jaringan EXP (`https://exp-api-jet.vercel.app/`):</li>
 </ul><p>- <strong>TRON</strong>: TronGrid Official, Tron PublicNode, dan Nile Testnet.</p>
@@ -521,8 +529,8 @@
 <ul><li><strong>Filter Segmentasi Mainnet vs. Testnet</strong>: Memudahkan administrator beralih antara melihat semua node, node produksi, atau node pengujian sandbox.</li>
 </ul><p><em> <strong>Proteksi Anti-Replay Serangan Konkuren (Backend Go)</strong>: Validasi ketat `tx_hash` unik pada tabel pembayaran mencegah pencatatan ganda (</em>double-crediting*) saat pemindaian ulang blok blockchain terjadi.</p>
 <p><em> <strong>Proteksi Rute Backend Admin</strong>: Middleware `AdminAuth` mengunci seluruh endpoint `/api/v1/admin/</em>` dengan verifikasi `X-Admin-Key` dan token sesi master.</p>
-<hr class="divider" />
-<h2 class="section-title">BAB 7: SISTEM ESCROW, BUKU BESAR SALDO INTERNAL & WORKFLOW WITHDRAWAL</h2>
+<hr class="divider">
+<h2 class="section-title">BAB 7: SISTEM ESCROW, BUKU BESAR SALDO INTERNAL &amp; WORKFLOW WITHDRAWAL</h2>
 <h3 class="sub-title">7.1 Arsitektur Hybrid: Non-Custodial vs. Escrow Balance</h3>
 <p>Sistem 13C mendukung mode penyelesaian dana ganda per merchant:</p>
 <ul><li><strong>`ESCROW_BALANCE` (Default)</strong>: Setiap pembayaran invoice yang diverifikasi on-chain otomatis dikreditkan ke buku besar saldo internal merchant (`BalanceUSD`). Dana tertampung aman di Master Vault platform, menghemat biaya gas fee blockchain secara masif.</li>
@@ -533,23 +541,23 @@
 </ul><p><em> <strong>Mekanisme Penguncian Saldo Atomik</strong>: Saat permintaan dibuat, sistem secara atomik memindahkan dana dari `BalanceUSD` ke `LockedBalanceUSD` untuk mencegah pembelanjaan ganda (</em>anti-double spend*).</p>
 <h3 class="sub-title">7.3 Tata Kelola Persetujuan Super Admin (Dev/Admin Payout Governance)</h3>
 <ul><li>Seluruh permintaan withdrawal masuk ke antrean Super Admin di rute <strong>`/withdrawals`</strong>.</li>
-<li><strong>Persetujuan & Siaran On-Chain (`Approve & Broadcast`)</strong>: Admin menyetujui permintaan dengan 1 klik (`IconButton` checkmark). Sistem memotong `LockedBalanceUSD`, menyiarkan transaksi payout on-chain dari Hot Wallet platform, dan mencatat `TxHash`.</li>
-<li><strong>Penolakan & Pengembalian Saldo (`Reject & Refund`)</strong>: Admin dapat menolak permintaan disertai catatan alasan. Saldo yang terkunci otomatis dikembalikan utuh ke `BalanceUSD` merchant.</li>
-</ul><hr class="divider" />
-<h2 class="section-title">BAB 8: SISTEM LISENSI KRIPTOGRAFIS ED25519 & REMOTE KILL-SWITCH</h2>
+<li><strong>Persetujuan &amp; Siaran On-Chain (`Approve &amp; Broadcast`)</strong>: Admin menyetujui permintaan dengan 1 klik (`IconButton` checkmark). Sistem memotong `LockedBalanceUSD`, menyiarkan transaksi payout on-chain dari Hot Wallet platform, dan mencatat `TxHash`.</li>
+<li><strong>Penolakan &amp; Pengembalian Saldo (`Reject &amp; Refund`)</strong>: Admin dapat menolak permintaan disertai catatan alasan. Saldo yang terkunci otomatis dikembalikan utuh ke `BalanceUSD` merchant.</li>
+</ul><hr class="divider">
+<h2 class="section-title">BAB 8: SISTEM LISENSI KRIPTOGRAFIS ED25519 &amp; REMOTE KILL-SWITCH</h2>
 <h3 class="sub-title">8.1 Verifikasi Kunci Asimetris Ed25519 (Offline Signature)</h3>
 <ul><li><strong>Master Developer Public Key</strong>: Kunci publik 32-byte milik developer tertanam secara permanen pada biner Go backend (`internal/license`).</li>
-<li><strong>Format Token Lisensi</strong>: Token terdiri dari `<PayloadBase64>.<SignatureBase64>` yang hanya dapat dihasilkan menggunakan Kunci Privat milik Developer.</li>
+<li><strong>Format Token Lisensi</strong>: Token terdiri dari `<payloadbase64>.<signaturebase64>` yang hanya dapat dihasilkan menggunakan Kunci Privat milik Developer.</signaturebase64></payloadbase64></li>
 </ul><p><em> Tanpa token lisensi valid yang ditandatangani developer, seluruh API gateway menolak pemrosesan transaksi dengan HTTP 402 (</em>License Required*).</p>
-<h3 class="sub-title">8.2 Remote Heartbeat Daemon & Instant Kill-Switch Controller (Vercel Hosted)</h3>
+<h3 class="sub-title">8.2 Remote Heartbeat Daemon &amp; Instant Kill-Switch Controller (Vercel Hosted)</h3>
 <ul><li><strong>Aplikasi Controller Mandiri (`license-server/`)</strong>: Disediakan aplikasi Next.js mandiri yang siap di-deploy secara instan ke akun <strong>Vercel</strong> pribadi developer.</li>
 <li><strong>Mekanisme Heartbeat</strong>: Setiap 6 jam, backend gateway melakukan ping terenkripsi ke endpoint verifikasi Vercel (`/api/verify`).</li>
 <li><strong>Kill-Switch Seketika</strong>: Jika klien melanggar perjanjian atau belum menyelesaikan pembayaran, developer dapat menekan tombol <strong>"Kill Switch"</strong> di dashboard Vercel. Pada ping berikutnya, sistem klien langsung terkunci secara permanen hingga developer menekan <strong>"Restore"</strong>.</li>
-</ul><hr class="divider" />
-<h2 class="section-title">BAB 9: FITUR TINGKAT TINGGI & OPTIMISASI INDUSTRI</h2>
+</ul><hr class="divider">
+<h2 class="section-title">BAB 9: FITUR TINGKAT TINGGI &amp; OPTIMISASI INDUSTRI</h2>
 <h3 class="sub-title">9.1 Real-Time Server-Sent Events (SSE) pada Checkout Widget</h3>
 <ul><li><strong>Endpoint Streaming</strong>: `GET /api/v1/invoices/:id/events` dengan header `text/event-stream`.</li>
-</ul><p><em> <strong>Telemetri Sub-Detik (< 500ms)</strong>: Menghilangkan jeda </em>polling<em> HTTP. Saat pembeli mengirimkan kripto, layar widget checkout langsung merespons secara </em>real-time*:</p>
+</ul><p><em> <strong>Telemetri Sub-Detik (&lt; 500ms)</strong>: Menghilangkan jeda </em>polling<em> HTTP. Saat pembeli mengirimkan kripto, layar widget checkout langsung merespons secara </em>real-time*:</p>
 <p>- Event `payment.detected`: Memperbarui status layar menjadi <em>"Transaction Detected"</em> disertai tautan blok explorer dan penghitung konfirmasi.</p>
 <p>- Event `payment.paid`: Beralih ke layar pembayaran sukses seketika.</p>
 <ul><li><strong>Fallback Defensif</strong>: Tetap mempertahankan interval polling defensif (10 detik) jika koneksi SSE terputus oleh pembatasan firewall proxy klien.</li>
@@ -559,7 +567,7 @@
 </ul><p>- Modul memverifikasi kuota energi Hot Wallet sebelum melakukan transfer konsolidasi.</p>
 <p>- Jika energi di bawah 32,000, sistem menyewa delegasi energi terprogram secara instan.</p>
 <p>- Memangkas biaya gas sweeping TRON hingga <strong>~80%</strong> (hanya ~$0.40 – $0.64 per transaksi), melipatgandakan margin keuntungan platform.</p>
-<h3 class="sub-title">9.3 Indeks Komposit Database & Automated Pruner Worker</h3>
+<h3 class="sub-title">9.3 Indeks Komposit Database &amp; Automated Pruner Worker</h3>
 <ul><li><strong>Indeks Komposit B-Tree Berkecepatan Tinggi</strong>:</li>
 </ul><p>- `idx_invoices_watcher` pada kolom `(pay_network, status, expires_at)` untuk mempercepat query pemindaian watcher di bawah 1ms.</p>
 <p>- `idx_merchant_created` pada kolom `(merchant_id, created_at DESC)` untuk pagination instan di dashboard merchant.</p>
@@ -572,7 +580,7 @@
 </ul><p>- Mendukung penerimaan USDT di 4 jaringan (TRON, BSC, Polygon, Solana).</p>
 <p>- Validasi kriptografis HMAC-SHA256 pada webhook callback (`?wc-api=wc_gateway_13c`).</p>
 <p>- Pembaruan otomatis status pesanan WooCommerce ke `Processing` atau `Completed` saat pembayaran terverifikasi on-chain.</p>
-<hr class="divider" />
+<hr class="divider">
 <p><em>Dokumen manual ini diperbarui secara resmi untuk 13C Crypto Payment Gateway v1.6 Enterprise Edition.</em></p>
-</body>
-</html>
+
+</select></li></ul></body></html>

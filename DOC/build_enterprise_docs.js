@@ -6,7 +6,12 @@ const chromePath = 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
 
 function parseMarkdownToHtml(md, title) {
   let html = md
-    // Code blocks
+    // Mermaid diagrams
+    .replace(/```mermaid([\s\S]*?)```/g, (match, p1) => {
+      const code = p1.trim();
+      return `<div class="mermaid-diagram"><div class="mermaid">\n${code}\n</div></div>`;
+    })
+    // Generic Code blocks
     .replace(/```([\s\S]*?)```/g, (match, p1) => {
       const escaped = p1.replace(/</g, '&lt;').replace(/>/g, '&gt;');
       return `<pre class="code-block"><code>${escaped}</code></pre>`;
@@ -26,7 +31,7 @@ function parseMarkdownToHtml(md, title) {
     // Blockquotes
     .replace(/^\> (.*$)/gim, '<blockquote>$1</blockquote>');
 
-  // Convert Markdown Tables
+  // Convert Markdown Tables & Lists
   const lines = html.split('\n');
   let inTable = false;
   let tableRows = [];
@@ -35,40 +40,26 @@ function parseMarkdownToHtml(md, title) {
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i].trim();
     if (line.startsWith('|') && line.endsWith('|')) {
-      // Check if separator line
-      if (line.match(/^\|(\s*:?-+:?\s*\|)+$/)) {
-        continue;
-      }
+      if (line.match(/^\|(\s*:?-+:?\s*\|)+$/)) continue;
       inTable = true;
-      const cells = line
-        .split('|')
-        .slice(1, -1)
-        .map((c) => c.trim());
+      const cells = line.split('|').slice(1, -1).map((c) => c.trim());
       tableRows.push(cells);
     } else {
-      if (inTable) {
-        // Output accumulated table
-        if (tableRows.length > 0) {
-          let tableHtml = '<div class="table-wrapper"><table>\n<thead><tr>';
-          tableRows[0].forEach((h) => {
-            tableHtml += `<th>${h}</th>`;
-          });
-          tableHtml += '</tr></thead>\n<tbody>';
-          for (let r = 1; r < tableRows.length; r++) {
-            tableHtml += '<tr>';
-            tableRows[r].forEach((c) => {
-              tableHtml += `<td>${c}</td>`;
-            });
-            tableHtml += '</tr>\n';
-          }
-          tableHtml += '</tbody></table></div>\n';
-          processedLines.push(tableHtml);
+      if (inTable && tableRows.length > 0) {
+        let tableHtml = '<div class="table-wrapper"><table>\n<thead><tr>';
+        tableRows[0].forEach((h) => { tableHtml += `<th>${h}</th>`; });
+        tableHtml += '</tr></thead>\n<tbody>';
+        for (let r = 1; r < tableRows.length; r++) {
+          tableHtml += '<tr>';
+          tableRows[r].forEach((c) => { tableHtml += `<td>${c}</td>`; });
+          tableHtml += '</tr>\n';
         }
+        tableHtml += '</tbody></table></div>\n';
+        processedLines.push(tableHtml);
         inTable = false;
         tableRows = [];
       }
 
-      // Process lists or paragraphs
       if (line.startsWith('* ')) {
         processedLines.push(`<li>${line.substring(2)}</li>`);
       } else if (line.match(/^\d+\.\s+/)) {
@@ -85,15 +76,11 @@ function parseMarkdownToHtml(md, title) {
 
   if (inTable && tableRows.length > 0) {
     let tableHtml = '<div class="table-wrapper"><table>\n<thead><tr>';
-    tableRows[0].forEach((h) => {
-      tableHtml += `<th>${h}</th>`;
-    });
+    tableRows[0].forEach((h) => { tableHtml += `<th>${h}</th>`; });
     tableHtml += '</tr></thead>\n<tbody>';
     for (let r = 1; r < tableRows.length; r++) {
       tableHtml += '<tr>';
-      tableRows[r].forEach((c) => {
-        tableHtml += `<td>${c}</td>`;
-      });
+      tableRows[r].forEach((c) => { tableHtml += `<td>${c}</td>`; });
       tableHtml += '</tr>\n';
     }
     tableHtml += '</tbody></table></div>\n';
@@ -108,17 +95,22 @@ function parseMarkdownToHtml(md, title) {
 <head>
   <meta charset="UTF-8">
   <title>${title}</title>
+  <script src="mermaid.min.js"></script>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'default',
+      securityLevel: 'loose',
+      flowchart: { useMaxWidth: true, htmlLabels: true, curve: 'basis' }
+    });
+  </script>
   <style>
     @page {
       size: A4;
       margin: 16mm 14mm 18mm 14mm;
-      @bottom-right {
-        content: counter(page);
-      }
+      @bottom-right { content: counter(page); }
     }
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
       color: #0f172a;
@@ -167,13 +159,8 @@ function parseMarkdownToHtml(md, title) {
       page-break-after: avoid;
       break-after: avoid;
     }
-    p {
-      margin: 6px 0;
-      text-align: justify;
-    }
-    strong {
-      color: #0f172a;
-    }
+    p { margin: 6px 0; text-align: justify; }
+    strong { color: #0f172a; }
     ul, ol {
       margin: 6px 0 10px 18px;
       padding: 0;
@@ -204,6 +191,27 @@ function parseMarkdownToHtml(md, title) {
       break-inside: avoid;
       border: 1px solid #1e293b;
     }
+    .mermaid-diagram {
+      margin: 14px 0;
+      padding: 12px 10px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      text-align: center;
+      page-break-inside: avoid;
+      break-inside: avoid;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+    .mermaid {
+      display: flex;
+      justify-content: center;
+      margin: 0 auto;
+    }
+    .mermaid svg {
+      max-width: 95% !important;
+      height: auto !important;
+      max-height: 480px;
+    }
     .table-wrapper {
       margin: 12px 0;
       page-break-inside: avoid;
@@ -224,14 +232,8 @@ function parseMarkdownToHtml(md, title) {
       page-break-inside: avoid;
       break-inside: avoid;
     }
-    th {
-      background: #f1f5f9;
-      font-weight: 700;
-      color: #0f172a;
-    }
-    tr:nth-child(even) {
-      background: #f8fafc;
-    }
+    th { background: #f1f5f9; font-weight: 700; color: #0f172a; }
+    tr:nth-child(even) { background: #f8fafc; }
     blockquote {
       border-left: 3.5px solid #0284c7;
       background: #f0f9ff;
@@ -301,12 +303,13 @@ const docs = [
   },
 ];
 
-console.log('--- Compiling Enterprise Professional Documentation Suite ---');
+console.log('--- Compiling Enterprise Professional Documentation Suite with Vector Diagrams ---');
 
 docs.forEach((doc) => {
   const mdPath = path.resolve(__dirname, doc.md);
   const htmlPath = path.resolve(__dirname, doc.html);
   const pdfPath = path.resolve(__dirname, doc.pdf);
+  const tempHtmlPath = path.resolve(__dirname, `temp_${doc.html}`);
 
   if (!fs.existsSync(mdPath)) {
     console.warn(`File not found: ${mdPath}`);
@@ -314,12 +317,29 @@ docs.forEach((doc) => {
   }
 
   const mdContent = fs.readFileSync(mdPath, 'utf8');
-  const htmlContent = parseMarkdownToHtml(mdContent, doc.title);
-  fs.writeFileSync(htmlPath, htmlContent, 'utf8');
+  const initialHtml = parseMarkdownToHtml(mdContent, doc.title);
+  const hasMermaid = initialHtml.includes('class="mermaid"');
 
-  const cmd = `"${chromePath}" --headless=new --disable-gpu --run-all-compositor-stages-before-draw --print-to-pdf="${pdfPath}" --no-pdf-header-footer "${htmlPath}"`;
+  if (hasMermaid) {
+    // Stage 1: Render Mermaid diagrams into static SVG using Chrome DOM dump
+    fs.writeFileSync(tempHtmlPath, initialHtml, 'utf8');
+    try {
+      const dumpCmd = `"${chromePath}" --headless=new --disable-gpu --virtual-time-budget=3000 --dump-dom "${tempHtmlPath}"`;
+      const renderedDom = execSync(dumpCmd, { encoding: 'utf8', maxBuffer: 15 * 1024 * 1024 });
+      fs.writeFileSync(htmlPath, renderedDom, 'utf8');
+      if (fs.existsSync(tempHtmlPath)) fs.unlinkSync(tempHtmlPath);
+    } catch (err) {
+      console.warn(`[WARN] Mermaid rendering fallback for ${doc.name}: ${err.message}`);
+      fs.writeFileSync(htmlPath, initialHtml, 'utf8');
+    }
+  } else {
+    fs.writeFileSync(htmlPath, initialHtml, 'utf8');
+  }
+
+  // Stage 2: Print rendered HTML with vector SVGs directly to PDF
+  const printCmd = `"${chromePath}" --headless=new --disable-gpu --run-all-compositor-stages-before-draw --print-to-pdf="${pdfPath}" --no-pdf-header-footer "${htmlPath}"`;
   try {
-    execSync(cmd, { stdio: 'ignore' });
+    execSync(printCmd, { stdio: 'ignore' });
     if (fs.existsSync(pdfPath)) {
       const stats = fs.statSync(pdfPath);
       console.log(`[SUCCESS] ${doc.name} -> ${doc.pdf} (${stats.size} bytes)`);
@@ -331,4 +351,4 @@ docs.forEach((doc) => {
   }
 });
 
-console.log('--- Compilation Completed ---');
+console.log('--- Compilation Completed Successfully ---');
