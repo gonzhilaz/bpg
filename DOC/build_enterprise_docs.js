@@ -326,6 +326,19 @@ const docs = [
 
 console.log('--- Compiling Enterprise Professional Documentation Suite with Vector Diagrams ---');
 
+// Auto-assemble modular manual files if manual/ directory exists
+const manualDir = path.resolve(__dirname, 'manual');
+if (fs.existsSync(manualDir)) {
+  const manualFiles = fs.readdirSync(manualDir)
+    .filter((f) => f.endsWith('.md'))
+    .sort();
+  console.log(`[INFO] Assembling 13C_Payment_Gateway_Manual.md from ${manualFiles.length} modular chapters in manual/...`);
+  const combinedManual = manualFiles
+    .map((f) => fs.readFileSync(path.join(manualDir, f), 'utf8'))
+    .join('\n\n');
+  fs.writeFileSync(path.resolve(__dirname, '13C_Payment_Gateway_Manual.md'), combinedManual, 'utf8');
+}
+
 docs.forEach((doc) => {
   const mdPath = path.resolve(__dirname, doc.md);
   const htmlPath = path.resolve(__dirname, doc.html);
