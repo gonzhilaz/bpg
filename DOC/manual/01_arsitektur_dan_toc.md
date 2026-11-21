@@ -1,8 +1,8 @@
 # Panduan Operasional & Dokumentasi Resmi 13C Crypto Payment Gateway
 
-**Versi**: 2.2.0 (Enterprise Edition)  
+**Versi**: 2.3.0 (Enterprise Edition)  
 **Tanggal**: November 2026  
-**Klasifikasi**: User Manual, Technical Specification & Integration Guide  
+**Klasifikasi**: User Manual & Operational Testing Guide  
 **Repositori**: [https://github.com/gonzhilaz/bpg.git](https://github.com/gonzhilaz/bpg.git)
 
 ---
@@ -15,76 +15,66 @@
    * 1.3 Siklus Tagihan 1 Invoice = 1 Dedicated Ephemeral Address
    * 1.4 Protokol Keamanan & API Key Hashing At-Rest
 
-2. **Bab 2: Panduan Pengguna Merchant Portal & Keterangan UI**
-   * 2.1 Pendaftaran Akun & Protokol *Reveal Once* API Key
-   * 2.2 Autentikasi, Multi-Route Sidebar & Navigasi
-   * 2.3 Manajemen Tagihan Pelanggan (`/invoices`) & Filter Dropdown
-   * 2.4 Konfigurasi Cold Wallet Payout & Gas Policy (`/wallets`)
-   * 2.5 Pemantauan Laporan Keuangan (Financial Ledger) & Ekspor CSV
-   * 2.6 Log Webhook & Tombol Test Ping / Manual Replay
-   * 2.7 Manajemen Multi-Toko (*Multi-Store per Merchant*)
+2. **Bab 2: Persiapan & Prasyarat Pengujian Sistem (Testing Setup Guide)**
+   * 2.1 Prasyarat Lingkungan Perangkat Lunak (Software Prerequisites)
+   * 2.2 Konfigurasi Berkas Lingkungan (.env, .env.local)
+   * 2.3 Persiapan Dompet Kripto & Saldo Faucet Testnet
+   * 2.4 Pendanaan Saldo Gas Hot Wallet Platform
+   * 2.5 Prosedur Menjalankan Layanan (Backend, Dashboard & Demo Store)
+   * 2.6 Panduan Pengujian Transaksi End-to-End (E2E Walkthrough)
 
-3. **Bab 3: Tutorial Integrasi Toko Online (Merchant Integration)**
-   * 3.1 Pembuatan Tagihan via REST API (cURL, Node.js, PHP, Python)
-   * 3.2 Menampilkan Checkout Widget ke Pelanggan
-   * 3.3 Penanganan & Validasi Tanda Tangan Kriptografis Webhook (HMAC-SHA256)
-   * 3.4 Plugin Resmi WooCommerce WordPress (`plugins/woocommerce-13c-gateway`)
+3. **Bab 3: Panduan Pengguna Merchant Portal & Keterangan UI**
+   * 3.1 Pendaftaran Akun & Protokol Reveal Once API Key
+   * 3.2 Autentikasi, Multi-Route Sidebar & Navigasi
+   * 3.3 Manajemen Tagihan Pelanggan (`/invoices`) & Filter Dropdown
+   * 3.4 Konfigurasi Cold Wallet Payout & Gas Policy (`/wallets`)
+   * 3.5 Pemantauan Laporan Keuangan (Financial Ledger) & Ekspor CSV
+   * 3.6 Log Webhook & Tombol Test Ping / Manual Replay
+   * 3.7 Manajemen Multi-Toko (Multi-Store per Merchant)
 
-4. **Bab 4: Panduan Pengujian Sandbox & Jaringan Testnet**
-   * 4.1 Menggunakan Sandbox Simulator Bawaan
-   * 4.2 Pengujian Transaksi On-Chain Menggunakan Faucet Testnet Resmi
-   * 4.3 Simulasi Edge Cases (Underpaid, Overpaid, Expired)
+4. **Bab 4: Tutorial Integrasi Toko Online (Merchant Integration)**
+   * 4.1 Pembuatan Tagihan via REST API (cURL, Node.js, PHP, Python)
+   * 4.2 Menampilkan Checkout Widget ke Pelanggan
+   * 4.3 Penanganan & Validasi Tanda Tangan Kriptografis Webhook (HMAC-SHA256)
+   * 4.4 Plugin Resmi WooCommerce WordPress (`plugins/woocommerce-13c-gateway`)
 
-5. **Bab 5: Panduan DevOps & Super Admin Portal**
-   * 5.1 Dashboard Monitoring Operasional Platform
-   * 5.2 Manajemen Cadangan Gas Hot Wallet & Alert Otomatis
-   * 5.3 Prosedur Penyapuan Dana Manual (*Manual Sweeper*)
-   * 5.4 Pemeliharaan Database (Pool Connection & Pruning Expired Records)
-   * 5.5 Emergency Circuit Breaker (Prosedur Darurat Pembekuan Payout)
-   * 5.6 Deployment Mandiri di Server VPS Menggunakan Docker Compose
-   * 5.7 Resolusi Dinamis Endpoint (Zero Hardcoded Localhost & Cloud Ready)
+5. **Bab 5: Pengujian Transaksi di Lingkungan Sandbox & Edge Cases**
+   * 5.1 Menggunakan Sandbox Simulator Bawaan
+   * 5.2 Pengujian Transaksi On-Chain Menggunakan Faucet Testnet Resmi
+   * 5.3 Simulasi Edge Cases (Underpaid, Overpaid, Expired)
 
-6. **Bab 6: Manajemen Dinamis RPC, Keamanan 2FA & Next.js BFF Proxy**
-   * 6.1 Manajemen Dinamis Multi-Chain RPC Node
-   * 6.2 Autentikasi Ganda (2FA) Super Admin & Merchant Guard
-   * 6.3 Enkoding & Proteksi Link API via Next.js BFF Reverse Proxy
-   * 6.4 Tata Kelola Merchant Lengkap (Full CRUD Governance & Action Buttons)
+6. **Bab 6: Operasional DevOps & Konsol Super Admin**
+   * 6.1 Dashboard Monitoring Operasional Platform
+   * 6.2 Manajemen Cadangan Gas Hot Wallet & Alert Otomatis
+   * 6.3 Prosedur Penyapuan Dana Manual (Manual Sweeper)
+   * 6.4 Pemeliharaan Database (Pool Connection & Pruning Expired Records)
+   * 6.5 Emergency Circuit Breaker (Prosedur Darurat Pembekuan Payout)
+   * 6.6 Deployment Mandiri di Server VPS Menggunakan Docker Compose
+   * 6.7 Resolusi Dinamis Endpoint (Zero Hardcoded Localhost & Cloud Ready)
 
-7. **Bab 7: Sistem Escrow, Buku Besar Saldo Internal & Workflow Withdrawal**
-   * 7.1 Arsitektur Hybrid: Non-Custodial Instant Forward vs. Escrow Balance
-   * 7.2 Permintaan Penarikan Dana (*Merchant Withdrawal*)
-   * 7.3 Tata Kelola Persetujuan Super Admin (*Approve & Broadcast vs. Reject & Refund*)
+7. **Bab 7: Manajemen Dinamis RPC, Keamanan 2FA & Next.js BFF Proxy**
+   * 7.1 Manajemen Dinamis Multi-Chain RPC Node
+   * 7.2 Autentikasi Ganda (2FA) Super Admin & Merchant Guard
+   * 7.3 Enkoding & Proteksi Link API via Next.js BFF Reverse Proxy
+   * 7.4 Tata Kelola Merchant Lengkap (Full CRUD Governance & Action Buttons)
 
-8. **Bab 8: Model Kepemilikan Mandiri (White-Label Sovereignty & Jual Putus)**
-   * 8.1 Jaminan Nol Telemetri (*Zero-Phone-Home Guarantee*)
-   * 8.2 Kedaulatan Master Secret & Kunci Privat (*Self-Sovereignty*)
-   * 8.3 Kemudahan White-Labeling & Rebranding
+8. **Bab 8: Sistem Escrow, Buku Besar Saldo Internal & Workflow Withdrawal**
+   * 8.1 Arsitektur Hybrid: Non-Custodial Instant Forward vs. Escrow Balance
+   * 8.2 Permintaan Penarikan Dana (Merchant Withdrawal)
+   * 8.3 Tata Kelola Persetujuan Super Admin (Approve & Broadcast vs. Reject & Refund)
 
 9. **Bab 9: Fitur Tingkat Tinggi & Optimisasi Industri**
    * 9.1 Real-Time Server-Sent Events (SSE) pada Checkout Widget
    * 9.2 Efisiensi Gas Biaya Sweeping via TRON Energy Rental
    * 9.3 Indeks Komposit Database & Automated Pruner Worker
 
-10. **Bab 10: Integrasi Hybrid dengan Payment Gateway Fiat (Studi Kasus Kaguh.id)**
-    * 10.1 Arsitektur Unified Gateway: Fiat + Crypto Channel
-    * 10.2 Pemetaan Produk (`product_code`) pada `POST /v2/transactions`
-    * 10.3 Konversi Kurs Otomatis (IDR $\leftrightarrow$ USDT) via Rate Service
-    * 10.4 Webhook Bridge Callback (13C Engine $\to$ Kaguh API $\to$ Toko Merchant)
-    * 10.5 Tampilan Terpadu di Kaguh Business Portal (`business.kaguh.id`)
-
-11. **Bab 11: Panduan Pemecahan Masalah Komprehensif (Troubleshooting & FAQs)**
-    * 11.1 Transaksi Kurang Bayar (*Underpaid Invoice*) & Ambang Batas Toleransi
-    * 11.2 Tagihan Kedaluwarsa (*Expired Invoice*) Saat Dana Baru Dikirim
-    * 11.3 RPC Node Timeout / Rate Limit (HTTP 429) & Failover Otomatis
-    * 11.4 Kegagalan Pengiriman Webhook & Prosedur Manual Replay
-    * 11.5 Saldo Gas Hot Wallet Menipis & Peringatan Ambang Batas
-    * 11.6 Penanganan SQLite Lock (`database is locked`) & WAL Tuning
-
-12. **Bab 12: Panduan Proteksi Kode Sumber & Kompilasi Biner Aman**
-    * 12.1 Strip Debugging Symbols & DWARF Information (`-ldflags="-s -w"`)
-    * 12.2 Obfuscasi Tingkat Lanjut Menggunakan Garble (`-literals -tiny`)
-    * 12.3 Distribusi Berbasis Docker Distroless / Scratch (*Zero Source Code Delivery*)
-    * 12.4 Proteksi Frontend Next.js (Disable Source Maps & Standalone Output)
+10. **Bab 10: Panduan Pemecahan Masalah Komprehensif (Troubleshooting & FAQs)**
+    * 10.1 Transaksi Kurang Bayar (Underpaid Invoice) & Ambang Batas Toleransi
+    * 10.2 Tagihan Kedaluwarsa (Expired Invoice) Saat Dana Baru Dikirim
+    * 10.3 RPC Node Timeout / Rate Limit (HTTP 429) & Failover Otomatis
+    * 10.4 Kegagalan Pengiriman Webhook & Prosedur Manual Replay
+    * 10.5 Saldo Gas Hot Wallet Menipis & Peringatan Ambang Batas
+    * 10.6 Penanganan SQLite Lock (`database is locked`) & WAL Tuning
 
 ---
 
@@ -98,22 +88,25 @@ Dengan arsitektur **Non-Custodial Instant Forwarding**, sistem 13C tidak pernah 
 ```mermaid
 flowchart LR
     Buyer["Pembeli (USDT / USDC)"] -->|"Bayar ke Deposit Address"| Ephemeral["Alamat Tagihan Ephemeral"]
-    Ephemeral -->|"Auto-Sweeper Instan"| ColdWallet["Cold Wallet Pribadi Merchant"]
-    Ephemeral -.->|"Deteksi On-Chain"| Indexer["Watcher Daemon Memindai Log"]
-    Indexer -.->|"Callback Terverifikasi"| Webhook["Webhook HMAC Dikirim ke Toko"]
+    Ephemeral -->|"Verifikasi On-Chain"| Watcher["Watcher Engine"]
+    Watcher -->|"Penyapuan Otomatis"| Sweeper["Sweeper Engine"]
+    Sweeper -->|"Transfer Instan"| ColdWallet["Cold Wallet Merchant"]
+    Sweeper -->|"Notifikasi Sukses"| Webhook["Webhook HMAC Toko"]
 ```
 
 ### 1.2 Multi-Chain Network Matrix
-Sistem secara *native* mendukung 4 ekosistem blockchain utama dunia dengan biaya transaksi rendah dan finalitas blok instan:
+Sistem mendukung 4 jaringan blockchain terpopuler di dunia secara simultan:
 
-| Blockchain | Standar Token | Satuan Biaya Gas | Kecepatan Konfirmasi | Estimasi Biaya Sweep |
+| Blockchain | Standar Token | Satuan Gas | Kecepatan Finalitas | Karakteristik Utama |
 | :--- | :--- | :--- | :--- | :--- |
-| **BSC (BNB Smart Chain)** | BEP-20 (USDT / USDC) | Gwei (Native BNB) | ~3 Detik | ~$0.05 |
-| **Polygon PoS** | ERC-20 (USDT / USDC) | Gwei (Native POL) | ~2 Detik | ~$0.02 |
-| **TRON Network** | TRC-20 (USDT) | Energy & Bandwidth (TRX) | ~1 Detik | ~$1.20 |
-| **Solana** | SPL Token (USDC / USDT) | Lamports (Native SOL) | ~400 Milidetik | ~$0.01 |
+| **BNB Smart Chain (BSC)** | BEP-20 (USDT/USDC) | BNB | 3 detik (3 blok) | Biaya gas sangat murah, ekosistem likuiditas tinggi |
+| **Polygon (PoS)** | ERC-20 (USDT/USDC) | POL / MATIC | 2.1 detik (15 blok) | Kompatibel EVM, throughput tinggi |
+| **TRON** | TRC-20 (USDT) | TRX / Energy | ~3 detik (19 blok) | Standar industri transfer USDT global |
+| **Solana** | SPL Token (USDT/USDC) | SOL | 400 ms (Confirmed slot) | Kecepatan ultra-tinggi, finalitas instan |
 
-### 1.3 Siklus Tagihan 1 Invoice = 1 Dedicated Ephemeral Address
-1. **Generasi Kunci Kriptografi**: Saat toko memanggil endpoint pembuatan invoice, backend Go membangkitkan pasangan kunci (*keypair*) baru secara dinamis menggunakan algoritma kriptografi standar industri (ECDSA secp256k1 untuk EVM/TRON dan Ed25519 untuk Solana).
-2. **Enkripsi Kunci Privat**: Kunci privat dari alamat deposit langsung dienkripsi menggunakan sandi militer **AES-256-GCM** sebelum disimpan ke database.
-3. **Masa Berlaku Tagihan**: Tagihan memiliki masa aktif 15–30 menit dengan hitung mundur presisi. Alamat yang kedaluwarsa tanpa pelunasan otomatis dinonaktifkan.
+### 1.3 Siklus Tagihan: 1 Invoice = 1 Dedicated Ephemeral Address
+Untuk menjamin privasi dan kemudahan audit pembukuan:
+* Setiap pembuatan invoice menghasilkan pasangan kunci unik baru (*fresh keypair*).
+* Alamat deposit ini bertindak sebagai penampung sementara hanya untuk 1 transaksi spesifik tersebut.
+* Tidak diperlukan Memo atau Tag tambahan dari pembeli, sehingga meminimalisasi salah transfer oleh pembeli awam.
+* Kunci privat dienkripsi dengan **AES-256-GCM** sebelum disimpan ke database, dan dihapus dari memori aktif setelah penyapuan selesai.
